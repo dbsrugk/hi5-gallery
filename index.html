@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
 <title>Hi5 Gallery · 부산 센텀점</title>
-<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkhpNSBHYWxsZXJ5IiwKICAic2hvcnRfbmFtZSI6ICJIaTUgR2FsbGVyeSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAidGhlbWVfY29sb3IiOiAiI2MwMzkyYiIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmNyIKfQ==">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkhpNSBHYWxsZXJ5IiwgInNob3J0X25hbWUiOiAiSGk1IEdhbGxlcnkiLCAic3RhcnRfdXJsIjogIi4vIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJ0aGVtZV9jb2xvciI6ICIjYzAzOTJiIiwgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmNyIsICJzaGFyZV90YXJnZXQiOiB7ImFjdGlvbiI6ICIuLz9zaGFyZT0xIiwgIm1ldGhvZCI6ICJHRVQiLCAiZW5jdHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiLCAicGFyYW1zIjogeyJ0aXRsZSI6ICJ0aXRsZSIsICJ0ZXh0IjogInRleHQiLCAidXJsIjogInNoYXJlZF91cmwifX19">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
@@ -33,11 +33,21 @@ img{display:block;max-width:100%}
 .brand-text .sub{font-family:'Bodoni Moda',serif;font-style:italic;color:var(--mute);font-size:10px}
 .search-btn{font-size:22px}
 
-.hero{padding:28px 20px 22px;position:relative}
-.hero h1{font-family:'Bodoni Moda',serif;font-weight:400;font-size:40px;line-height:1;letter-spacing:-1px;margin-bottom:6px}
-.hero h1 em{color:var(--red);font-style:italic;font-weight:700}
-.hero .meta{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
-.hero-deco{position:absolute;top:26px;right:18px;width:60px;height:60px;border:1.5px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bodoni Moda',serif;font-size:10px;color:var(--red);transform:rotate(-12deg);text-align:center;line-height:1.2}
+.hero{padding:20px 20px 8px}
+.hero-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.hero-avatar{width:64px;height:64px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;letter-spacing:.5px;flex-shrink:0;font-family:'Bodoni Moda',serif;font-style:italic}
+.hero-info{flex:1;min-width:0}
+.hero-info h1{font-size:18px;font-weight:800;line-height:1.2;margin-bottom:2px;letter-spacing:-.3px}
+.hero-info .handle{font-size:11px;color:var(--mute);letter-spacing:.3px;margin-bottom:6px}
+.hero-stats{display:flex;gap:16px}
+.hero-stat{font-size:12px;color:var(--ink)}
+.hero-stat strong{font-weight:800;font-size:13px}
+.hero-stat span{color:var(--mute);font-size:11px;margin-left:3px}
+.hero-mosaic{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:14px;max-height:60px;overflow:hidden;border-radius:6px}
+.hero-mosaic .m-cell{aspect-ratio:1;background:var(--line);overflow:hidden;background-size:cover;background-position:center}
+.hero-mosaic.empty{display:none}
+.hero-bio{font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:2px}
+.hero-bio .bio-em{color:var(--red);font-weight:700}
 
 .tabs{display:flex;padding:0 20px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -108,19 +118,59 @@ img{display:block;max-width:100%}
 .upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
 .upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
 .upload-page .subtitle{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:22px}
+
+/* 업로드 방식 탭 */
+.upload-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:18px}
+.upload-tab{flex:1;padding:10px 0;font-size:12px;font-weight:700;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.upload-tab.active{color:var(--ink);border-bottom-color:var(--red)}
+
+.upload-mode{display:none}
+.upload-mode.active{display:block}
+
 .file-zone{border:2px dashed var(--line);padding:36px 20px;text-align:center;margin-bottom:16px;border-radius:4px;position:relative;background:#fff}
 .file-zone.has-file{border-color:var(--red)}
 .file-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .file-zone .icon{font-size:32px;color:var(--mute);margin-bottom:8px}
 .file-zone .msg{font-size:13px;color:var(--ink);font-weight:700;margin-bottom:4px}
-.file-zone .hint{font-size:11px;color:var(--mute)}
+.file-zone .hint{font-size:11px;color:var(--mute);line-height:1.5}
 .file-zone img.preview{max-height:200px;margin:0 auto}
+
+/* 다중 선택 미리보기 */
+.multi-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px;max-height:280px;overflow-y:auto;padding:2px}
+.multi-preview .mp-item{position:relative;aspect-ratio:1;background:var(--line);border-radius:4px;overflow:hidden}
+.multi-preview .mp-item img{width:100%;height:100%;object-fit:cover}
+.multi-preview .mp-item .mp-status{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px}
+.multi-preview .mp-item.done .mp-status{background:rgba(39,174,96,.85)}
+.multi-preview .mp-item.error .mp-status{background:rgba(192,57,43,.85)}
+.multi-preview .mp-item.uploading .mp-status{background:rgba(0,0,0,.5)}
+.multi-preview .mp-item .mp-remove{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:2}
+
+.multi-count{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;font-size:12px}
+.multi-count .num{font-weight:800;color:var(--red);font-size:14px}
+.multi-count button{font-size:11px;color:var(--mute);text-decoration:underline}
+
+/* 진행률 바 */
+.progress-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:10px 0}
+.progress-bar .progress-fill{height:100%;background:var(--red);transition:width .3s ease;width:0%}
+.progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);letter-spacing:.5px;margin-bottom:14px}
+
+/* URL 입력 영역 */
+.url-zone{background:#fff;border:1px solid var(--line);border-radius:4px;padding:14px;margin-bottom:16px}
+.url-zone textarea{width:100%;border:none;font-size:13px;font-family:inherit;resize:vertical;min-height:90px;line-height:1.5;outline:none;color:var(--ink)}
+.url-zone textarea::placeholder{color:var(--mute);font-size:12px}
+.url-hint{font-size:11px;color:var(--mute);line-height:1.5;padding:10px 12px;background:#f5f5f0;border-radius:4px;margin-bottom:14px}
+.url-hint strong{color:var(--ink)}
+
 .form-row{margin-bottom:14px}
 .form-row label{display:block;font-size:11px;font-weight:700;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
 .form-row input,.form-row textarea,.form-row select{width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:14px}
 .form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--red)}
 .form-row textarea{resize:vertical;min-height:80px}
 .form-row .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* 일괄 적용 안내 */
+.batch-notice{background:#fff8e1;border-left:3px solid #f1c40f;padding:10px 12px;font-size:11px;color:#7d6608;margin-bottom:14px;line-height:1.5;border-radius:0 4px 4px 0}
+
 .btn-primary{width:100%;background:var(--red);color:#fff;padding:14px;font-size:14px;font-weight:700;letter-spacing:1px;border-radius:4px;margin-top:12px}
 .btn-primary:disabled{background:var(--mute);opacity:.6}
 .btn-ghost{width:100%;border:1px solid var(--line);color:var(--ink);padding:12px;font-size:13px;font-weight:700;background:#fff;border-radius:4px;margin-top:8px}
@@ -150,9 +200,20 @@ img{display:block;max-width:100%}
   </div>
 
   <div class="hero">
-    <h1>나의 <em>아카이브</em></h1>
-    <div class="meta" id="heroMeta"><span>0 작품</span></div>
-    <div class="hero-deco">SINCE<br>2026</div>
+    <div class="hero-top">
+      <div class="hero-avatar">Hi5</div>
+      <div class="hero-info">
+        <h1>부산 센텀점</h1>
+        <div class="handle">@hi5_centum · 미술학원 갤러리</div>
+        <div class="hero-stats" id="heroStats">
+          <div class="hero-stat"><strong>0</strong><span>작품</span></div>
+          <div class="hero-stat"><strong>5</strong><span>카테고리</span></div>
+          <div class="hero-stat"><strong>0</strong><span>★</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-mosaic empty" id="heroMosaic"></div>
+    <div class="hero-bio">학생 작품·수업 레퍼런스·영감 자료를 한곳에. <span class="bio-em">#기록하고_분석하기</span></div>
   </div>
 
   <div class="tabs" id="tabs"></div>
@@ -168,17 +229,64 @@ img{display:block;max-width:100%}
   <h2><span id="upTitle">새 </span><em><span id="upTitleEm">업로드</span></em></h2>
   <div class="subtitle" id="upSubtitle">Add New Artwork</div>
 
-  <div class="file-zone" id="fileZone">
-    <input type="file" accept="image/*" id="fileInput">
-    <div id="fileZoneContent">
-      <div class="icon">📷</div>
-      <div class="msg">이미지 선택</div>
-      <div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>
+  <!-- 업로드 방식 선택 탭 -->
+  <div class="upload-tabs" id="uploadTabs">
+    <button class="upload-tab active" data-mode="single">한 장</button>
+    <button class="upload-tab" data-mode="multi">여러 장</button>
+    <button class="upload-tab" data-mode="url">URL</button>
+  </div>
+
+  <!-- 한 장 업로드 모드 -->
+  <div class="upload-mode active" id="modeSingle">
+    <div class="file-zone" id="fileZone">
+      <input type="file" accept="image/*" id="fileInput">
+      <div id="fileZoneContent">
+        <div class="icon">📷</div>
+        <div class="msg">이미지 선택</div>
+        <div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>
+      </div>
     </div>
   </div>
 
+  <!-- 여러 장 업로드 모드 -->
+  <div class="upload-mode" id="modeMulti">
+    <div class="file-zone" id="multiFileZone">
+      <input type="file" accept="image/*" multiple id="multiFileInput">
+      <div class="icon">🖼️</div>
+      <div class="msg">여러 이미지 선택</div>
+      <div class="hint">최대 200장 · 한 장당 20MB 이하<br>이미지 길게 눌러서 다중 선택</div>
+    </div>
+    <div class="multi-count" id="multiCount" style="display:none">
+      <div><span class="num" id="multiNum">0</span>장 선택됨</div>
+      <button onclick="clearMultiFiles()">모두 지우기</button>
+    </div>
+    <div class="multi-preview" id="multiPreview"></div>
+  </div>
+
+  <!-- URL 업로드 모드 -->
+  <div class="upload-mode" id="modeUrl">
+    <div class="url-hint">
+      <strong>이미지 URL을 한 줄에 하나씩</strong> 붙여넣으세요.<br>
+      핀터레스트는 이미지 길게 눌러 "이미지 주소 복사" → 여기 붙여넣기.<br>
+      인스타·카톡은 직접 다운로드 후 "여러 장" 탭 사용 권장.
+    </div>
+    <div class="url-zone">
+      <textarea id="urlInput" placeholder="https://i.pinimg.com/...&#10;https://example.com/image.jpg&#10;..."></textarea>
+    </div>
+    <div class="multi-count" id="urlCount" style="display:none">
+      <div><span class="num" id="urlNum">0</span>개 URL · 미리보기 확인 후 업로드</div>
+    </div>
+    <div class="multi-preview" id="urlPreview"></div>
+    <button class="btn-ghost" onclick="checkUrls()" style="margin-top:0">URL 미리보기</button>
+  </div>
+
+  <!-- 공통 메타 정보 -->
+  <div class="batch-notice" id="batchNotice" style="display:none">
+    💡 아래 정보가 모든 작품에 공통으로 적용됩니다. 업로드 후 작품별로 개별 수정 가능해요.
+  </div>
+
   <div class="form-row">
-    <label>제목 *</label>
+    <label>제목 <span id="titleHint" style="color:var(--mute);font-weight:400;text-transform:none;letter-spacing:0">(여러 장은 비워두면 파일명 자동)</span></label>
     <input type="text" id="fTitle" placeholder="예: 사고의 전환 — 빛과 어둠">
   </div>
 
@@ -235,6 +343,15 @@ img{display:block;max-width:100%}
   <div class="form-row">
     <label>분석 코멘트 (조형성·색감·구성)</label>
     <textarea id="fMemo" rows="4" placeholder="작품에 대한 분석·평가·메모"></textarea>
+  </div>
+
+  <!-- 진행률 표시 -->
+  <div id="progressZone" style="display:none">
+    <div class="progress-info">
+      <span id="progressLabel">업로드 중...</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
   </div>
 
   <button class="btn-primary" id="btnSubmit" onclick="submitArtwork()">업로드</button>
@@ -536,6 +653,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupFileInput()
   renderColors()
   await loadData()
+  handleShareTarget()
 })
 
 async function loadData() {
@@ -565,8 +683,23 @@ function renderAll() {
 
 function renderHero() {
   const favCnt = artworks.filter(a => a.is_favorite).length
-  const meta = document.getElementById('heroMeta')
-  meta.innerHTML = `<span>${artworks.length} 작품</span><span>${categories.length} 카테고리</span>${favCnt > 0 ? `<span>★ ${favCnt}</span>` : ''}`
+  document.getElementById('heroStats').innerHTML = `
+    <div class="hero-stat"><strong>${artworks.length}</strong><span>작품</span></div>
+    <div class="hero-stat"><strong>${categories.length}</strong><span>카테고리</span></div>
+    <div class="hero-stat"><strong>${favCnt}</strong><span>★</span></div>
+  `
+  // 최근 작품 4장 모자이크
+  const mosaic = document.getElementById('heroMosaic')
+  const recent = artworks.slice(0, 4)
+  if (recent.length === 0) {
+    mosaic.classList.add('empty')
+    mosaic.innerHTML = ''
+  } else {
+    mosaic.classList.remove('empty')
+    mosaic.innerHTML = recent.map(a =>
+      `<div class="m-cell" style="background-image:url('${a.image_url}')"></div>`
+    ).join('')
+  }
 }
 
 function renderTabs() {
@@ -770,8 +903,30 @@ window.editCurrent = () => {
   showUploadPage()
 }
 
-// ============ UPLOAD ============
+// ============ UPLOAD MODES ============
+let uploadMode = 'single'  // 'single' | 'multi' | 'url'
+let multiFiles = []  // [{file, preview, status, error}]
+let urlItems = []    // [{url, preview, status, error}]
+
+function switchUploadMode(mode) {
+  uploadMode = mode
+  document.querySelectorAll('.upload-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === mode)
+  })
+  document.querySelectorAll('.upload-mode').forEach(m => m.classList.remove('active'))
+  document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active')
+  // 배치 안내·제목 힌트 표시 조정
+  const isBatch = mode !== 'single'
+  document.getElementById('batchNotice').style.display = isBatch ? 'block' : 'none'
+  document.getElementById('titleHint').style.display = isBatch ? 'inline' : 'none'
+  const btn = document.getElementById('btnSubmit')
+  if (!editingId) {
+    btn.textContent = isBatch ? '일괄 업로드' : '업로드'
+  }
+}
+
 function setupFileInput() {
+  // 한 장 업로드
   document.getElementById('fileInput').addEventListener('change', e => {
     const f = e.target.files[0]
     if (!f) return
@@ -781,59 +936,339 @@ function setupFileInput() {
     document.getElementById('fileZoneContent').innerHTML = `<img src="${url}" class="preview" alt="">`
     document.getElementById('fileZone').classList.add('has-file')
   })
+
+  // 여러 장 업로드
+  document.getElementById('multiFileInput').addEventListener('change', e => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    addMultiFiles(files)
+    // 같은 파일 다시 선택 가능하게
+    e.target.value = ''
+  })
+
+  // 업로드 모드 탭
+  document.querySelectorAll('.upload-tab').forEach(t => {
+    t.onclick = () => switchUploadMode(t.dataset.mode)
+  })
 }
 
+function addMultiFiles(files) {
+  const available = 200 - multiFiles.length
+  if (available <= 0) {
+    toast('최대 200장까지 선택 가능해요')
+    return
+  }
+  const toAdd = files.slice(0, available)
+  if (files.length > available) {
+    toast(`${available}장만 추가됨 (최대 200장)`)
+  }
+  toAdd.forEach(f => {
+    if (f.size > 20*1024*1024) return
+    if (!f.type.startsWith('image/')) return
+    multiFiles.push({
+      file: f,
+      preview: URL.createObjectURL(f),
+      status: 'pending',
+      error: null
+    })
+  })
+  renderMultiPreview()
+}
+
+function renderMultiPreview() {
+  const wrap = document.getElementById('multiPreview')
+  const countWrap = document.getElementById('multiCount')
+  document.getElementById('multiNum').textContent = multiFiles.length
+  countWrap.style.display = multiFiles.length > 0 ? 'flex' : 'none'
+
+  wrap.innerHTML = multiFiles.map((m, i) => {
+    let statusOverlay = ''
+    if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
+    else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
+    else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
+    const removeBtn = m.status === 'pending' || m.status === 'error'
+      ? `<button class="mp-remove" onclick="removeMultiFile(${i})">×</button>` : ''
+    return `<div class="mp-item ${m.status}">
+      <img src="${m.preview}" alt="">
+      ${statusOverlay}
+      ${removeBtn}
+    </div>`
+  }).join('')
+}
+
+window.removeMultiFile = (i) => {
+  URL.revokeObjectURL(multiFiles[i].preview)
+  multiFiles.splice(i, 1)
+  renderMultiPreview()
+}
+
+window.clearMultiFiles = () => {
+  if (multiFiles.some(m => m.status === 'uploading')) {
+    toast('업로드 중에는 지울 수 없어요')
+    return
+  }
+  multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
+  multiFiles = []
+  renderMultiPreview()
+}
+
+// URL 업로드
+window.checkUrls = () => {
+  const text = document.getElementById('urlInput').value
+  const urls = text.split(/[\s,]+/).map(u => u.trim()).filter(u => u.match(/^https?:\/\//i))
+  if (urls.length === 0) {
+    toast('유효한 URL이 없어요')
+    return
+  }
+  if (urls.length > 200) {
+    toast('최대 200개까지만 가능해요')
+    urls.length = 200
+  }
+  urlItems = urls.map(url => ({
+    url,
+    preview: url,
+    status: 'pending',
+    error: null
+  }))
+  renderUrlPreview()
+  toast(`${urls.length}개 URL 인식됨`)
+}
+
+function renderUrlPreview() {
+  const wrap = document.getElementById('urlPreview')
+  const countWrap = document.getElementById('urlCount')
+  document.getElementById('urlNum').textContent = urlItems.length
+  countWrap.style.display = urlItems.length > 0 ? 'flex' : 'none'
+
+  wrap.innerHTML = urlItems.map((m, i) => {
+    let statusOverlay = ''
+    if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
+    else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
+    else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
+    const removeBtn = m.status === 'pending' || m.status === 'error'
+      ? `<button class="mp-remove" onclick="removeUrlItem(${i})">×</button>` : ''
+    return `<div class="mp-item ${m.status}">
+      <img src="${m.preview}" alt="" onerror="this.style.opacity=.3">
+      ${statusOverlay}
+      ${removeBtn}
+    </div>`
+  }).join('')
+}
+
+window.removeUrlItem = (i) => {
+  urlItems.splice(i, 1)
+  renderUrlPreview()
+}
+
+// ============ 공통 메타 수집 ============
+function collectMeta() {
+  return {
+    category: document.getElementById('fCategory').value,
+    tags: document.getElementById('fTags').value.split(/[,\s]+/).map(t => t.replace(/^#/,'').trim()).filter(Boolean),
+    student_name: document.getElementById('fStudent').value.trim() || null,
+    school: document.getElementById('fSchool').value.trim() || null,
+    subject: document.getElementById('fSubject').value.trim() || null,
+    artwork_date: document.getElementById('fDate').value || null,
+    memo: document.getElementById('fMemo').value.trim() || null,
+    main_color: document.getElementById('fColor').value || null
+  }
+}
+
+// 진행률 UI
+function setProgress(label, current, total) {
+  const pct = total === 0 ? 0 : Math.round(current / total * 100)
+  document.getElementById('progressLabel').textContent = label
+  document.getElementById('progressPct').textContent = pct + '%'
+  document.getElementById('progressFill').style.width = pct + '%'
+}
+
+function showProgress(show) {
+  document.getElementById('progressZone').style.display = show ? 'block' : 'none'
+}
+
+// ============ 파일 1장 업로드 (재사용) ============
+async function uploadSingleFile(file, meta, customTitle) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
+  const filePath = `gallery/${fileName}`
+  const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, file, {cacheControl:'3600', upsert:false})
+  if (upErr) throw upErr
+  const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
+  // 작품 데이터 저장
+  const title = customTitle || (file.name.replace(/\.[^.]+$/, '')) || '제목 없음'
+  const {error} = await supabase.from('artworks').insert({
+    ...meta,
+    title,
+    image_url: publicUrl,
+    storage_path: filePath
+  })
+  if (error) throw error
+}
+
+// URL에서 이미지 가져와서 업로드
+async function uploadFromUrl(url, meta, customTitle) {
+  // CORS 우회 시도 - 직접 fetch 후 blob 업로드
+  const res = await fetch(url, { mode: 'cors' })
+  if (!res.ok) throw new Error('이미지를 가져올 수 없어요')
+  const blob = await res.blob()
+  if (blob.size > 20*1024*1024) throw new Error('파일이 너무 커요')
+  if (!blob.type.startsWith('image/')) throw new Error('이미지가 아니에요')
+  // 파일명 추정
+  const urlPath = new URL(url).pathname
+  const fileName = (urlPath.split('/').pop() || 'image.jpg')
+  const file = new File([blob], fileName, { type: blob.type })
+  await uploadSingleFile(file, meta, customTitle || fileName.replace(/\.[^.]+$/, ''))
+}
+
+// ============ MAIN SUBMIT ============
 window.submitArtwork = async () => {
   const title = document.getElementById('fTitle').value.trim()
-  if (!editingId && !selectedFile) { toast('이미지를 선택해 주세요'); return }
-  if (!title) { toast('제목을 입력해 주세요'); return }
-
+  const meta = collectMeta()
   const btn = document.getElementById('btnSubmit')
-  btn.disabled = true
-  btn.textContent = '저장 중...'
 
-  try {
-    const payload = {
-      title,
-      category: document.getElementById('fCategory').value,
-      tags: document.getElementById('fTags').value.split(/[,\s]+/).map(t => t.replace(/^#/,'').trim()).filter(Boolean),
-      student_name: document.getElementById('fStudent').value.trim() || null,
-      school: document.getElementById('fSchool').value.trim() || null,
-      subject: document.getElementById('fSubject').value.trim() || null,
-      artwork_date: document.getElementById('fDate').value || null,
-      memo: document.getElementById('fMemo').value.trim() || null,
-      main_color: document.getElementById('fColor').value || null
-    }
-
-    if (selectedFile) {
-      const ext = selectedFile.name.split('.').pop().toLowerCase()
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`
-      const filePath = `gallery/${fileName}`
-      const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, selectedFile, {cacheControl:'3600', upsert:false})
-      if (upErr) throw upErr
-      const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
-      payload.image_url = publicUrl
-      payload.storage_path = filePath
-    }
-
-    if (editingId) {
+  // 수정 모드
+  if (editingId) {
+    if (!title) { toast('제목을 입력해 주세요'); return }
+    btn.disabled = true
+    btn.textContent = '저장 중...'
+    try {
+      const payload = { ...meta, title }
+      if (selectedFile) {
+        const ext = (selectedFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
+        const filePath = `gallery/${fileName}`
+        const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, selectedFile, {cacheControl:'3600', upsert:false})
+        if (upErr) throw upErr
+        const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
+        payload.image_url = publicUrl
+        payload.storage_path = filePath
+      }
       const {error} = await supabase.from('artworks').update(payload).eq('id', editingId)
       if (error) throw error
       toast('수정 완료')
-    } else {
-      const {error} = await supabase.from('artworks').insert(payload)
-      if (error) throw error
-      toast('업로드 완료')
+      await loadData()
+      showGallery()
+    } catch (err) {
+      toast('수정 실패: ' + err.message)
+    } finally {
+      btn.disabled = false
+      btn.textContent = '수정 저장'
     }
+    return
+  }
 
+  // 단일 업로드
+  if (uploadMode === 'single') {
+    if (!selectedFile) { toast('이미지를 선택해 주세요'); return }
+    if (!title) { toast('제목을 입력해 주세요'); return }
+    btn.disabled = true
+    btn.textContent = '저장 중...'
+    try {
+      await uploadSingleFile(selectedFile, meta, title)
+      toast('업로드 완료')
+      await loadData()
+      showGallery()
+    } catch (err) {
+      toast('업로드 실패: ' + err.message)
+    } finally {
+      btn.disabled = false
+      btn.textContent = '업로드'
+    }
+    return
+  }
+
+  // 여러 장 업로드
+  if (uploadMode === 'multi') {
+    if (multiFiles.length === 0) { toast('이미지를 선택해 주세요'); return }
+    btn.disabled = true
+    showProgress(true)
+    let done = 0, failed = 0
+    for (let i = 0; i < multiFiles.length; i++) {
+      const m = multiFiles[i]
+      if (m.status === 'done') { done++; continue }
+      m.status = 'uploading'
+      renderMultiPreview()
+      setProgress(`업로드 중 (${i+1}/${multiFiles.length})`, i, multiFiles.length)
+      try {
+        const customTitle = title || null  // 비어있으면 파일명 사용
+        await uploadSingleFile(m.file, meta, customTitle)
+        m.status = 'done'
+        done++
+      } catch (err) {
+        m.status = 'error'
+        m.error = err.message
+        failed++
+      }
+      renderMultiPreview()
+    }
+    setProgress(`완료: ${done}장 성공${failed > 0 ? `, ${failed}장 실패` : ''}`, multiFiles.length, multiFiles.length)
+    toast(`${done}장 업로드 완료${failed > 0 ? ` · ${failed}장 실패` : ''}`)
     await loadData()
-    showGallery()
-  } catch (err) {
-    console.error(err)
-    toast((editingId ? '수정' : '업로드') + ' 실패: ' + err.message)
-  } finally {
     btn.disabled = false
-    btn.textContent = editingId ? '수정 저장' : '업로드'
+    if (failed === 0) {
+      setTimeout(() => { showGallery(); showProgress(false) }, 1200)
+    } else {
+      btn.textContent = '실패 항목 재시도'
+    }
+    return
+  }
+
+  // URL 업로드
+  if (uploadMode === 'url') {
+    if (urlItems.length === 0) { toast('URL 미리보기 먼저 확인해 주세요'); return }
+    btn.disabled = true
+    showProgress(true)
+    let done = 0, failed = 0
+    for (let i = 0; i < urlItems.length; i++) {
+      const m = urlItems[i]
+      if (m.status === 'done') { done++; continue }
+      m.status = 'uploading'
+      renderUrlPreview()
+      setProgress(`가져오는 중 (${i+1}/${urlItems.length})`, i, urlItems.length)
+      try {
+        await uploadFromUrl(m.url, meta, title || null)
+        m.status = 'done'
+        done++
+      } catch (err) {
+        m.status = 'error'
+        m.error = err.message
+        failed++
+      }
+      renderUrlPreview()
+    }
+    setProgress(`완료: ${done}개 성공${failed > 0 ? `, ${failed}개 실패` : ''}`, urlItems.length, urlItems.length)
+    if (failed > 0) {
+      toast(`${done}개 성공, ${failed}개 실패. 핀터레스트는 직접 다운로드 후 "여러 장"으로 업로드해 보세요`)
+    } else {
+      toast(`${done}개 업로드 완료`)
+    }
+    await loadData()
+    btn.disabled = false
+    if (failed === 0) {
+      setTimeout(() => { showGallery(); showProgress(false) }, 1200)
+    } else {
+      btn.textContent = '실패 항목 재시도'
+    }
+    return
+  }
+}
+
+// ============ WEB SHARE TARGET (PWA로 설치 후) ============
+// 다른 앱에서 "공유"를 통해 들어오면 자동으로 업로드 화면 + 파일 채우기
+function handleShareTarget() {
+  const params = new URLSearchParams(location.search)
+  if (params.has('share') || params.has('shared_url')) {
+    // URL이 공유된 경우
+    const sharedUrl = params.get('shared_url') || params.get('url')
+    if (sharedUrl && sharedUrl.match(/^https?:\/\//i)) {
+      switchUploadMode('url')
+      document.getElementById('urlInput').value = sharedUrl
+      checkUrls()
+      showUpload()
+      toast('공유된 URL을 가져왔어요')
+    }
+    // history 정리
+    history.replaceState(null, '', location.pathname)
   }
 }
 
@@ -871,13 +1306,22 @@ function resetUploadForm() {
   document.getElementById('fColor').value = ''
   document.getElementById('fMemo').value = ''
   document.getElementById('fileInput').value = ''
+  document.getElementById('multiFileInput').value = ''
+  document.getElementById('urlInput').value = ''
   selectedFile = null
   document.getElementById('fileZone').classList.remove('has-file')
   document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
+  // 다중·URL 초기화
+  multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
+  multiFiles = []
+  urlItems = []
+  renderMultiPreview()
+  renderUrlPreview()
+  showProgress(false)
   document.getElementById('upTitle').textContent = '새 '
   document.getElementById('upTitleEm').textContent = '업로드'
   document.getElementById('upSubtitle').textContent = 'Add New Artwork'
-  document.getElementById('btnSubmit').textContent = '업로드'
+  document.getElementById('btnSubmit').textContent = uploadMode === 'single' ? '업로드' : '일괄 업로드'
 }
 
 // ============ SLIDESHOW ============
