@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#c0392b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
+<title>Hi5 Gallery · 부산 센텀점</title>
+<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkhpNSBHYWxsZXJ5IiwKICAic2hvcnRfbmFtZSI6ICJIaTUgR2FsbGVyeSIsCiAgInN0YXJ0X3VybCI6ICIuLyIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0IiwKICAidGhlbWVfY29sb3IiOiAiI2MwMzkyYiIsCiAgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmNyIKfQ==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#c0392b; --red-deep:#922518; --ink:#1a1a1a;
+  --paper:#fafaf7; --line:#e8e8e8; --mute:#888;
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--paper);color:var(--ink);font-family:'Nanum Gothic',sans-serif;overflow-x:hidden}
+body{max-width:480px;margin:0 auto;min-height:100dvh;padding-bottom:calc(80px + var(--safe))}
+@media(min-width:481px){body{box-shadow:0 0 40px rgba(0,0,0,.06);background:#fff}}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input,textarea,select{font-family:inherit;font-size:14px}
+img{display:block;max-width:100%}
+
+.topbar{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:5px 8px;letter-spacing:.5px}
+.brand-text{font-size:11px;line-height:1.2}
+.brand-text .sub{font-family:'Bodoni Moda',serif;font-style:italic;color:var(--mute);font-size:10px}
+.search-btn{font-size:22px}
+
+.hero{padding:28px 20px 22px;position:relative}
+.hero h1{font-family:'Bodoni Moda',serif;font-weight:400;font-size:40px;line-height:1;letter-spacing:-1px;margin-bottom:6px}
+.hero h1 em{color:var(--red);font-style:italic;font-weight:700}
+.hero .meta{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+.hero-deco{position:absolute;top:26px;right:18px;width:60px;height:60px;border:1.5px solid var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bodoni Moda',serif;font-size:10px;color:var(--red);transform:rotate(-12deg);text-align:center;line-height:1.2}
+
+.tabs{display:flex;padding:0 20px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 0;margin-right:22px;font-size:13px;font-weight:700;color:var(--mute);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--ink);border-bottom-color:var(--red)}
+.tab .count{font-size:10px;margin-left:4px;font-weight:400;color:var(--mute)}
+.tab.active .count{color:var(--red)}
+
+.chips{padding:14px 20px 6px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:#fff;padding:6px 12px;font-size:11px;font-weight:700;border-radius:20px;white-space:nowrap;color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+.color-strip{padding:6px 20px 14px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.color-strip::-webkit-scrollbar{display:none}
+.color-strip-label{font-size:10px;color:var(--mute);letter-spacing:1px;font-weight:700;margin-right:4px;flex-shrink:0}
+.color-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid transparent;flex-shrink:0;cursor:pointer}
+.color-dot.active{transform:scale(1.15);border-color:var(--ink)}
+
+.grid{padding:8px 14px;column-count:2;column-gap:8px}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:pointer}
+.card:active{transform:scale(.98)}
+.card img{width:100%;height:auto}
+.card .badge{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:3px 6px;letter-spacing:.5px;z-index:1}
+.card .fav{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.92);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:1}
+.card .fav.on{color:var(--red)}
+.card .info{padding:8px 10px;border-top:1px solid var(--line)}
+.card .info .ttl{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.card .info .tag{font-size:9px;color:var(--mute);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.fab{position:fixed;bottom:calc(96px + var(--safe));right:calc(50% - 220px);z-index:99;width:54px;height:54px;border-radius:50%;background:var(--red);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(192,57,43,.4);display:flex;align-items:center;justify-content:center}
+@media(max-width:480px){.fab{right:20px}}
+
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);padding:10px 0 calc(14px + var(--safe));display:flex;justify-content:space-around;z-index:100}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;color:var(--mute);font-size:9px;font-weight:700}
+.bnav-item.active{color:var(--red)}
+.bnav-item svg{width:22px;height:22px;stroke-width:1.8}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px;overflow-y:auto}
+.modal-backdrop.show{display:flex}
+.modal-backdrop img{max-width:100%;max-height:55vh;object-fit:contain}
+.modal-info{margin-top:16px;color:#fff;text-align:center;max-width:360px;width:100%}
+.modal-info .mtitle{font-size:16px;font-weight:700;margin-bottom:6px}
+.modal-info .mmeta{font-size:11px;color:#aaa;letter-spacing:.5px;margin-bottom:14px}
+.modal-info .mmemo{font-size:12px;color:#ddd;margin-bottom:14px;line-height:1.5;text-align:left;padding:10px;background:rgba(255,255,255,.05);border-radius:4px}
+.modal-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.modal-actions button{border:1px solid #555;color:#fff;padding:7px 14px;font-size:11px;font-weight:700}
+.modal-actions button.primary{background:var(--red);border-color:var(--red)}
+.modal-actions button.danger{color:#ff7670}
+.modal-close{position:absolute;top:16px;right:16px;color:#fff;font-size:30px}
+.modal-counter{position:absolute;top:20px;left:20px;color:#aaa;font-size:11px;letter-spacing:1px;font-family:'Bodoni Moda',serif}
+.tag-chip{display:inline-block;background:rgba(255,255,255,.1);color:#fff;font-size:10px;padding:3px 8px;border-radius:12px;margin:2px}
+
+.slideshow{position:fixed;inset:0;background:#000;z-index:300;display:none;align-items:center;justify-content:center}
+.slideshow.show{display:flex}
+.slideshow img{max-width:100%;max-height:100vh;object-fit:contain}
+.slideshow-exit{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);color:#fff;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
+.slideshow-count{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#fff;font-family:'Bodoni Moda',serif;font-size:14px;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:20px}
+
+.upload-page{padding:20px;display:none}
+.upload-page.show{display:block}
+.upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
+.upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
+.upload-page .subtitle{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:22px}
+.file-zone{border:2px dashed var(--line);padding:36px 20px;text-align:center;margin-bottom:16px;border-radius:4px;position:relative;background:#fff}
+.file-zone.has-file{border-color:var(--red)}
+.file-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-zone .icon{font-size:32px;color:var(--mute);margin-bottom:8px}
+.file-zone .msg{font-size:13px;color:var(--ink);font-weight:700;margin-bottom:4px}
+.file-zone .hint{font-size:11px;color:var(--mute)}
+.file-zone img.preview{max-height:200px;margin:0 auto}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:14px}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--red)}
+.form-row textarea{resize:vertical;min-height:80px}
+.form-row .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-primary{width:100%;background:var(--red);color:#fff;padding:14px;font-size:14px;font-weight:700;letter-spacing:1px;border-radius:4px;margin-top:12px}
+.btn-primary:disabled{background:var(--mute);opacity:.6}
+.btn-ghost{width:100%;border:1px solid var(--line);color:var(--ink);padding:12px;font-size:13px;font-weight:700;background:#fff;border-radius:4px;margin-top:8px}
+
+.toast{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;font-size:12px;border-radius:24px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:60px 20px;color:var(--mute);font-size:13px}
+.empty .em-icon{font-size:40px;margin-bottom:12px;opacity:.3}
+.loading{text-align:center;padding:40px;color:var(--mute);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.gallery-page{display:block}
+.gallery-page.hidden{display:none}
+</style>
+</head>
+<body>
+
+<!-- ============ GALLERY PAGE ============ -->
+<div class="gallery-page" id="galleryPage">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">Hi5</div>
+      <div class="brand-text">
+        <div><strong>하이파이브 미술학원</strong></div>
+        <div class="sub">Busan Centum · Gallery</div>
+      </div>
+    </div>
+    <button class="search-btn" onclick="toast('검색 — 추후 추가')">⌕</button>
+  </div>
+
+  <div class="hero">
+    <h1>나의 <em>아카이브</em></h1>
+    <div class="meta" id="heroMeta"><span>0 작품</span></div>
+    <div class="hero-deco">SINCE<br>2026</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="chips" id="chips"></div>
+  <div class="color-strip" id="colors"></div>
+  <div id="gridContainer"></div>
+
+  <button class="fab" id="fab" onclick="startSlideshow()">▶</button>
+</div>
+
+<!-- ============ UPLOAD PAGE ============ -->
+<div class="upload-page" id="uploadPage">
+  <h2><span id="upTitle">새 </span><em><span id="upTitleEm">업로드</span></em></h2>
+  <div class="subtitle" id="upSubtitle">Add New Artwork</div>
+
+  <div class="file-zone" id="fileZone">
+    <input type="file" accept="image/*" id="fileInput">
+    <div id="fileZoneContent">
+      <div class="icon">📷</div>
+      <div class="msg">이미지 선택</div>
+      <div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label>제목 *</label>
+    <input type="text" id="fTitle" placeholder="예: 사고의 전환 — 빛과 어둠">
+  </div>
+
+  <div class="form-row">
+    <label>카테고리 *</label>
+    <select id="fCategory"></select>
+  </div>
+
+  <div class="form-row">
+    <label>태그 (쉼표·공백으로 구분)</label>
+    <input type="text" id="fTags" placeholder="예: 수채, 합격작, 정물">
+  </div>
+
+  <div class="form-row">
+    <div class="row2">
+      <div>
+        <label>학생 이름</label>
+        <input type="text" id="fStudent" placeholder="홍길동">
+      </div>
+      <div>
+        <label>학교</label>
+        <input type="text" id="fSchool" placeholder="OO고">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="row2">
+      <div>
+        <label>과목·교과</label>
+        <input type="text" id="fSubject" placeholder="기초디자인">
+      </div>
+      <div>
+        <label>작품 날짜</label>
+        <input type="date" id="fDate">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <label>대표 색상</label>
+    <select id="fColor">
+      <option value="">선택 안 함</option>
+      <option value="red">빨강</option>
+      <option value="orange">주황</option>
+      <option value="yellow">노랑</option>
+      <option value="green">초록</option>
+      <option value="blue">파랑</option>
+      <option value="purple">보라</option>
+      <option value="mono">모노</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label>분석 코멘트 (조형성·색감·구성)</label>
+    <textarea id="fMemo" rows="4" placeholder="작품에 대한 분석·평가·메모"></textarea>
+  </div>
+
+  <button class="btn-primary" id="btnSubmit" onclick="submitArtwork()">업로드</button>
+  <button class="btn-ghost" onclick="showGallery()">취소</button>
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bnav">
+  <button class="bnav-item active" id="navGallery" onclick="showGallery()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <span>갤러리</span>
+  </button>
+  <button class="bnav-item" id="navUpload" onclick="showUpload()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+    <span>업로드</span>
+  </button>
+  <button class="bnav-item" onclick="toast('컬렉션 — Phase 2 예정')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+    <span>컬렉션</span>
+  </button>
+  <button class="bnav-item" onclick="toast('공유 모드 — Phase 4 예정')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+    <span>공유</span>
+  </button>
+  <button class="bnav-item" onclick="toast('설정 — 추후 추가')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>설정</span>
+  </button>
+</nav>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-backdrop" id="modal">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <div class="modal-counter" id="modalCat"></div>
+  <img id="modalImg" src="" alt="" onclick="event.stopPropagation()">
+  <div class="modal-info" onclick="event.stopPropagation()">
+    <div class="mtitle" id="modalTitle"></div>
+    <div class="mmeta" id="modalMeta"></div>
+    <div class="mmemo" id="modalMemo" style="display:none"></div>
+    <div id="modalTags" style="margin-bottom:14px"></div>
+    <div class="modal-actions">
+      <button onclick="toggleFavorite()" id="btnFav">♡ 즐겨찾기</button>
+      <button onclick="editCurrent()">수정</button>
+      <button class="primary" onclick="shareCurrent()">공유</button>
+      <button class="danger" onclick="deleteCurrent()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SLIDESHOW ============ -->
+<div class="slideshow" id="slideshow">
+  <button class="slideshow-exit" onclick="exitSlideshow()">EXIT ×</button>
+  <img id="slideImg" src="" alt="">
+  <div class="slideshow-count" id="slideCount">1 / 1</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+
+// ============ SUPABASE CONFIG ============
+const SUPABASE_URL = 'https://zcakexegtjpmmszbqdgv.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_d2gdZfyMzvEhb5fZoal31A_Ee_dD_fl'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+// ============ STATE ============
+let artworks = []
+let categories = []
+let activeView = 'all'
+let activeCat = 'all'
+let activeColor = 'all'
+let currentId = null
+let editingId = null
+let selectedFile = null
+let slideIdx = 0, slideTimer = null
+
+const COLORS = [
+  {id:'all',style:'background:linear-gradient(135deg,#c0392b,#3498db,#f1c40f);border:1px solid var(--line)'},
+  {id:'red',style:'background:#c0392b'},
+  {id:'orange',style:'background:#e67e22'},
+  {id:'yellow',style:'background:#f1c40f'},
+  {id:'green',style:'background:#27ae60'},
+  {id:'blue',style:'background:#2980b9'},
+  {id:'purple',style:'background:#8e44ad'},
+  {id:'mono',style:'background:#2c3e50'}
+]
+
+// ============ INIT ============
+window.addEventListener('DOMContentLoaded', async () => {
+  setupFileInput()
+  renderColors()
+  await loadData()
+})
+
+async function loadData() {
+  document.getElementById('gridContainer').innerHTML = '<div class="loading">불러오는 중...</div>'
+  try {
+    const [{data: cats}, {data: arts}] = await Promise.all([
+      supabase.from('categories').select('*').order('sort_order'),
+      supabase.from('artworks').select('*').order('created_at',{ascending:false}).limit(500)
+    ])
+    categories = cats || []
+    artworks = arts || []
+    renderAll()
+  } catch (err) {
+    console.error(err)
+    toast('데이터 로딩 실패: ' + err.message)
+    document.getElementById('gridContainer').innerHTML = '<div class="empty"><div class="em-icon">⚠</div>데이터를 불러오지 못했어요</div>'
+  }
+}
+
+function renderAll() {
+  renderTabs()
+  renderChips()
+  renderGrid()
+  renderHero()
+  renderCategorySelect()
+}
+
+function renderHero() {
+  const favCnt = artworks.filter(a => a.is_favorite).length
+  const meta = document.getElementById('heroMeta')
+  meta.innerHTML = `<span>${artworks.length} 작품</span><span>${categories.length} 카테고리</span>${favCnt > 0 ? `<span>★ ${favCnt}</span>` : ''}`
+}
+
+function renderTabs() {
+  const favCnt = artworks.filter(a => a.is_favorite).length
+  const recentCnt = Math.min(artworks.length, 12)
+  const tabs = [
+    {id:'all', label:'전체', count:artworks.length},
+    {id:'favorite', label:'즐겨찾기', count:favCnt},
+    {id:'recent', label:'최근', count:recentCnt}
+  ]
+  document.getElementById('tabs').innerHTML = tabs.map(t =>
+    `<button class="tab ${activeView===t.id?'active':''}" data-view="${t.id}">${t.label}<span class="count">${t.count}</span></button>`
+  ).join('')
+  document.querySelectorAll('#tabs .tab').forEach(el => {
+    el.onclick = () => { activeView = el.dataset.view; renderTabs(); renderGrid() }
+  })
+}
+
+function renderChips() {
+  const html = `<button class="chip ${activeCat==='all'?'active':''}" data-cat="all"><span class="dot" style="background:#1a1a1a"></span>전체</button>` +
+    categories.map(c => `<button class="chip ${activeCat===c.id?'active':''}" data-cat="${c.id}"><span class="dot" style="background:${c.color}"></span>${c.name}</button>`).join('')
+  document.getElementById('chips').innerHTML = html
+  document.querySelectorAll('#chips .chip').forEach(el => {
+    el.onclick = () => { activeCat = el.dataset.cat; renderChips(); renderGrid() }
+  })
+}
+
+function renderColors() {
+  const html = '<span class="color-strip-label">컬러</span>' +
+    COLORS.map(c => `<div class="color-dot ${activeColor===c.id?'active':''}" data-color="${c.id}" style="${c.style}"></div>`).join('')
+  document.getElementById('colors').innerHTML = html
+  document.querySelectorAll('.color-dot').forEach(el => {
+    el.onclick = () => { activeColor = el.dataset.color; renderColors(); renderGrid() }
+  })
+}
+
+function renderCategorySelect() {
+  const sel = document.getElementById('fCategory')
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')
+}
+
+function getFiltered() {
+  let list = artworks
+  if (activeView === 'favorite') list = list.filter(a => a.is_favorite)
+  if (activeView === 'recent') list = list.slice(0, 12)
+  if (activeCat !== 'all') list = list.filter(a => a.category === activeCat)
+  if (activeColor !== 'all') list = list.filter(a => a.main_color === activeColor)
+  return list
+}
+
+function renderGrid() {
+  const list = getFiltered()
+  const container = document.getElementById('gridContainer')
+  document.getElementById('fab').style.display = list.length > 0 ? 'flex' : 'none'
+
+  if (list.length === 0) {
+    if (artworks.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="em-icon">🖼</div><div>아직 작품이 없어요</div><div style="margin-top:8px;font-size:11px">하단 + 버튼으로 첫 작품을 추가해 보세요</div></div>`
+    } else {
+      container.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>조건에 맞는 작품이 없어요</div>`
+    }
+    return
+  }
+
+  const cards = list.map(a => {
+    const badge = (a.tags||[]).includes('합격작') ? '합격작' : (a.tags||[]).includes('우수작') ? '우수작' : a.category==='best' ? 'BEST' : null
+    const tagText = ((a.tags||[]).slice(0,2).map(t => '#'+t).join(' '))
+    const studentText = a.student_name ? a.student_name + (tagText ? ' · ' : '') : ''
+    return `
+      <div class="card" data-id="${a.id}">
+        ${badge ? `<div class="badge">${badge}</div>` : ''}
+        <button class="fav ${a.is_favorite?'on':''}" data-fav="${a.id}">${a.is_favorite?'♥':'♡'}</button>
+        <img src="${a.image_url}" alt="${escapeHtml(a.title)}" loading="lazy">
+        <div class="info">
+          <div class="ttl">${escapeHtml(a.title)}</div>
+          <div class="tag">${escapeHtml(studentText + tagText)}</div>
+        </div>
+      </div>`
+  }).join('')
+  container.innerHTML = `<div class="grid">${cards}</div>`
+
+  document.querySelectorAll('.card').forEach(el => {
+    el.onclick = e => { if (e.target.classList.contains('fav')) return; openModal(parseInt(el.dataset.id)) }
+  })
+  document.querySelectorAll('.fav').forEach(el => {
+    el.onclick = async e => { e.stopPropagation(); await toggleFav(parseInt(el.dataset.fav)) }
+  })
+}
+
+// ============ MODAL ============
+function openModal(id) {
+  const a = artworks.find(x => x.id === id)
+  if (!a) return
+  currentId = id
+  const cat = categories.find(c => c.id === a.category)
+  const dateStr = a.artwork_date ? new Date(a.artwork_date).toLocaleDateString('ko-KR') : null
+  const metaParts = [a.student_name, a.school, a.subject, dateStr].filter(Boolean).join(' · ')
+
+  document.getElementById('modalImg').src = a.image_url
+  document.getElementById('modalCat').textContent = cat?.name || ''
+  document.getElementById('modalTitle').textContent = a.title
+  document.getElementById('modalMeta').textContent = metaParts
+  const memo = document.getElementById('modalMemo')
+  if (a.memo) { memo.textContent = a.memo; memo.style.display = 'block' } else { memo.style.display = 'none' }
+  document.getElementById('modalTags').innerHTML = (a.tags||[]).map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')
+  document.getElementById('btnFav').textContent = a.is_favorite ? '♥ 즐겨찾기' : '♡ 즐겨찾기'
+  document.getElementById('modal').classList.add('show')
+}
+
+window.closeModal = () => document.getElementById('modal').classList.remove('show')
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') closeModal()
+})
+
+window.toggleFavorite = async () => {
+  if (currentId === null) return
+  await toggleFav(currentId)
+  const a = artworks.find(x => x.id === currentId)
+  document.getElementById('btnFav').textContent = a.is_favorite ? '♥ 즐겨찾기' : '♡ 즐겨찾기'
+}
+
+async function toggleFav(id) {
+  const a = artworks.find(x => x.id === id)
+  if (!a) return
+  try {
+    const {data, error} = await supabase.from('artworks').update({is_favorite: !a.is_favorite}).eq('id', id).select().single()
+    if (error) throw error
+    const idx = artworks.findIndex(x => x.id === id)
+    artworks[idx] = data
+    renderAll()
+    toast(data.is_favorite ? '즐겨찾기 추가' : '즐겨찾기 해제')
+  } catch (err) {
+    toast('처리 실패')
+  }
+}
+
+window.shareCurrent = async () => {
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  try {
+    if (navigator.share) {
+      await navigator.share({title: a.title, text: a.memo || a.title, url: a.image_url})
+    } else {
+      await navigator.clipboard.writeText(a.image_url)
+      toast('이미지 링크 복사됨')
+    }
+  } catch (err) {}
+}
+
+window.deleteCurrent = async () => {
+  if (!confirm('정말 삭제하시겠어요?')) return
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  try {
+    if (a.storage_path) {
+      await supabase.storage.from('artworks').remove([a.storage_path])
+    }
+    const {error} = await supabase.from('artworks').delete().eq('id', a.id)
+    if (error) throw error
+    artworks = artworks.filter(x => x.id !== a.id)
+    closeModal()
+    renderAll()
+    toast('삭제 완료')
+  } catch (err) {
+    toast('삭제 실패: ' + err.message)
+  }
+}
+
+window.editCurrent = () => {
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  editingId = a.id
+  document.getElementById('fTitle').value = a.title || ''
+  document.getElementById('fCategory').value = a.category || 'inspire'
+  document.getElementById('fTags').value = (a.tags || []).join(', ')
+  document.getElementById('fStudent').value = a.student_name || ''
+  document.getElementById('fSchool').value = a.school || ''
+  document.getElementById('fSubject').value = a.subject || ''
+  document.getElementById('fDate').value = a.artwork_date || ''
+  document.getElementById('fColor').value = a.main_color || ''
+  document.getElementById('fMemo').value = a.memo || ''
+  document.getElementById('fileZoneContent').innerHTML = `<img src="${a.image_url}" class="preview" alt="">`
+  document.getElementById('fileZone').classList.add('has-file')
+  selectedFile = null
+  document.getElementById('upTitle').textContent = '작품 '
+  document.getElementById('upTitleEm').textContent = '수정'
+  document.getElementById('upSubtitle').textContent = 'Edit Artwork'
+  document.getElementById('btnSubmit').textContent = '수정 저장'
+  closeModal()
+  showUploadPage()
+}
+
+// ============ UPLOAD ============
+function setupFileInput() {
+  document.getElementById('fileInput').addEventListener('change', e => {
+    const f = e.target.files[0]
+    if (!f) return
+    if (f.size > 20*1024*1024) { toast('파일이 너무 커요 (최대 20MB)'); return }
+    selectedFile = f
+    const url = URL.createObjectURL(f)
+    document.getElementById('fileZoneContent').innerHTML = `<img src="${url}" class="preview" alt="">`
+    document.getElementById('fileZone').classList.add('has-file')
+  })
+}
+
+window.submitArtwork = async () => {
+  const title = document.getElementById('fTitle').value.trim()
+  if (!editingId && !selectedFile) { toast('이미지를 선택해 주세요'); return }
+  if (!title) { toast('제목을 입력해 주세요'); return }
+
+  const btn = document.getElementById('btnSubmit')
+  btn.disabled = true
+  btn.textContent = '저장 중...'
+
+  try {
+    const payload = {
+      title,
+      category: document.getElementById('fCategory').value,
+      tags: document.getElementById('fTags').value.split(/[,\s]+/).map(t => t.replace(/^#/,'').trim()).filter(Boolean),
+      student_name: document.getElementById('fStudent').value.trim() || null,
+      school: document.getElementById('fSchool').value.trim() || null,
+      subject: document.getElementById('fSubject').value.trim() || null,
+      artwork_date: document.getElementById('fDate').value || null,
+      memo: document.getElementById('fMemo').value.trim() || null,
+      main_color: document.getElementById('fColor').value || null
+    }
+
+    if (selectedFile) {
+      const ext = selectedFile.name.split('.').pop().toLowerCase()
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`
+      const filePath = `gallery/${fileName}`
+      const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, selectedFile, {cacheControl:'3600', upsert:false})
+      if (upErr) throw upErr
+      const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
+      payload.image_url = publicUrl
+      payload.storage_path = filePath
+    }
+
+    if (editingId) {
+      const {error} = await supabase.from('artworks').update(payload).eq('id', editingId)
+      if (error) throw error
+      toast('수정 완료')
+    } else {
+      const {error} = await supabase.from('artworks').insert(payload)
+      if (error) throw error
+      toast('업로드 완료')
+    }
+
+    await loadData()
+    showGallery()
+  } catch (err) {
+    console.error(err)
+    toast((editingId ? '수정' : '업로드') + ' 실패: ' + err.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = editingId ? '수정 저장' : '업로드'
+  }
+}
+
+// ============ NAVIGATION ============
+window.showGallery = () => {
+  document.getElementById('galleryPage').classList.remove('hidden')
+  document.getElementById('uploadPage').classList.remove('show')
+  document.getElementById('navGallery').classList.add('active')
+  document.getElementById('navUpload').classList.remove('active')
+  resetUploadForm()
+}
+
+window.showUpload = () => {
+  editingId = null
+  resetUploadForm()
+  showUploadPage()
+}
+
+function showUploadPage() {
+  document.getElementById('galleryPage').classList.add('hidden')
+  document.getElementById('uploadPage').classList.add('show')
+  document.getElementById('navGallery').classList.remove('active')
+  document.getElementById('navUpload').classList.add('active')
+  window.scrollTo(0,0)
+}
+
+function resetUploadForm() {
+  if (editingId) return
+  document.getElementById('fTitle').value = ''
+  document.getElementById('fTags').value = ''
+  document.getElementById('fStudent').value = ''
+  document.getElementById('fSchool').value = ''
+  document.getElementById('fSubject').value = ''
+  document.getElementById('fDate').value = ''
+  document.getElementById('fColor').value = ''
+  document.getElementById('fMemo').value = ''
+  document.getElementById('fileInput').value = ''
+  selectedFile = null
+  document.getElementById('fileZone').classList.remove('has-file')
+  document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
+  document.getElementById('upTitle').textContent = '새 '
+  document.getElementById('upTitleEm').textContent = '업로드'
+  document.getElementById('upSubtitle').textContent = 'Add New Artwork'
+  document.getElementById('btnSubmit').textContent = '업로드'
+}
+
+// ============ SLIDESHOW ============
+window.startSlideshow = () => {
+  const list = getFiltered()
+  if (list.length === 0) { toast('표시할 작품이 없어요'); return }
+  slideIdx = 0
+  showSlide(list)
+  slideTimer = setInterval(() => {
+    slideIdx = (slideIdx + 1) % list.length
+    showSlide(list)
+  }, 3000)
+  document.getElementById('slideshow').classList.add('show')
+}
+
+function showSlide(list) {
+  document.getElementById('slideImg').src = list[slideIdx].image_url
+  document.getElementById('slideCount').textContent = (slideIdx+1) + ' / ' + list.length
+}
+
+window.exitSlideshow = () => {
+  clearInterval(slideTimer)
+  document.getElementById('slideshow').classList.remove('show')
+}
+
+// ============ UTILS ============
+let toastTimer = null
+function toast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000)
+}
+window.toast = toast
+
+function escapeHtml(s) {
+  if (!s) return ''
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))
+}
+</script>
+</body>
+</html>
