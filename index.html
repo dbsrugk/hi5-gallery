@@ -79,12 +79,12 @@ img{display:block;max-width:100%}
 
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px;overflow-y:auto}
 .modal-backdrop.show{display:flex}
-.zoom-container{width:100%;max-height:55vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
-.zoom-container img{max-width:100%;max-height:55vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none}
-.zoom-hint{position:absolute;top:60px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:10px;letter-spacing:1px;background:rgba(0,0,0,.4);padding:4px 10px;border-radius:12px;pointer-events:none;animation:fadeHint 4s ease-out forwards}
+.zoom-container{width:100%;max-height:55vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;position:relative}
+.zoom-container img{max-width:100%;max-height:55vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.zoom-hint{position:absolute;top:60px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:1px;background:rgba(0,0,0,.5);padding:5px 12px;border-radius:14px;pointer-events:none;animation:fadeHint 4s ease-out forwards;z-index:10}
 @keyframes fadeHint{0%,30%{opacity:1}100%{opacity:0}}
-.slideshow-zoom{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none}
-.slideshow-zoom img{max-width:100%;max-height:100vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none}
+.slideshow-zoom{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;position:relative}
+.slideshow-zoom img{max-width:100%;max-height:100vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .modal-info{margin-top:16px;color:#fff;text-align:center;max-width:360px;width:100%}
 .modal-info .mtitle{font-size:16px;font-weight:700;margin-bottom:6px}
 .modal-info .mmeta{font-size:11px;color:#aaa;letter-spacing:.5px;margin-bottom:14px}
@@ -328,25 +328,32 @@ const COLORS = [
   {id:'mono',style:'background:#2c3e50'}
 ]
 
-// ============ PINCH ZOOM ============
+// ============ PINCH ZOOM (자연스러운 포토뷰어 방식) ============
 function createPinchZoom(container) {
   if (!container) return null
   const img = container.querySelector('img')
   if (!img) return null
 
-  let scale = 1, lastScale = 1
-  let posX = 0, posY = 0, lastPosX = 0, lastPosY = 0
-  let startDist = 0, startX = 0, startY = 0
-  let lastTap = 0
+  let scale = 1
+  let posX = 0, posY = 0
+  // 제스처 시작 시점의 상태
+  let startScale = 1
+  let startDist = 0
+  let startMidX = 0, startMidY = 0  // 컨테이너 기준 두 손가락 중심
+  let startPosX = 0, startPosY = 0
+  // 단일 손가락 패닝
+  let startTouchX = 0, startTouchY = 0
   let isPanning = false
+  let lastTap = 0
+  let lastTapX = 0, lastTapY = 0
 
   function applyTransform() {
-    img.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`
+    img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`
   }
 
   function reset() {
-    scale = 1; lastScale = 1
-    posX = 0; posY = 0; lastPosX = 0; lastPosY = 0
+    scale = 1
+    posX = 0; posY = 0
     img.style.transition = 'transform 0.25s ease'
     applyTransform()
     setTimeout(() => { img.style.transition = '' }, 260)
@@ -358,41 +365,83 @@ function createPinchZoom(container) {
     return Math.sqrt(dx*dx + dy*dy)
   }
 
+  // 컨테이너 좌표계로 변환
+  function getContainerPoint(clientX, clientY) {
+    const rect = container.getBoundingClientRect()
+    return {
+      x: clientX - rect.left - rect.width / 2,
+      y: clientY - rect.top - rect.height / 2
+    }
+  }
+
+  // 이미지가 컨테이너 밖으로 너무 나가지 않도록 위치 제한
   function clampPosition() {
-    const maxOffset = 200 * scale
-    posX = Math.max(-maxOffset, Math.min(maxOffset, posX))
-    posY = Math.max(-maxOffset, Math.min(maxOffset, posY))
+    const rect = container.getBoundingClientRect()
+    const imgRect = img.getBoundingClientRect()
+    // 확대된 이미지의 실제 크기
+    const scaledW = img.offsetWidth * scale
+    const scaledH = img.offsetHeight * scale
+    // 이미지가 컨테이너보다 크면 그 차이만큼만 이동 가능
+    const maxX = Math.max(0, (scaledW - rect.width) / 2)
+    const maxY = Math.max(0, (scaledH - rect.height) / 2)
+    posX = Math.max(-maxX, Math.min(maxX, posX))
+    posY = Math.max(-maxY, Math.min(maxY, posY))
   }
 
   container.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
+      // 핀치 시작
       e.preventDefault()
-      startDist = getDistance(e.touches[0], e.touches[1])
-      lastScale = scale
+      const t1 = e.touches[0], t2 = e.touches[1]
+      startDist = getDistance(t1, t2)
+      startScale = scale
+      // 두 손가락 중심점 (컨테이너 기준)
+      const mid = getContainerPoint(
+        (t1.clientX + t2.clientX) / 2,
+        (t1.clientY + t2.clientY) / 2
+      )
+      startMidX = mid.x
+      startMidY = mid.y
+      startPosX = posX
+      startPosY = posY
       isPanning = false
     } else if (e.touches.length === 1) {
+      const t = e.touches[0]
       // 더블탭 감지
       const now = Date.now()
-      if (now - lastTap < 300) {
+      const tapX = t.clientX, tapY = t.clientY
+      const tapDist = Math.hypot(tapX - lastTapX, tapY - lastTapY)
+      if (now - lastTap < 300 && tapDist < 40) {
         e.preventDefault()
-        if (scale > 1) {
+        if (scale > 1.1) {
+          // 이미 확대됨 → 원래대로
           reset()
         } else {
-          scale = 2.5
-          lastScale = 2.5
+          // 탭한 위치 기준으로 2.5배 확대
+          const point = getContainerPoint(tapX, tapY)
+          const newScale = 2.5
+          // 탭한 지점이 화면 중앙으로 오도록 위치 계산
+          posX = -point.x * (newScale - 1) / 1
+          posY = -point.y * (newScale - 1) / 1
+          scale = newScale
+          clampPosition()
+          img.style.transition = 'transform 0.25s ease'
           applyTransform()
+          setTimeout(() => { img.style.transition = '' }, 260)
         }
         lastTap = 0
         return
       }
       lastTap = now
+      lastTapX = tapX
+      lastTapY = tapY
 
       // 확대된 상태에서만 패닝 활성화
-      if (scale > 1) {
-        startX = e.touches[0].clientX
-        startY = e.touches[0].clientY
-        lastPosX = posX
-        lastPosY = posY
+      if (scale > 1.05) {
+        startTouchX = t.clientX
+        startTouchY = t.clientY
+        startPosX = posX
+        startPosY = posY
         isPanning = true
       }
     }
@@ -400,17 +449,34 @@ function createPinchZoom(container) {
 
   container.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
+      // 핀치 줌 + 동시 패닝
       e.preventDefault()
-      const dist = getDistance(e.touches[0], e.touches[1])
-      scale = Math.max(1, Math.min(5, lastScale * (dist / startDist)))
-      if (scale === 1) { posX = 0; posY = 0 }
+      const t1 = e.touches[0], t2 = e.touches[1]
+      const dist = getDistance(t1, t2)
+      const newScale = Math.max(1, Math.min(5, startScale * (dist / startDist)))
+
+      // 현재 두 손가락 중심점
+      const currentMid = getContainerPoint(
+        (t1.clientX + t2.clientX) / 2,
+        (t1.clientY + t2.clientY) / 2
+      )
+
+      // 핵심 공식:
+      // 확대 시작 시점의 중심점(startMidX/Y)을 기준으로 줌하면서
+      // 손가락이 이동한 만큼 이미지도 같이 따라가도록
+      const scaleRatio = newScale / startScale
+      posX = currentMid.x - (startMidX - startPosX) * scaleRatio
+      posY = currentMid.y - (startMidY - startPosY) * scaleRatio
+
+      scale = newScale
+      clampPosition()
       applyTransform()
-    } else if (e.touches.length === 1 && isPanning && scale > 1) {
+    } else if (e.touches.length === 1 && isPanning && scale > 1.05) {
+      // 단일 손가락 패닝
       e.preventDefault()
-      const dx = e.touches[0].clientX - startX
-      const dy = e.touches[0].clientY - startY
-      posX = lastPosX + dx
-      posY = lastPosY + dy
+      const t = e.touches[0]
+      posX = startPosX + (t.clientX - startTouchX)
+      posY = startPosY + (t.clientY - startTouchY)
       clampPosition()
       applyTransform()
     }
@@ -419,20 +485,42 @@ function createPinchZoom(container) {
   container.addEventListener('touchend', (e) => {
     if (e.touches.length === 0) {
       isPanning = false
-      lastScale = scale
-      // 1배보다 작아지면 리셋
-      if (scale < 1.05) reset()
+      // 1배 미만으로 줄어들면 부드럽게 리셋
+      if (scale < 1.05) {
+        reset()
+      } else {
+        // 경계 다시 한 번 확인 후 스냅
+        clampPosition()
+        img.style.transition = 'transform 0.2s ease'
+        applyTransform()
+        setTimeout(() => { img.style.transition = '' }, 210)
+      }
+    } else if (e.touches.length === 1) {
+      // 두 손가락 → 한 손가락으로 바뀌면 패닝 시작점 갱신
+      const t = e.touches[0]
+      startTouchX = t.clientX
+      startTouchY = t.clientY
+      startPosX = posX
+      startPosY = posY
+      isPanning = scale > 1.05
     }
   })
 
-  // 마우스 휠로 PC에서도 줌 가능
+  // 마우스 휠 (PC) - 마우스 위치 기준 확대
   container.addEventListener('wheel', (e) => {
     e.preventDefault()
+    const point = getContainerPoint(e.clientX, e.clientY)
+    const oldScale = scale
     const delta = e.deltaY > 0 ? 0.9 : 1.1
-    scale = Math.max(1, Math.min(5, scale * delta))
-    if (scale === 1) { posX = 0; posY = 0 }
+    const newScale = Math.max(1, Math.min(5, scale * delta))
+    // 마우스 위치 기준 확대
+    const scaleRatio = newScale / oldScale
+    posX = point.x - (point.x - posX) * scaleRatio
+    posY = point.y - (point.y - posY) * scaleRatio
+    scale = newScale
+    if (scale <= 1.01) { posX = 0; posY = 0; scale = 1 }
+    clampPosition()
     applyTransform()
-    lastScale = scale
   }, { passive: false })
 
   return { reset }
