@@ -286,11 +286,6 @@ img{display:block;max-width:100%}
   </div>
 
   <div class="form-row">
-    <label>제목 <span id="titleHint" style="color:var(--mute);font-weight:400;text-transform:none;letter-spacing:0">(여러 장은 비워두면 파일명 자동)</span></label>
-    <input type="text" id="fTitle" placeholder="예: 사고의 전환 — 빛과 어둠">
-  </div>
-
-  <div class="form-row">
     <label>카테고리 *</label>
     <select id="fCategory"></select>
   </div>
@@ -301,47 +296,7 @@ img{display:block;max-width:100%}
   </div>
 
   <div class="form-row">
-    <div class="row2">
-      <div>
-        <label>학생 이름</label>
-        <input type="text" id="fStudent" placeholder="홍길동">
-      </div>
-      <div>
-        <label>학교</label>
-        <input type="text" id="fSchool" placeholder="OO고">
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <div class="row2">
-      <div>
-        <label>과목·교과</label>
-        <input type="text" id="fSubject" placeholder="기초디자인">
-      </div>
-      <div>
-        <label>작품 날짜</label>
-        <input type="date" id="fDate">
-      </div>
-    </div>
-  </div>
-
-  <div class="form-row">
-    <label>대표 색상</label>
-    <select id="fColor">
-      <option value="">선택 안 함</option>
-      <option value="red">빨강</option>
-      <option value="orange">주황</option>
-      <option value="yellow">노랑</option>
-      <option value="green">초록</option>
-      <option value="blue">파랑</option>
-      <option value="purple">보라</option>
-      <option value="mono">모노</option>
-    </select>
-  </div>
-
-  <div class="form-row">
-    <label>분석 코멘트 (조형성·색감·구성)</label>
+    <label>코멘트 (조형성·색감·구성)</label>
     <textarea id="fMemo" rows="4" placeholder="작품에 대한 분석·평가·메모"></textarea>
   </div>
 
@@ -883,24 +838,150 @@ window.editCurrent = () => {
   const a = artworks.find(x => x.id === currentId)
   if (!a) return
   editingId = a.id
-  document.getElementById('fTitle').value = a.title || ''
-  document.getElementById('fCategory').value = a.category || 'inspire'
+
+  // 단일 모드로 전환
+  switchUploadMode('single')
+
+  // 기본 필드
   document.getElementById('fTags').value = (a.tags || []).join(', ')
-  document.getElementById('fStudent').value = a.student_name || ''
-  document.getElementById('fSchool').value = a.school || ''
-  document.getElementById('fSubject').value = a.subject || ''
-  document.getElementById('fDate').value = a.artwork_date || ''
-  document.getElementById('fColor').value = a.main_color || ''
   document.getElementById('fMemo').value = a.memo || ''
+  // 카테고리 (값을 select에 세팅)
+  setTimeout(() => {
+    document.getElementById('fCategory').value = a.category || 'inspire'
+  }, 0)
+
+  // 현재 이미지 미리보기
   document.getElementById('fileZoneContent').innerHTML = `<img src="${a.image_url}" class="preview" alt="">`
   document.getElementById('fileZone').classList.add('has-file')
   selectedFile = null
+
+  // 상세 정보 폼 동적 주입 (수정 모드에서만)
+  injectDetailForm(a)
+
   document.getElementById('upTitle').textContent = '작품 '
   document.getElementById('upTitleEm').textContent = '수정'
   document.getElementById('upSubtitle').textContent = 'Edit Artwork'
   document.getElementById('btnSubmit').textContent = '수정 저장'
   closeModal()
   showUploadPage()
+}
+
+function injectDetailForm(a) {
+  // 이미 있으면 제거
+  const existing = document.getElementById('detailFormZone')
+  if (existing) existing.remove()
+
+  const memoRow = document.getElementById('fMemo').closest('.form-row')
+  const zone = document.createElement('div')
+  zone.id = 'detailFormZone'
+  zone.innerHTML = `
+    <div style="border-top:1px solid var(--line);margin:18px 0 14px;padding-top:14px">
+      <div style="font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;font-weight:700">📋 상세 정보 (선택 입력)</div>
+      <div class="form-row">
+        <label>제목</label>
+        <input type="text" id="fTitleDetail" value="${escapeHtml(a.title || '')}" placeholder="비워두면 자동 생성">
+      </div>
+      <div class="form-row">
+        <div class="row2">
+          <div>
+            <label>학생 이름</label>
+            <input type="text" id="fStudentDetail" value="${escapeHtml(a.student_name || '')}" placeholder="홍길동">
+          </div>
+          <div>
+            <label>학교</label>
+            <input type="text" id="fSchoolDetail" value="${escapeHtml(a.school || '')}" placeholder="OO고">
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="row2">
+          <div>
+            <label>과목·교과</label>
+            <input type="text" id="fSubjectDetail" value="${escapeHtml(a.subject || '')}" placeholder="기초디자인">
+          </div>
+          <div>
+            <label>작품 날짜</label>
+            <input type="date" id="fDateDetail" value="${a.artwork_date || ''}">
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+  memoRow.parentNode.insertBefore(zone, memoRow.nextSibling)
+}
+
+// ============ 색상 자동 추출 ============
+// 이미지의 대표 색상 톤을 분류해서 반환 (red/orange/yellow/green/blue/purple/mono)
+async function extractMainColor(imageSource) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        const size = 50  // 작게 줄여서 빠르게 분석
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, size, size)
+        const data = ctx.getImageData(0, 0, size, size).data
+
+        const buckets = { red:0, orange:0, yellow:0, green:0, blue:0, purple:0, mono:0 }
+        let total = 0
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3]
+          if (a < 128) continue
+          // 너무 어두운/밝은 픽셀 제외 (배경 흰색·검정 무시)
+          const max = Math.max(r,g,b), min = Math.min(r,g,b)
+          const lightness = (max + min) / 2
+          const saturation = max === 0 ? 0 : (max - min) / max
+
+          // 채도가 너무 낮으면 모노톤
+          if (saturation < 0.2 || lightness < 30 || lightness > 230) {
+            buckets.mono++; total++; continue
+          }
+          // HSL의 hue 계산
+          let h = 0
+          if (max === r) h = ((g - b) / (max - min)) % 6
+          else if (max === g) h = (b - r) / (max - min) + 2
+          else h = (r - g) / (max - min) + 4
+          h = h * 60
+          if (h < 0) h += 360
+
+          // hue 기준 색상 분류
+          if (h < 15 || h >= 345) buckets.red++
+          else if (h < 45) buckets.orange++
+          else if (h < 70) buckets.yellow++
+          else if (h < 170) buckets.green++
+          else if (h < 250) buckets.blue++
+          else if (h < 290) buckets.purple++
+          else buckets.red++
+          total++
+        }
+
+        if (total === 0) { resolve('mono'); return }
+        // 모노가 70% 이상이면 모노, 아니면 가장 많은 컬러
+        if (buckets.mono / total > 0.7) { resolve('mono'); return }
+        // 모노 제외하고 최다 색상
+        delete buckets.mono
+        let bestColor = 'red', bestCount = 0
+        Object.entries(buckets).forEach(([k, v]) => {
+          if (v > bestCount) { bestCount = v; bestColor = k }
+        })
+        resolve(bestColor)
+      } catch (err) {
+        resolve('mono')
+      }
+    }
+    img.onerror = () => resolve('mono')
+    // File인지 URL인지 처리
+    if (imageSource instanceof File || imageSource instanceof Blob) {
+      img.src = URL.createObjectURL(imageSource)
+    } else {
+      img.src = imageSource
+    }
+  })
 }
 
 // ============ UPLOAD MODES ============
@@ -915,10 +996,8 @@ function switchUploadMode(mode) {
   })
   document.querySelectorAll('.upload-mode').forEach(m => m.classList.remove('active'))
   document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active')
-  // 배치 안내·제목 힌트 표시 조정
   const isBatch = mode !== 'single'
   document.getElementById('batchNotice').style.display = isBatch ? 'block' : 'none'
-  document.getElementById('titleHint').style.display = isBatch ? 'inline' : 'none'
   const btn = document.getElementById('btnSubmit')
   if (!editingId) {
     btn.textContent = isBatch ? '일괄 업로드' : '업로드'
@@ -1065,13 +1144,17 @@ function collectMeta() {
   return {
     category: document.getElementById('fCategory').value,
     tags: document.getElementById('fTags').value.split(/[,\s]+/).map(t => t.replace(/^#/,'').trim()).filter(Boolean),
-    student_name: document.getElementById('fStudent').value.trim() || null,
-    school: document.getElementById('fSchool').value.trim() || null,
-    subject: document.getElementById('fSubject').value.trim() || null,
-    artwork_date: document.getElementById('fDate').value || null,
-    memo: document.getElementById('fMemo').value.trim() || null,
-    main_color: document.getElementById('fColor').value || null
+    memo: document.getElementById('fMemo').value.trim() || null
   }
+}
+
+// 자동 제목 생성: 태그 첫 항목 → 카테고리명 → "작품"
+function generateAutoTitle(meta, fileName) {
+  if (meta.tags && meta.tags.length > 0) return '#' + meta.tags[0]
+  const cat = categories.find(c => c.id === meta.category)
+  if (cat) return cat.name
+  if (fileName) return fileName.replace(/\.[^.]+$/, '').slice(0, 30)
+  return '작품'
 }
 
 // 진행률 UI
@@ -1088,17 +1171,22 @@ function showProgress(show) {
 
 // ============ 파일 1장 업로드 (재사용) ============
 async function uploadSingleFile(file, meta, customTitle) {
+  // 색상 자동 추출 (실패해도 mono로 폴백)
+  let mainColor = 'mono'
+  try { mainColor = await extractMainColor(file) } catch(e) {}
+
   const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
   const filePath = `gallery/${fileName}`
   const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, file, {cacheControl:'3600', upsert:false})
   if (upErr) throw upErr
   const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
-  // 작품 데이터 저장
-  const title = customTitle || (file.name.replace(/\.[^.]+$/, '')) || '제목 없음'
+  // 자동 제목
+  const title = customTitle || generateAutoTitle(meta, file.name)
   const {error} = await supabase.from('artworks').insert({
     ...meta,
     title,
+    main_color: mainColor,
     image_url: publicUrl,
     storage_path: filePath
   })
@@ -1107,33 +1195,34 @@ async function uploadSingleFile(file, meta, customTitle) {
 
 // URL에서 이미지 가져와서 업로드
 async function uploadFromUrl(url, meta, customTitle) {
-  // CORS 우회 시도 - 직접 fetch 후 blob 업로드
   const res = await fetch(url, { mode: 'cors' })
   if (!res.ok) throw new Error('이미지를 가져올 수 없어요')
   const blob = await res.blob()
   if (blob.size > 20*1024*1024) throw new Error('파일이 너무 커요')
   if (!blob.type.startsWith('image/')) throw new Error('이미지가 아니에요')
-  // 파일명 추정
   const urlPath = new URL(url).pathname
   const fileName = (urlPath.split('/').pop() || 'image.jpg')
   const file = new File([blob], fileName, { type: blob.type })
-  await uploadSingleFile(file, meta, customTitle || fileName.replace(/\.[^.]+$/, ''))
+  await uploadSingleFile(file, meta, customTitle || null)
 }
 
 // ============ MAIN SUBMIT ============
 window.submitArtwork = async () => {
-  const title = document.getElementById('fTitle').value.trim()
   const meta = collectMeta()
   const btn = document.getElementById('btnSubmit')
 
-  // 수정 모드
+  // 수정 모드: 상세 정보까지 전부 업데이트 가능
   if (editingId) {
-    if (!title) { toast('제목을 입력해 주세요'); return }
     btn.disabled = true
     btn.textContent = '저장 중...'
     try {
-      const payload = { ...meta, title }
+      const payload = { ...meta }
+      // 수정 모드에서는 상세 폼에서 학생/학교/날짜 등도 받음
+      const detail = collectDetailMeta()
+      Object.assign(payload, detail)
       if (selectedFile) {
+        let mainColor = 'mono'
+        try { mainColor = await extractMainColor(selectedFile) } catch(e) {}
         const ext = (selectedFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
         const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
         const filePath = `gallery/${fileName}`
@@ -1142,6 +1231,11 @@ window.submitArtwork = async () => {
         const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
         payload.image_url = publicUrl
         payload.storage_path = filePath
+        payload.main_color = mainColor
+      }
+      // 자동 제목이 비어있다면 생성
+      if (!payload.title || !payload.title.trim()) {
+        payload.title = generateAutoTitle(meta, '')
       }
       const {error} = await supabase.from('artworks').update(payload).eq('id', editingId)
       if (error) throw error
@@ -1160,11 +1254,10 @@ window.submitArtwork = async () => {
   // 단일 업로드
   if (uploadMode === 'single') {
     if (!selectedFile) { toast('이미지를 선택해 주세요'); return }
-    if (!title) { toast('제목을 입력해 주세요'); return }
     btn.disabled = true
     btn.textContent = '저장 중...'
     try {
-      await uploadSingleFile(selectedFile, meta, title)
+      await uploadSingleFile(selectedFile, meta, null)
       toast('업로드 완료')
       await loadData()
       showGallery()
@@ -1190,8 +1283,7 @@ window.submitArtwork = async () => {
       renderMultiPreview()
       setProgress(`업로드 중 (${i+1}/${multiFiles.length})`, i, multiFiles.length)
       try {
-        const customTitle = title || null  // 비어있으면 파일명 사용
-        await uploadSingleFile(m.file, meta, customTitle)
+        await uploadSingleFile(m.file, meta, null)
         m.status = 'done'
         done++
       } catch (err) {
@@ -1226,7 +1318,7 @@ window.submitArtwork = async () => {
       renderUrlPreview()
       setProgress(`가져오는 중 (${i+1}/${urlItems.length})`, i, urlItems.length)
       try {
-        await uploadFromUrl(m.url, meta, title || null)
+        await uploadFromUrl(m.url, meta, null)
         m.status = 'done'
         done++
       } catch (err) {
@@ -1251,6 +1343,22 @@ window.submitArtwork = async () => {
     }
     return
   }
+}
+
+// 수정 모드에서 상세 폼 데이터 수집
+function collectDetailMeta() {
+  const result = {}
+  const title = document.getElementById('fTitleDetail')
+  const student = document.getElementById('fStudentDetail')
+  const school = document.getElementById('fSchoolDetail')
+  const subject = document.getElementById('fSubjectDetail')
+  const date = document.getElementById('fDateDetail')
+  if (title) result.title = title.value.trim() || generateAutoTitle(collectMeta(), '')
+  if (student) result.student_name = student.value.trim() || null
+  if (school) result.school = school.value.trim() || null
+  if (subject) result.subject = subject.value.trim() || null
+  if (date) result.artwork_date = date.value || null
+  return result
 }
 
 // ============ WEB SHARE TARGET (PWA로 설치 후) ============
@@ -1283,6 +1391,9 @@ window.showGallery = () => {
 
 window.showUpload = () => {
   editingId = null
+  // 수정용 상세 폼이 남아있으면 제거
+  const existing = document.getElementById('detailFormZone')
+  if (existing) existing.remove()
   resetUploadForm()
   showUploadPage()
 }
@@ -1297,13 +1408,7 @@ function showUploadPage() {
 
 function resetUploadForm() {
   if (editingId) return
-  document.getElementById('fTitle').value = ''
   document.getElementById('fTags').value = ''
-  document.getElementById('fStudent').value = ''
-  document.getElementById('fSchool').value = ''
-  document.getElementById('fSubject').value = ''
-  document.getElementById('fDate').value = ''
-  document.getElementById('fColor').value = ''
   document.getElementById('fMemo').value = ''
   document.getElementById('fileInput').value = ''
   document.getElementById('multiFileInput').value = ''
@@ -1311,7 +1416,6 @@ function resetUploadForm() {
   selectedFile = null
   document.getElementById('fileZone').classList.remove('has-file')
   document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
-  // 다중·URL 초기화
   multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
   multiFiles = []
   urlItems = []
