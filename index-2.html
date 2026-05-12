@@ -1,0 +1,3143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#c0392b">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="hi5-version" content="2026-05-12-v5-NUKE-pwa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
+<title>Hi5 Gallery · 부산 센텀점</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='%23c0392b'/><text x='50%25' y='50%25' dy='.04em' text-anchor='middle' dominant-baseline='central' font-family='Bodoni Moda, Bodoni 72, Didot, Georgia, serif' font-size='46' font-style='italic' font-weight='700' fill='%23ffffff'>G</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='28' fill='%23c0392b'/><text x='50%25' y='50%25' dy='.04em' text-anchor='middle' dominant-baseline='central' font-family='Bodoni Moda, Bodoni 72, Didot, Georgia, serif' font-size='128' font-style='italic' font-weight='700' fill='%23ffffff'>G</text></svg>">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkhpNSBHYWxsZXJ5IiwgInNob3J0X25hbWUiOiAiSGk1IEdhbGxlcnkiLCAic3RhcnRfdXJsIjogIi4vIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJ0aGVtZV9jb2xvciI6ICIjYzAzOTJiIiwgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmNyIsICJzaGFyZV90YXJnZXQiOiB7ImFjdGlvbiI6ICIuLz9zaGFyZT0xIiwgIm1ldGhvZCI6ICJHRVQiLCAiZW5jdHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiLCAicGFyYW1zIjogeyJ0aXRsZSI6ICJ0aXRsZSIsICJ0ZXh0IjogInRleHQiLCAidXJsIjogInNoYXJlZF91cmwifX19">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#c0392b; --red-deep:#922518; --ink:#1a1a1a;
+  --paper:#fafaf7; --line:#e8e8e8; --mute:#888;
+  --safe:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--paper);color:var(--ink);font-family:'Nanum Gothic',sans-serif;overflow-x:hidden}
+body{max-width:480px;margin:0 auto;min-height:100dvh;padding-top:32px;padding-bottom:calc(80px + var(--safe))}
+@media(min-width:481px){body{box-shadow:0 0 40px rgba(0,0,0,.06);background:#fff}}
+button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit}
+input,textarea,select{font-family:inherit;font-size:14px}
+img{display:block;max-width:100%}
+
+.topbar{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--line);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{background:var(--red);color:#fff;font-weight:800;font-size:13px;padding:5px 8px;letter-spacing:.5px}
+.brand-text{font-size:11px;line-height:1.2}
+.brand-text .sub{font-family:'Bodoni Moda',serif;font-style:italic;color:var(--mute);font-size:10px}
+.search-btn{font-size:22px;background:none;border:none;cursor:pointer;color:var(--ink);padding:4px 8px}
+.search-btn.active{color:var(--red)}
+.search-bar{display:none;padding:10px 20px;background:var(--paper);border-bottom:1px solid var(--line);position:sticky;top:48px;z-index:99}
+.search-bar.show{display:flex;gap:8px;align-items:center}
+.search-bar input{flex:1;padding:10px 14px;border:1px solid var(--line);border-radius:20px;font-size:14px;outline:none;background:#fafafa}
+.search-bar input:focus{border-color:var(--red);background:#fff}
+.search-bar .clear-btn{background:none;border:none;color:var(--mute);font-size:18px;cursor:pointer;padding:4px 8px;display:none}
+.search-bar .clear-btn.show{display:block}
+.search-result-info{font-size:11px;color:var(--mute);padding:6px 20px 0;display:none}
+.search-result-info.show{display:block}
+
+.hero{padding:20px 20px 8px}
+.hero-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.hero-avatar{width:64px;height:64px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;letter-spacing:.5px;flex-shrink:0;font-family:'Bodoni Moda',serif;font-style:italic}
+.hero-info{flex:1;min-width:0}
+.hero-info h1{font-size:18px;font-weight:800;line-height:1.2;margin-bottom:2px;letter-spacing:-.3px}
+.hero-info .handle{font-size:11px;color:var(--mute);letter-spacing:.3px;margin-bottom:6px}
+.hero-stats{display:flex;gap:16px}
+.hero-stat{font-size:12px;color:var(--ink)}
+.hero-stat strong{font-weight:800;font-size:13px}
+.hero-stat span{color:var(--mute);font-size:11px;margin-left:3px}
+.hero-mosaic{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:14px;max-height:60px;overflow:hidden;border-radius:6px}
+.hero-mosaic .m-cell{aspect-ratio:1;background:var(--line);overflow:hidden;background-size:cover;background-position:center}
+.hero-mosaic.empty{display:none}
+.hero-bio{font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:2px}
+.hero-bio .bio-em{color:var(--red);font-weight:700}
+
+.tabs{display:flex;padding:0 20px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:12px 0;margin-right:22px;font-size:13px;font-weight:700;color:var(--mute);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:var(--ink);border-bottom-color:var(--red)}
+.tab .count{font-size:10px;margin-left:4px;font-weight:400;color:var(--mute)}
+.tab.active .count{color:var(--red)}
+
+.chips{padding:14px 20px 6px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:#fff;padding:6px 12px;font-size:11px;font-weight:700;border-radius:20px;white-space:nowrap;color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+.color-strip{padding:6px 20px 14px;display:flex;align-items:center;gap:8px;overflow-x:auto;scrollbar-width:none}
+.color-strip::-webkit-scrollbar{display:none}
+.color-strip-label{font-size:10px;color:var(--mute);letter-spacing:1px;font-weight:700;margin-right:4px;flex-shrink:0}
+.color-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid transparent;flex-shrink:0;cursor:pointer}
+.color-dot.active{transform:scale(1.15);border-color:var(--ink)}
+
+.grid{padding:8px 14px;column-count:2;column-gap:8px}
+.grid.cols-1{column-count:1}
+.grid.cols-2{column-count:2}
+.grid.cols-3{column-count:3;column-gap:6px}
+.grid.cols-3 .card .info{padding:6px 8px}
+.grid.cols-3 .card .info .ttl{font-size:10px}
+.grid.cols-3 .card .info .tag{font-size:8px}
+.grid.cols-3 .card .badge{font-size:8px;padding:2px 5px}
+.grid.cols-3 .card .fav,.grid.cols-3 .card .select-check{width:22px;height:22px;font-size:11px}
+.grid.cols-1 .card .info{padding:12px 14px}
+.grid.cols-1 .card .info .ttl{font-size:14px}
+.grid.cols-1 .card .info .tag{font-size:11px}
+
+/* 갤러리 컨트롤 바 (정렬 + 카드 크기) */
+.gallery-controls{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 0;gap:8px}
+.gc-sort{position:relative;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.3px;background:none;border:none;cursor:pointer;padding:6px 4px;text-transform:uppercase}
+.gc-sort .gc-sort-icon{font-size:13px}
+.gc-sort .gc-sort-arrow{font-size:8px;color:var(--mute);margin-left:2px}
+.gc-sort-menu{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:50;min-width:140px;margin-top:4px;overflow:hidden}
+.gc-sort-menu.show{display:block}
+.gc-sort-menu button{display:block;width:100%;text-align:left;padding:10px 14px;font-size:12px;background:#fff;border:none;cursor:pointer;color:var(--ink);font-weight:500;border-bottom:1px solid #f5f5f5}
+.gc-sort-menu button:last-child{border-bottom:none}
+.gc-sort-menu button.active{color:var(--red);font-weight:700;background:#fff5f5}
+.gc-sort-menu button:active{background:#f0f0f0}
+.gc-cols{display:inline-flex;background:#f5f5f5;border-radius:4px;padding:2px;gap:2px}
+.gc-cols button{padding:5px 8px;font-size:13px;background:none;border:none;cursor:pointer;color:var(--mute);border-radius:3px;line-height:1;font-weight:700}
+.gc-cols button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.card{break-inside:avoid;margin-bottom:8px;position:relative;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:pointer}
+.card:active{transform:scale(.98)}
+.card img{width:100%;height:auto}
+.card .badge{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:3px 6px;letter-spacing:.5px;z-index:1}
+.card .fav{position:absolute;top:6px;right:6px;background:rgba(255,255,255,.92);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;z-index:1}
+.card .fav.on{color:var(--red)}
+.card .info{padding:8px 10px;border-top:1px solid var(--line)}
+.card .info .ttl{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.card .info .tag{font-size:9px;color:var(--mute);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* 선택 모드 */
+body.select-mode .card .fav{display:none}
+body.select-mode .card{cursor:pointer}
+.card .select-check{display:none;position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);border:2px solid var(--line);color:#fff;font-size:16px;align-items:center;justify-content:center;z-index:2;font-weight:700;line-height:1}
+body.select-mode .card .select-check{display:flex}
+.card.selected{outline:3px solid var(--red);outline-offset:-3px}
+.card.selected .select-check{background:var(--red);border-color:var(--red);color:#fff}
+
+/* 선택 모드 하단 액션 바 */
+.select-bar{display:none;position:fixed;bottom:calc(72px + var(--safe));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:440px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;z-index:150;align-items:center;gap:6px}
+.select-bar.show{display:flex}
+.select-bar .sb-count{flex:1;font-size:12px;font-weight:700;color:var(--ink);padding-left:6px;min-width:0}
+.select-bar button{padding:9px 10px;font-size:13px;font-weight:700;border-radius:4px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap;line-height:1}
+.select-bar button.primary{background:var(--red);color:#fff;border-color:var(--red);font-size:15px;padding:9px 11px}
+.select-bar button.danger{background:#fff;color:var(--red);border-color:var(--red)}
+.select-bar button:disabled{opacity:.5;cursor:not-allowed}
+
+/* 회전 진행 모달 (PDF 모달과 유사) */
+.rotate-modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.8);z-index:300;align-items:center;justify-content:center;padding:30px}
+.rotate-modal.show{display:flex}
+.rotate-modal-box{background:#fff;border-radius:8px;padding:24px 20px;width:100%;max-width:320px;text-align:center}
+.rotate-modal-box h3{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.rotate-modal-box .rt-sub{font-size:12px;color:var(--mute);margin-bottom:18px}
+.rt-progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.rt-progress-bar{height:100%;background:var(--red);width:0%;transition:width .25s}
+.rt-progress-text{font-size:11px;color:var(--mute);margin-bottom:18px}
+
+.fab{position:fixed;bottom:calc(96px + var(--safe));right:calc(50% - 220px);z-index:99;width:54px;height:54px;border-radius:50%;background:var(--red);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(192,57,43,.4);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
+@media(max-width:480px){.fab{right:20px}}
+
+/* PDF FAB (FAB 위쪽에 작게) */
+.fab-pdf{position:fixed;bottom:calc(160px + var(--safe));right:calc(50% - 220px);z-index:99;width:44px;height:44px;border-radius:50%;background:#fff;color:var(--ink);font-size:18px;border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
+@media(max-width:480px){.fab-pdf{right:25px}}
+
+/* PDF 진행 모달 */
+.pdf-modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.8);z-index:200;align-items:center;justify-content:center;padding:30px}
+.pdf-modal.show{display:flex}
+.pdf-modal-box{background:#fff;border-radius:8px;padding:24px 20px;width:100%;max-width:320px;text-align:center}
+.pdf-modal-box h3{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.pdf-modal-box .pdf-sub{font-size:12px;color:var(--mute);margin-bottom:18px}
+.pdf-progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.pdf-progress-bar{height:100%;background:var(--red);width:0%;transition:width .25s}
+.pdf-progress-text{font-size:11px;color:var(--mute);margin-bottom:18px}
+.pdf-modal-actions{display:flex;gap:8px}
+.pdf-modal-actions button{flex:1;padding:10px;font-size:13px;font-weight:700;border-radius:4px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.pdf-modal-actions button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.pdf-modal-actions button:disabled{opacity:.5;cursor:not-allowed}
+
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);padding:10px 0 calc(14px + var(--safe));display:flex;justify-content:space-around;z-index:100}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;color:var(--mute);font-size:9px;font-weight:700}
+.bnav-item.active{color:var(--red)}
+.bnav-item svg{width:22px;height:22px;stroke-width:1.8}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px;overflow-y:auto}
+.modal-backdrop.show{display:flex}
+.zoom-container{width:100%;max-height:55vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;position:relative}
+.zoom-container img{max-width:100%;max-height:55vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.zoom-hint{position:absolute;top:60px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.5);font-size:10px;letter-spacing:1px;background:rgba(0,0,0,.5);padding:5px 12px;border-radius:14px;pointer-events:none;animation:fadeHint 4s ease-out forwards;z-index:10}
+@keyframes fadeHint{0%,30%{opacity:1}100%{opacity:0}}
+.slideshow-zoom{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;position:relative}
+.slideshow-zoom img{max-width:100%;max-height:100vh;object-fit:contain;transform-origin:center center;will-change:transform;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.modal-info{margin-top:16px;color:#fff;text-align:center;max-width:360px;width:100%}
+.modal-info .mtitle{font-size:16px;font-weight:700;margin-bottom:6px}
+.modal-info .mmeta{font-size:11px;color:#aaa;letter-spacing:.5px;margin-bottom:14px}
+.modal-info .mmemo{font-size:12px;color:#ddd;margin-bottom:14px;line-height:1.5;text-align:left;padding:10px;background:rgba(255,255,255,.05);border-radius:4px}
+.modal-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.modal-actions button{border:1px solid #555;color:#fff;padding:7px 14px;font-size:11px;font-weight:700}
+.modal-actions button.primary{background:var(--red);border-color:var(--red)}
+.modal-actions button.danger{color:#ff7670}
+.modal-close{position:absolute;top:16px;right:16px;color:#fff;font-size:30px}
+.modal-counter{position:absolute;top:20px;left:20px;color:#aaa;font-size:11px;letter-spacing:1px;font-family:'Bodoni Moda',serif}
+.tag-chip{display:inline-block;background:rgba(255,255,255,.1);color:#fff;font-size:10px;padding:3px 8px;border-radius:12px;margin:2px}
+
+.slideshow{position:fixed;inset:0;background:#000;z-index:300;display:none;align-items:center;justify-content:center}
+.slideshow.show{display:flex}
+.slideshow img{max-width:100%;max-height:100vh;object-fit:contain}
+.slideshow-exit{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);color:#fff;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
+.slideshow-count{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#fff;font-family:'Bodoni Moda',serif;font-size:14px;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:20px}
+
+.upload-page{padding:20px;display:none !important}
+.upload-page.show{display:block !important}
+
+.upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
+.upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
+.upload-page .subtitle{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:22px}
+
+/* 업로드 방식 탭 */
+.upload-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:18px}
+.upload-tab{flex:1;padding:10px 0;font-size:12px;font-weight:700;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.upload-tab.active{color:var(--ink);border-bottom-color:var(--red)}
+
+.upload-mode{display:none}
+.upload-mode.active{display:block}
+
+.file-zone{border:2px dashed var(--line);padding:36px 20px;text-align:center;margin-bottom:16px;border-radius:4px;position:relative;background:#fff}
+.file-zone.has-file{border-color:var(--red)}
+.file-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-zone .icon{font-size:32px;color:var(--mute);margin-bottom:8px}
+.file-zone .msg{font-size:13px;color:var(--ink);font-weight:700;margin-bottom:4px}
+.file-zone .hint{font-size:11px;color:var(--mute);line-height:1.5}
+.file-zone img.preview{max-height:200px;margin:0 auto}
+
+/* AI 분석 패널 */
+.ai-panel{display:none;margin-bottom:16px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+.ai-panel.show{display:block}
+.ai-trigger{width:100%;padding:14px;background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:none;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.ai-trigger:disabled{color:var(--mute);cursor:wait}
+.ai-trigger .sparkle{font-size:16px}
+.ai-result{padding:14px;border-top:1px solid var(--line);display:none}
+.ai-result.show{display:block}
+.ai-result-title{font-size:11px;color:var(--mute);font-weight:700;letter-spacing:.3px;margin-bottom:8px;text-transform:uppercase}
+.ai-tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ai-tag{padding:6px 10px;border:1px solid var(--line);border-radius:14px;background:#fafafa;font-size:12px;cursor:pointer;color:var(--ink);transition:all .15s}
+.ai-tag:hover{border-color:var(--red)}
+.ai-tag.picked{background:var(--red);color:#fff;border-color:var(--red)}
+.ai-comment-box{background:#fafafa;border-radius:4px;padding:10px 12px;font-size:12px;line-height:1.6;color:var(--ink);margin-bottom:10px}
+.ai-comment-actions{display:flex;gap:8px}
+.ai-comment-actions button{flex:1;padding:8px;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:4px;cursor:pointer;font-weight:600}
+.ai-comment-actions button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.ai-loading{padding:20px;text-align:center;font-size:12px;color:var(--mute)}
+.ai-loading .dot{display:inline-block;animation:aidot 1.4s infinite}
+.ai-loading .dot:nth-child(2){animation-delay:.2s}
+.ai-loading .dot:nth-child(3){animation-delay:.4s}
+@keyframes aidot{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.ai-error{padding:14px;font-size:12px;color:#c0392b;background:#fff5f5}
+
+/* 다중 선택 미리보기 */
+.multi-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px;max-height:340px;overflow-y:auto;padding:2px;-webkit-overflow-scrolling:touch}
+.multi-preview .mp-item{position:relative;aspect-ratio:1;min-height:70px;background:var(--line);border-radius:4px;overflow:hidden;contain:layout style paint}
+.multi-preview .mp-item img{width:100%;height:100%;object-fit:cover}
+.multi-preview .mp-item .mp-status{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px}
+.multi-preview .mp-item.done .mp-status{background:rgba(39,174,96,.85)}
+.multi-preview .mp-item.error .mp-status{background:rgba(192,57,43,.85)}
+.multi-preview .mp-item.uploading .mp-status{background:rgba(0,0,0,.5)}
+.multi-preview .mp-item .mp-remove{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:2}
+.multi-preview .mp-item .mp-skel{position:absolute;inset:0;background:linear-gradient(90deg,#eee 0%,#f5f5f5 50%,#eee 100%);background-size:200% 100%;animation:mp-skel-anim 1.4s infinite}
+@keyframes mp-skel-anim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.multi-count{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;font-size:12px}
+.multi-count .num{font-weight:800;color:var(--red);font-size:14px}
+.multi-count button{font-size:11px;color:var(--mute);text-decoration:underline}
+
+/* 진행률 바 */
+.progress-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:10px 0}
+.progress-bar .progress-fill{height:100%;background:var(--red);transition:width .3s ease;width:0%}
+.progress-info{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);letter-spacing:.5px;margin-bottom:14px}
+
+/* URL 입력 영역 */
+.url-zone{background:#fff;border:1px solid var(--line);border-radius:4px;padding:14px;margin-bottom:16px}
+.url-zone textarea{width:100%;border:none;font-size:13px;font-family:inherit;resize:vertical;min-height:90px;line-height:1.5;outline:none;color:var(--ink)}
+.url-zone textarea::placeholder{color:var(--mute);font-size:12px}
+.url-hint{font-size:11px;color:var(--mute);line-height:1.5;padding:10px 12px;background:#f5f5f0;border-radius:4px;margin-bottom:14px}
+.url-hint strong{color:var(--ink)}
+
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.form-row input,.form-row textarea,.form-row select{width:100%;padding:10px 12px;border:1px solid var(--line);background:#fff;border-radius:4px;font-size:14px}
+.form-row input:focus,.form-row textarea:focus,.form-row select:focus{outline:none;border-color:var(--red)}
+.form-row textarea{resize:vertical;min-height:80px}
+.form-row .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* 일괄 적용 안내 */
+.batch-notice{background:#fff8e1;border-left:3px solid #f1c40f;padding:10px 12px;font-size:11px;color:#7d6608;margin-bottom:14px;line-height:1.5;border-radius:0 4px 4px 0}
+
+.btn-primary{width:100%;background:var(--red);color:#fff;padding:14px;font-size:14px;font-weight:700;letter-spacing:1px;border-radius:4px;margin-top:12px}
+.btn-primary:disabled{background:var(--mute);opacity:.6}
+.btn-ghost{width:100%;border:1px solid var(--line);color:var(--ink);padding:12px;font-size:13px;font-weight:700;background:#fff;border-radius:4px;margin-top:8px}
+
+.toast{position:fixed;bottom:160px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;font-size:12px;border-radius:24px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:60px 20px;color:var(--mute);font-size:13px}
+.empty .em-icon{font-size:40px;margin-bottom:12px;opacity:.3}
+.loading{text-align:center;padding:40px;color:var(--mute);font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.gallery-page{display:block !important}
+.gallery-page.hidden{display:none !important}
+</style>
+</head>
+<body>
+<div id="debugBar" style="position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;font:bold 9px monospace;padding:4px 6px;z-index:99999;text-align:center;letter-spacing:0.3px;white-space:nowrap;overflow:hidden">v5-NUKE · clearing caches...</div>
+<script>
+// PWA Service Worker 강제 제거 + 캐시 박살
+(async function nukePWA() {
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      for (const reg of regs) {
+        await reg.unregister()
+        console.log('SW unregistered:', reg.scope)
+      }
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys()
+      for (const k of keys) {
+        await caches.delete(k)
+        console.log('cache deleted:', k)
+      }
+    }
+    const bar = document.getElementById('debugBar')
+    if (bar) bar.textContent = 'v5-NUKE · caches cleared · ready'
+  } catch (e) {
+    console.error('nukePWA failed:', e)
+  }
+})()
+</script>
+
+<!-- ============ GALLERY PAGE ============ -->
+<div class="gallery-page" id="galleryPage">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">Hi5</div>
+      <div class="brand-text">
+        <div><strong>하이파이브 미술학원</strong></div>
+        <div class="sub">Busan Centum · Gallery</div>
+      </div>
+    </div>
+    <button class="search-btn" id="selectBtn" onclick="toggleSelectMode()" title="선택 모드">☑</button>
+    <button class="search-btn" id="searchBtn" onclick="toggleSearch()">⌕</button>
+  </div>
+
+  <div class="search-bar" id="searchBar">
+    <input type="text" id="searchInput" placeholder="제목 · 태그 · 메모 · 학생 · 학교 검색" autocomplete="off">
+    <button class="clear-btn" id="searchClear" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="search-result-info" id="searchResultInfo"></div>
+
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-avatar">Hi5</div>
+      <div class="hero-info">
+        <h1>부산 센텀점</h1>
+        <div class="handle">@hi5_centum · 미술학원 갤러리</div>
+        <div class="hero-stats" id="heroStats">
+          <div class="hero-stat"><strong>0</strong><span>작품</span></div>
+          <div class="hero-stat"><strong>5</strong><span>카테고리</span></div>
+          <div class="hero-stat"><strong>0</strong><span>★</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-mosaic empty" id="heroMosaic"></div>
+    <div class="hero-bio">학생 작품·수업 레퍼런스·영감 자료를 한곳에. <span class="bio-em">#기록하고_분석하기</span></div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="chips" id="chips"></div>
+  <div class="color-strip" id="colors"></div>
+
+  <div class="gallery-controls">
+    <button class="gc-sort" id="sortBtn" onclick="toggleSortMenu(event)">
+      <span class="gc-sort-icon">⇅</span>
+      <span id="sortLabel">최신순</span>
+      <span class="gc-sort-arrow">▾</span>
+      <div class="gc-sort-menu" id="sortMenu">
+        <button data-sort="newest">최신순</button>
+        <button data-sort="oldest">오래된순</button>
+        <button data-sort="artwork_date">작품 날짜순</button>
+        <button data-sort="favorite">즐겨찾기 먼저</button>
+      </div>
+    </button>
+    <div class="gc-cols" id="colsToggle">
+      <button data-cols="1" title="크게">▭</button>
+      <button data-cols="2" title="기본">▦</button>
+      <button data-cols="3" title="작게">⋮⋮⋮</button>
+    </div>
+  </div>
+
+  <div id="gridContainer"></div>
+
+  <button class="fab-pdf" id="fabPdf" onclick="openPdfModal()" title="PDF 내보내기">📄</button>
+  <button class="fab" id="fab" onclick="startSlideshow()">▶</button>
+
+  <!-- 선택 모드 하단 액션 바 -->
+  <div class="select-bar" id="selectBar">
+    <div class="sb-count"><span id="selectCount">0</span>장</div>
+    <button onclick="selectAllVisible()">전체</button>
+    <button onclick="rotateSelected(-90)" class="primary" id="rotateCcwBtn" title="반시계 90°">↺</button>
+    <button onclick="rotateSelected(90)" class="primary" id="rotateCwBtn" title="시계 90°">↻</button>
+    <button onclick="cancelSelectMode()">취소</button>
+  </div>
+</div>
+
+<!-- ============ PDF 진행 모달 ============ -->
+<div class="pdf-modal" id="pdfModal">
+  <div class="pdf-modal-box">
+    <h3 id="pdfModalTitle">PDF로 내보내기</h3>
+    <div class="pdf-sub" id="pdfModalSub">현재 보이는 작품들을 PDF 포트폴리오로 저장합니다.</div>
+    <div class="pdf-progress" id="pdfProgressWrap" style="display:none">
+      <div class="pdf-progress-bar" id="pdfProgressBar"></div>
+    </div>
+    <div class="pdf-progress-text" id="pdfProgressText" style="display:none">준비 중...</div>
+    <div class="pdf-modal-actions" id="pdfModalActions">
+      <button onclick="closePdfModal()" id="pdfCancelBtn">취소</button>
+      <button class="primary" onclick="generatePdf()" id="pdfStartBtn">PDF 생성</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 회전 진행 모달 ============ -->
+<div class="rotate-modal" id="rotateModal">
+  <div class="rotate-modal-box">
+    <h3 id="rotateModalTitle">작품 회전 중</h3>
+    <div class="rt-sub" id="rotateModalSub">선택한 작품을 시계방향으로 90도 돌립니다.</div>
+    <div class="rt-progress"><div class="rt-progress-bar" id="rtProgressBar"></div></div>
+    <div class="rt-progress-text" id="rtProgressText">준비 중...</div>
+    <div class="pdf-modal-actions">
+      <button onclick="closeRotateModal()" id="rotateCloseBtn" disabled>닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ UPLOAD PAGE ============ -->
+<div class="upload-page" id="uploadPage">
+  <h2><span id="upTitle">새 </span><em><span id="upTitleEm">업로드</span></em></h2>
+  <div class="subtitle" id="upSubtitle">Add New Artwork</div>
+
+  <!-- 업로드 방식 선택 탭 -->
+  <div class="upload-tabs" id="uploadTabs">
+    <button class="upload-tab active" data-mode="single">한 장</button>
+    <button class="upload-tab" data-mode="multi">여러 장</button>
+    <button class="upload-tab" data-mode="url">URL</button>
+  </div>
+
+  <!-- 한 장 업로드 모드 -->
+  <div class="upload-mode active" id="modeSingle">
+    <div class="file-zone" id="fileZone">
+      <input type="file" accept="image/*" id="fileInput">
+      <div id="fileZoneContent">
+        <div class="icon">📷</div>
+        <div class="msg">이미지 선택</div>
+        <div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>
+      </div>
+    </div>
+
+    <!-- AI 분석 패널 (이미지 선택 후 자동 표시) -->
+    <div class="ai-panel" id="aiPanel">
+      <button class="ai-trigger" id="aiTrigger" onclick="runAiAnalysis()">
+        <span class="sparkle">✨</span>
+        <span id="aiTriggerText">AI로 태그 추천받기</span>
+      </button>
+      <div class="ai-result" id="aiResult"></div>
+    </div>
+  </div>
+
+  <!-- 여러 장 업로드 모드 -->
+  <div class="upload-mode" id="modeMulti">
+    <div class="file-zone" id="multiFileZone">
+      <input type="file" accept="image/*" multiple id="multiFileInput">
+      <div class="icon">🖼️</div>
+      <div class="msg">여러 이미지 선택</div>
+      <div class="hint">최대 200장 · 한 장당 20MB 이하<br>이미지 길게 눌러서 다중 선택</div>
+    </div>
+    <div class="multi-count" id="multiCount" style="display:none">
+      <div><span class="num" id="multiNum">0</span>장 선택됨</div>
+      <button onclick="clearMultiFiles()">모두 지우기</button>
+    </div>
+    <div class="multi-preview" id="multiPreview"></div>
+  </div>
+
+  <!-- URL 업로드 모드 -->
+  <div class="upload-mode" id="modeUrl">
+    <div class="url-hint">
+      <strong>이미지 URL을 한 줄에 하나씩</strong> 붙여넣으세요.<br>
+      핀터레스트는 이미지 길게 눌러 "이미지 주소 복사" → 여기 붙여넣기.<br>
+      인스타·카톡은 직접 다운로드 후 "여러 장" 탭 사용 권장.
+    </div>
+    <div class="url-zone">
+      <textarea id="urlInput" placeholder="https://i.pinimg.com/...&#10;https://example.com/image.jpg&#10;..."></textarea>
+    </div>
+    <div class="multi-count" id="urlCount" style="display:none">
+      <div><span class="num" id="urlNum">0</span>개 URL · 미리보기 확인 후 업로드</div>
+    </div>
+    <div class="multi-preview" id="urlPreview"></div>
+    <button class="btn-ghost" onclick="checkUrls()" style="margin-top:0">URL 미리보기</button>
+  </div>
+
+  <!-- 공통 메타 정보 -->
+  <div class="batch-notice" id="batchNotice" style="display:none">
+    💡 아래 정보가 모든 작품에 공통으로 적용됩니다. 업로드 후 작품별로 개별 수정 가능해요.
+  </div>
+
+  <div class="form-row">
+    <label>카테고리 *</label>
+    <select id="fCategory"></select>
+  </div>
+
+  <div class="form-row">
+    <label>태그 (쉼표·공백으로 구분)</label>
+    <input type="text" id="fTags" placeholder="예: 수채, 합격작, 정물">
+  </div>
+
+  <div class="form-row">
+    <label>코멘트 (조형성·색감·구성)</label>
+    <textarea id="fMemo" rows="4" placeholder="작품에 대한 분석·평가·메모"></textarea>
+  </div>
+
+  <!-- 진행률 표시 -->
+  <div id="progressZone" style="display:none">
+    <div class="progress-info">
+      <span id="progressLabel">업로드 중...</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <button class="btn-primary" id="btnSubmit" onclick="submitArtwork()">업로드</button>
+  <button class="btn-ghost" onclick="showGallery()">취소</button>
+</div>
+
+<!-- ============ BOTTOM NAV ============ -->
+<nav class="bnav">
+  <button class="bnav-item active" id="navGallery" onclick="showGallery()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <span>갤러리</span>
+  </button>
+  <button class="bnav-item" id="navUpload" onclick="showUpload()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
+    <span>업로드</span>
+  </button>
+  <button class="bnav-item" onclick="toast('컬렉션 — 추후 업데이트')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
+    <span>컬렉션</span>
+  </button>
+  <button class="bnav-item" onclick="toast('공유 모드 — Phase 4 예정')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+    <span>공유</span>
+  </button>
+  <button class="bnav-item" onclick="toast('설정 — 추후 추가')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    <span>설정</span>
+  </button>
+</nav>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-backdrop" id="modal">
+  <button class="modal-close" onclick="closeModal()">×</button>
+  <div class="modal-counter" id="modalCat"></div>
+  <div class="zoom-hint" id="zoomHint">두 손가락으로 확대 · 더블탭</div>
+  <div class="zoom-container" id="zoomContainer">
+    <img id="modalImg" src="" alt="" onclick="event.stopPropagation()">
+  </div>
+  <div class="modal-info" onclick="event.stopPropagation()">
+    <div class="mtitle" id="modalTitle"></div>
+    <div class="mmeta" id="modalMeta"></div>
+    <div class="mmemo" id="modalMemo" style="display:none"></div>
+    <div id="modalTags" style="margin-bottom:14px"></div>
+    <div class="modal-actions">
+      <button onclick="toggleFavorite()" id="btnFav">♡ 즐겨찾기</button>
+      <button onclick="editCurrent()">수정</button>
+      <button class="primary" onclick="shareCurrent()">공유</button>
+      <button class="danger" onclick="deleteCurrent()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SLIDESHOW ============ -->
+<div class="slideshow" id="slideshow">
+  <button class="slideshow-exit" onclick="exitSlideshow()">EXIT ×</button>
+  <div class="slideshow-zoom" id="slideZoomContainer">
+    <img id="slideImg" src="" alt="">
+  </div>
+  <div class="slideshow-count" id="slideCount">1 / 1</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'
+
+// ============ SUPABASE CONFIG ============
+const SUPABASE_URL = 'https://zcakexegtjpmmszbqdgv.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_d2gdZfyMzvEhb5fZoal31A_Ee_dD_fl'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+// ============ STATE ============
+let artworks = []
+let categories = []
+let activeView = 'all'
+let activeCat = 'all'
+let activeColor = 'all'
+let searchQuery = ''
+let selectMode = false
+let selectedIds = new Set()
+let sortMode = 'newest'
+let gridCols = 2
+let currentId = null
+let editingId = null
+let selectedFile = null
+let slideIdx = 0, slideTimer = null
+
+const COLORS = [
+  {id:'all',style:'background:linear-gradient(135deg,#c0392b,#3498db,#f1c40f);border:1px solid var(--line)'},
+  {id:'red',style:'background:#c0392b'},
+  {id:'orange',style:'background:#e67e22'},
+  {id:'yellow',style:'background:#f1c40f'},
+  {id:'green',style:'background:#27ae60'},
+  {id:'blue',style:'background:#2980b9'},
+  {id:'purple',style:'background:#8e44ad'},
+  {id:'mono',style:'background:#2c3e50'}
+]
+
+// ============ PINCH ZOOM (자연스러운 포토뷰어 방식) ============
+function createPinchZoom(container) {
+  if (!container) return null
+  const img = container.querySelector('img')
+  if (!img) return null
+
+  let scale = 1
+  let posX = 0, posY = 0
+  // 제스처 시작 시점의 상태
+  let startScale = 1
+  let startDist = 0
+  let startMidX = 0, startMidY = 0  // 컨테이너 기준 두 손가락 중심
+  let startPosX = 0, startPosY = 0
+  // 단일 손가락 패닝
+  let startTouchX = 0, startTouchY = 0
+  let isPanning = false
+  let lastTap = 0
+  let lastTapX = 0, lastTapY = 0
+
+  function applyTransform() {
+    img.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale})`
+  }
+
+  function reset() {
+    scale = 1
+    posX = 0; posY = 0
+    img.style.transition = 'transform 0.25s ease'
+    applyTransform()
+    setTimeout(() => { img.style.transition = '' }, 260)
+  }
+
+  function getDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX
+    const dy = t1.clientY - t2.clientY
+    return Math.sqrt(dx*dx + dy*dy)
+  }
+
+  // 컨테이너 좌표계로 변환
+  function getContainerPoint(clientX, clientY) {
+    const rect = container.getBoundingClientRect()
+    return {
+      x: clientX - rect.left - rect.width / 2,
+      y: clientY - rect.top - rect.height / 2
+    }
+  }
+
+  // 이미지가 컨테이너 밖으로 너무 나가지 않도록 위치 제한
+  function clampPosition() {
+    const rect = container.getBoundingClientRect()
+    const imgRect = img.getBoundingClientRect()
+    // 확대된 이미지의 실제 크기
+    const scaledW = img.offsetWidth * scale
+    const scaledH = img.offsetHeight * scale
+    // 이미지가 컨테이너보다 크면 그 차이만큼만 이동 가능
+    const maxX = Math.max(0, (scaledW - rect.width) / 2)
+    const maxY = Math.max(0, (scaledH - rect.height) / 2)
+    posX = Math.max(-maxX, Math.min(maxX, posX))
+    posY = Math.max(-maxY, Math.min(maxY, posY))
+  }
+
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      // 핀치 시작
+      e.preventDefault()
+      const t1 = e.touches[0], t2 = e.touches[1]
+      startDist = getDistance(t1, t2)
+      startScale = scale
+      // 두 손가락 중심점 (컨테이너 기준)
+      const mid = getContainerPoint(
+        (t1.clientX + t2.clientX) / 2,
+        (t1.clientY + t2.clientY) / 2
+      )
+      startMidX = mid.x
+      startMidY = mid.y
+      startPosX = posX
+      startPosY = posY
+      isPanning = false
+    } else if (e.touches.length === 1) {
+      const t = e.touches[0]
+      // 더블탭 감지
+      const now = Date.now()
+      const tapX = t.clientX, tapY = t.clientY
+      const tapDist = Math.hypot(tapX - lastTapX, tapY - lastTapY)
+      if (now - lastTap < 300 && tapDist < 40) {
+        e.preventDefault()
+        if (scale > 1.1) {
+          // 이미 확대됨 → 원래대로
+          reset()
+        } else {
+          // 탭한 위치 기준으로 2.5배 확대
+          const point = getContainerPoint(tapX, tapY)
+          const newScale = 2.5
+          // 탭한 지점이 화면 중앙으로 오도록 위치 계산
+          posX = -point.x * (newScale - 1) / 1
+          posY = -point.y * (newScale - 1) / 1
+          scale = newScale
+          clampPosition()
+          img.style.transition = 'transform 0.25s ease'
+          applyTransform()
+          setTimeout(() => { img.style.transition = '' }, 260)
+        }
+        lastTap = 0
+        return
+      }
+      lastTap = now
+      lastTapX = tapX
+      lastTapY = tapY
+
+      // 확대된 상태에서만 패닝 활성화
+      if (scale > 1.05) {
+        startTouchX = t.clientX
+        startTouchY = t.clientY
+        startPosX = posX
+        startPosY = posY
+        isPanning = true
+      }
+    }
+  }, { passive: false })
+
+  container.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      // 핀치 줌 + 동시 패닝
+      e.preventDefault()
+      const t1 = e.touches[0], t2 = e.touches[1]
+      const dist = getDistance(t1, t2)
+      const newScale = Math.max(1, Math.min(5, startScale * (dist / startDist)))
+
+      // 현재 두 손가락 중심점
+      const currentMid = getContainerPoint(
+        (t1.clientX + t2.clientX) / 2,
+        (t1.clientY + t2.clientY) / 2
+      )
+
+      // 핵심 공식:
+      // 확대 시작 시점의 중심점(startMidX/Y)을 기준으로 줌하면서
+      // 손가락이 이동한 만큼 이미지도 같이 따라가도록
+      const scaleRatio = newScale / startScale
+      posX = currentMid.x - (startMidX - startPosX) * scaleRatio
+      posY = currentMid.y - (startMidY - startPosY) * scaleRatio
+
+      scale = newScale
+      clampPosition()
+      applyTransform()
+    } else if (e.touches.length === 1 && isPanning && scale > 1.05) {
+      // 단일 손가락 패닝
+      e.preventDefault()
+      const t = e.touches[0]
+      posX = startPosX + (t.clientX - startTouchX)
+      posY = startPosY + (t.clientY - startTouchY)
+      clampPosition()
+      applyTransform()
+    }
+  }, { passive: false })
+
+  container.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) {
+      isPanning = false
+      // 1배 미만으로 줄어들면 부드럽게 리셋
+      if (scale < 1.05) {
+        reset()
+      } else {
+        // 경계 다시 한 번 확인 후 스냅
+        clampPosition()
+        img.style.transition = 'transform 0.2s ease'
+        applyTransform()
+        setTimeout(() => { img.style.transition = '' }, 210)
+      }
+    } else if (e.touches.length === 1) {
+      // 두 손가락 → 한 손가락으로 바뀌면 패닝 시작점 갱신
+      const t = e.touches[0]
+      startTouchX = t.clientX
+      startTouchY = t.clientY
+      startPosX = posX
+      startPosY = posY
+      isPanning = scale > 1.05
+    }
+  })
+
+  // 마우스 휠 (PC) - 마우스 위치 기준 확대
+  container.addEventListener('wheel', (e) => {
+    e.preventDefault()
+    const point = getContainerPoint(e.clientX, e.clientY)
+    const oldScale = scale
+    const delta = e.deltaY > 0 ? 0.9 : 1.1
+    const newScale = Math.max(1, Math.min(5, scale * delta))
+    // 마우스 위치 기준 확대
+    const scaleRatio = newScale / oldScale
+    posX = point.x - (point.x - posX) * scaleRatio
+    posY = point.y - (point.y - posY) * scaleRatio
+    scale = newScale
+    if (scale <= 1.01) { posX = 0; posY = 0; scale = 1 }
+    clampPosition()
+    applyTransform()
+  }, { passive: false })
+
+  return { reset }
+}
+
+let modalZoom = null
+let slideZoom = null
+
+// 초기화 (DOMContentLoaded 후)
+window.addEventListener('DOMContentLoaded', async () => {
+  modalZoom = createPinchZoom(document.getElementById('zoomContainer'))
+  slideZoom = createPinchZoom(document.getElementById('slideZoomContainer'))
+  setupFileInput()
+  setupGalleryControls()
+  renderColors()
+  // 페이지 시작 시: 업로드 페이지는 화면 밖으로 격리, 갤러리만 표시
+  showOnlyGallery()
+  await loadData()
+  handleShareTarget()
+})
+
+async function loadData() {
+  const grid = document.getElementById('gridContainer')
+  if (grid) grid.innerHTML = '<div class="loading">불러오는 중...</div>'
+  try {
+    const [{data: cats}, {data: arts}] = await Promise.all([
+      supabase.from('categories').select('*').order('sort_order'),
+      supabase.from('artworks').select('*').order('created_at',{ascending:false}).limit(500)
+    ])
+    categories = cats || []
+    artworks = arts || []
+    renderAll()
+  } catch (err) {
+    console.error(err)
+    toast('데이터 로딩 실패: ' + err.message)
+    const g2 = document.getElementById('gridContainer')
+    if (g2) g2.innerHTML = '<div class="empty"><div class="em-icon">⚠</div>데이터를 불러오지 못했어요</div>'
+  }
+}
+
+function renderAll() {
+  renderTabs()
+  renderChips()
+  renderGrid()
+  renderHero()
+  renderCategorySelect()
+}
+
+function renderHero() {
+  const favCnt = artworks.filter(a => a.is_favorite).length
+  const heroStats = document.getElementById('heroStats')
+  if (heroStats) heroStats.innerHTML = `
+    <div class="hero-stat"><strong>${artworks.length}</strong><span>작품</span></div>
+    <div class="hero-stat"><strong>${categories.length}</strong><span>카테고리</span></div>
+    <div class="hero-stat"><strong>${favCnt}</strong><span>★</span></div>
+  `
+  // 최근 작품 4장 모자이크
+  const mosaic = document.getElementById('heroMosaic')
+  if (!mosaic) return
+  const recent = artworks.slice(0, 4)
+  if (recent.length === 0) {
+    mosaic.classList.add('empty')
+    mosaic.innerHTML = ''
+  } else {
+    mosaic.classList.remove('empty')
+    mosaic.innerHTML = recent.map(a =>
+      `<div class="m-cell" style="background-image:url('${a.image_url}')"></div>`
+    ).join('')
+  }
+}
+
+function renderTabs() {
+  const favCnt = artworks.filter(a => a.is_favorite).length
+  const recentCnt = Math.min(artworks.length, 12)
+  const tabs = [
+    {id:'all', label:'전체', count:artworks.length},
+    {id:'favorite', label:'즐겨찾기', count:favCnt},
+    {id:'recent', label:'최근', count:recentCnt}
+  ]
+  const tabsEl = document.getElementById('tabs')
+  if (!tabsEl) return
+  tabsEl.innerHTML = tabs.map(t =>
+    `<button class="tab ${activeView===t.id?'active':''}" data-view="${t.id}">${t.label}<span class="count">${t.count}</span></button>`
+  ).join('')
+  document.querySelectorAll('#tabs .tab').forEach(el => {
+    el.onclick = () => { activeView = el.dataset.view; renderTabs(); renderGrid() }
+  })
+}
+
+function renderChips() {
+  const html = `<button class="chip ${activeCat==='all'?'active':''}" data-cat="all"><span class="dot" style="background:#1a1a1a"></span>전체</button>` +
+    categories.map(c => `<button class="chip ${activeCat===c.id?'active':''}" data-cat="${c.id}"><span class="dot" style="background:${c.color}"></span>${c.name}</button>`).join('')
+  const chipsEl = document.getElementById('chips')
+  if (!chipsEl) return
+  chipsEl.innerHTML = html
+  document.querySelectorAll('#chips .chip').forEach(el => {
+    el.onclick = () => { activeCat = el.dataset.cat; renderChips(); renderGrid() }
+  })
+}
+
+function renderColors() {
+  const html = '<span class="color-strip-label">컬러</span>' +
+    COLORS.map(c => `<div class="color-dot ${activeColor===c.id?'active':''}" data-color="${c.id}" style="${c.style}"></div>`).join('')
+  const colorsEl = document.getElementById('colors')
+  if (!colorsEl) return
+  colorsEl.innerHTML = html
+  document.querySelectorAll('.color-dot').forEach(el => {
+    el.onclick = () => { activeColor = el.dataset.color; renderColors(); renderGrid() }
+  })
+}
+
+function renderCategorySelect() {
+  const sel = document.getElementById('fCategory')
+  if (!sel) return  // 업로드 페이지가 아직 DOM에 마운트 안 됐을 때 안전 처리
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('')
+}
+
+function getFiltered() {
+  let list = artworks
+  if (activeView === 'favorite') list = list.filter(a => a.is_favorite)
+  if (activeView === 'recent') list = list.slice(0, 12)
+  if (activeCat !== 'all') list = list.filter(a => a.category === activeCat)
+  if (activeColor !== 'all') list = list.filter(a => a.main_color === activeColor)
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase().trim()
+    list = list.filter(a => {
+      const haystack = [
+        a.title,
+        a.memo,
+        a.student_name,
+        a.school,
+        a.subject,
+        ...(a.tags || [])
+      ].filter(Boolean).join(' ').toLowerCase()
+      return haystack.includes(q)
+    })
+  }
+  return applySorting(list)
+}
+
+function applySorting(list) {
+  // 원본 보존을 위해 복사 후 정렬
+  const arr = list.slice()
+  const getCreated = a => new Date(a.created_at || 0).getTime()
+  if (sortMode === 'newest') {
+    // 기본: created_at 내림차순 (artworks는 이미 그렇게 들어옴, 안전하게 한 번 더)
+    arr.sort((a, b) => getCreated(b) - getCreated(a))
+  } else if (sortMode === 'oldest') {
+    arr.sort((a, b) => getCreated(a) - getCreated(b))
+  } else if (sortMode === 'artwork_date') {
+    // artwork_date 내림차순 (null은 맨 뒤로)
+    arr.sort((a, b) => {
+      const ad = a.artwork_date ? new Date(a.artwork_date).getTime() : -Infinity
+      const bd = b.artwork_date ? new Date(b.artwork_date).getTime() : -Infinity
+      if (bd !== ad) return bd - ad
+      return getCreated(b) - getCreated(a)
+    })
+  } else if (sortMode === 'favorite') {
+    // 즐겨찾기 먼저, 그 안에선 최신순
+    arr.sort((a, b) => {
+      const fa = a.is_favorite ? 1 : 0
+      const fb = b.is_favorite ? 1 : 0
+      if (fb !== fa) return fb - fa
+      return getCreated(b) - getCreated(a)
+    })
+  }
+  return arr
+}
+
+function renderGrid() {
+  const list = getFiltered()
+  const container = document.getElementById('gridContainer')
+  document.getElementById('fab').style.display = list.length > 0 ? 'flex' : 'none'
+  document.getElementById('fabPdf').style.display = list.length > 0 ? 'flex' : 'none'
+
+  // 검색 결과 정보 업데이트
+  if (searchQuery) {
+    const info = document.getElementById('searchResultInfo')
+    if (info) {
+      info.textContent = `"${searchQuery}" — ${list.length}개 결과`
+      info.classList.add('show')
+    }
+  }
+
+  if (list.length === 0) {
+    if (artworks.length === 0) {
+      container.innerHTML = `<div class="empty"><div class="em-icon">🖼</div><div>아직 작품이 없어요</div><div style="margin-top:8px;font-size:11px">하단 + 버튼으로 첫 작품을 추가해 보세요</div></div>`
+    } else if (searchQuery) {
+      container.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>"${escapeHtml(searchQuery)}" 검색 결과가 없어요<div style="margin-top:8px;font-size:11px">다른 키워드로 시도해 보세요</div></div>`
+    } else {
+      container.innerHTML = `<div class="empty"><div class="em-icon">🔍</div>조건에 맞는 작품이 없어요</div>`
+    }
+    return
+  }
+
+  const cards = list.map(a => {
+    const badge = (a.tags||[]).includes('합격작') ? '합격작' : (a.tags||[]).includes('우수작') ? '우수작' : a.category==='best' ? 'BEST' : null
+    const tagText = ((a.tags||[]).slice(0,2).map(t => '#'+t).join(' '))
+    const studentText = a.student_name ? a.student_name + (tagText ? ' · ' : '') : ''
+    const isSelected = selectedIds.has(a.id)
+    return `
+      <div class="card ${isSelected?'selected':''}" data-id="${a.id}">
+        ${badge ? `<div class="badge">${badge}</div>` : ''}
+        <button class="fav ${a.is_favorite?'on':''}" data-fav="${a.id}">${a.is_favorite?'♥':'♡'}</button>
+        <div class="select-check">${isSelected?'✓':''}</div>
+        <img src="${a.image_url}" alt="${escapeHtml(a.title)}" loading="lazy">
+        <div class="info">
+          <div class="ttl">${escapeHtml(a.title)}</div>
+          <div class="tag">${escapeHtml(studentText + tagText)}</div>
+        </div>
+      </div>`
+  }).join('')
+  container.innerHTML = `<div class="grid cols-${gridCols}">${cards}</div>`
+
+  document.querySelectorAll('.card').forEach(el => {
+    const id = parseInt(el.dataset.id)
+    
+    // 길게 누르기 핸들러
+    let pressTimer = null
+    let longPressed = false
+    let startX = 0, startY = 0
+    
+    const startPress = (e) => {
+      longPressed = false
+      const t = e.touches ? e.touches[0] : e
+      startX = t.clientX
+      startY = t.clientY
+      pressTimer = setTimeout(() => {
+        longPressed = true
+        // 햅틱 피드백
+        if (navigator.vibrate) navigator.vibrate(40)
+        // 선택 모드 진입 + 이 카드 선택
+        if (!selectMode) enterSelectMode()
+        if (!selectedIds.has(id)) {
+          selectedIds.add(id)
+          el.classList.add('selected')
+          const chk = el.querySelector('.select-check')
+          if (chk) chk.textContent = '✓'
+          updateSelectBarCount()
+        }
+      }, 450)
+    }
+    
+    const cancelPress = (e) => {
+      // 스크롤 등으로 손가락 움직였으면 길게 누르기 취소
+      if (e && (e.touches || e.changedTouches)) {
+        const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0])
+        if (t) {
+          const dx = Math.abs(t.clientX - startX)
+          const dy = Math.abs(t.clientY - startY)
+          if (dx > 10 || dy > 10) {
+            clearTimeout(pressTimer)
+            pressTimer = null
+            return
+          }
+        }
+      }
+      clearTimeout(pressTimer)
+      pressTimer = null
+    }
+    
+    el.addEventListener('touchstart', startPress, { passive: true })
+    el.addEventListener('touchend', cancelPress, { passive: true })
+    el.addEventListener('touchmove', cancelPress, { passive: true })
+    el.addEventListener('touchcancel', cancelPress, { passive: true })
+    el.addEventListener('mousedown', startPress)
+    el.addEventListener('mouseup', cancelPress)
+    el.addEventListener('mouseleave', cancelPress)
+    
+    el.onclick = e => {
+      // 길게 눌러서 선택된 경우 클릭 이벤트 무시
+      if (longPressed) {
+        longPressed = false
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+      if (e.target.classList.contains('fav')) return
+      if (selectMode) {
+        toggleSelectArtwork(id)
+      } else {
+        openModal(id)
+      }
+    }
+  })
+  document.querySelectorAll('.fav').forEach(el => {
+    el.onclick = async e => { e.stopPropagation(); await toggleFav(parseInt(el.dataset.fav)) }
+  })
+}
+
+// ============ MODAL ============
+function openModal(id) {
+  const a = artworks.find(x => x.id === id)
+  if (!a) return
+  currentId = id
+  const cat = categories.find(c => c.id === a.category)
+  const dateStr = a.artwork_date ? new Date(a.artwork_date).toLocaleDateString('ko-KR') : null
+  const metaParts = [a.student_name, a.school, a.subject, dateStr].filter(Boolean).join(' · ')
+
+  document.getElementById('modalImg').src = a.image_url
+  document.getElementById('modalCat').textContent = cat?.name || ''
+  document.getElementById('modalTitle').textContent = a.title
+  document.getElementById('modalMeta').textContent = metaParts
+  const memo = document.getElementById('modalMemo')
+  if (a.memo) { memo.textContent = a.memo; memo.style.display = 'block' } else { memo.style.display = 'none' }
+  document.getElementById('modalTags').innerHTML = (a.tags||[]).map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')
+  document.getElementById('btnFav').textContent = a.is_favorite ? '♥ 즐겨찾기' : '♡ 즐겨찾기'
+  if (modalZoom) modalZoom.reset()
+  document.getElementById('modal').classList.add('show')
+  // 줌 힌트 다시 보이게
+  const hint = document.getElementById('zoomHint')
+  hint.style.animation = 'none'
+  hint.offsetHeight
+  hint.style.animation = 'fadeHint 4s ease-out forwards'
+}
+
+window.closeModal = () => {
+  if (modalZoom) modalZoom.reset()
+  document.getElementById('modal').classList.remove('show')
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  // 줌 컨테이너나 이미지 영역 클릭은 닫기 동작에서 제외
+  if (e.target.id === 'modal') closeModal()
+})
+
+window.toggleFavorite = async () => {
+  if (currentId === null) return
+  await toggleFav(currentId)
+  const a = artworks.find(x => x.id === currentId)
+  document.getElementById('btnFav').textContent = a.is_favorite ? '♥ 즐겨찾기' : '♡ 즐겨찾기'
+}
+
+async function toggleFav(id) {
+  const a = artworks.find(x => x.id === id)
+  if (!a) return
+  try {
+    const {data, error} = await supabase.from('artworks').update({is_favorite: !a.is_favorite}).eq('id', id).select().single()
+    if (error) throw error
+    const idx = artworks.findIndex(x => x.id === id)
+    artworks[idx] = data
+    renderAll()
+    toast(data.is_favorite ? '즐겨찾기 추가' : '즐겨찾기 해제')
+  } catch (err) {
+    toast('처리 실패')
+  }
+}
+
+window.shareCurrent = async () => {
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  try {
+    if (navigator.share) {
+      await navigator.share({title: a.title, text: a.memo || a.title, url: a.image_url})
+    } else {
+      await navigator.clipboard.writeText(a.image_url)
+      toast('이미지 링크 복사됨')
+    }
+  } catch (err) {}
+}
+
+window.deleteCurrent = async () => {
+  if (!confirm('정말 삭제하시겠어요?')) return
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  try {
+    if (a.storage_path) {
+      await supabase.storage.from('artworks').remove([a.storage_path])
+    }
+    const {error} = await supabase.from('artworks').delete().eq('id', a.id)
+    if (error) throw error
+    artworks = artworks.filter(x => x.id !== a.id)
+    closeModal()
+    renderAll()
+    toast('삭제 완료')
+  } catch (err) {
+    toast('삭제 실패: ' + err.message)
+  }
+}
+
+window.editCurrent = () => {
+  const a = artworks.find(x => x.id === currentId)
+  if (!a) return
+  editingId = a.id
+
+  // 단일 모드로 전환
+  switchUploadMode('single')
+
+  // 기본 필드
+  document.getElementById('fTags').value = (a.tags || []).join(', ')
+  document.getElementById('fMemo').value = a.memo || ''
+  // 카테고리 (값을 select에 세팅)
+  setTimeout(() => {
+    document.getElementById('fCategory').value = a.category || 'inspire'
+  }, 0)
+
+  // 현재 이미지 미리보기
+  document.getElementById('fileZoneContent').innerHTML = `<img src="${a.image_url}" class="preview" alt="">`
+  document.getElementById('fileZone').classList.add('has-file')
+  selectedFile = null
+  hideAiPanel()  // 수정 모드에서는 AI 패널 숨김 (필요하면 새 이미지 선택 시 자동 노출)
+
+  // 상세 정보 폼 동적 주입 (수정 모드에서만)
+  injectDetailForm(a)
+
+  document.getElementById('upTitle').textContent = '작품 '
+  document.getElementById('upTitleEm').textContent = '수정'
+  document.getElementById('upSubtitle').textContent = 'Edit Artwork'
+  document.getElementById('btnSubmit').textContent = '수정 저장'
+  closeModal()
+  showUploadPage()
+}
+
+function injectDetailForm(a) {
+  // 이미 있으면 제거
+  const existing = document.getElementById('detailFormZone')
+  if (existing) existing.remove()
+
+  const memoRow = document.getElementById('fMemo').closest('.form-row')
+  const zone = document.createElement('div')
+  zone.id = 'detailFormZone'
+  zone.innerHTML = `
+    <div style="border-top:1px solid var(--line);margin:18px 0 14px;padding-top:14px">
+      <div style="font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;font-weight:700">📋 상세 정보 (선택 입력)</div>
+      <div class="form-row">
+        <label>제목</label>
+        <input type="text" id="fTitleDetail" value="${escapeHtml(a.title || '')}" placeholder="비워두면 자동 생성">
+      </div>
+      <div class="form-row">
+        <div class="row2">
+          <div>
+            <label>학생 이름</label>
+            <input type="text" id="fStudentDetail" value="${escapeHtml(a.student_name || '')}" placeholder="홍길동">
+          </div>
+          <div>
+            <label>학교</label>
+            <input type="text" id="fSchoolDetail" value="${escapeHtml(a.school || '')}" placeholder="OO고">
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="row2">
+          <div>
+            <label>과목·교과</label>
+            <input type="text" id="fSubjectDetail" value="${escapeHtml(a.subject || '')}" placeholder="기초디자인">
+          </div>
+          <div>
+            <label>작품 날짜</label>
+            <input type="date" id="fDateDetail" value="${a.artwork_date || ''}">
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+  memoRow.parentNode.insertBefore(zone, memoRow.nextSibling)
+}
+
+// ============ 색상 자동 추출 ============
+// 이미지의 대표 색상 톤을 분류해서 반환 (red/orange/yellow/green/blue/purple/mono)
+async function extractMainColor(imageSource) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        const size = 50  // 작게 줄여서 빠르게 분석
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, size, size)
+        const data = ctx.getImageData(0, 0, size, size).data
+
+        const buckets = { red:0, orange:0, yellow:0, green:0, blue:0, purple:0, mono:0 }
+        let total = 0
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2], a = data[i+3]
+          if (a < 128) continue
+          // 너무 어두운/밝은 픽셀 제외 (배경 흰색·검정 무시)
+          const max = Math.max(r,g,b), min = Math.min(r,g,b)
+          const lightness = (max + min) / 2
+          const saturation = max === 0 ? 0 : (max - min) / max
+
+          // 채도가 너무 낮으면 모노톤
+          if (saturation < 0.2 || lightness < 30 || lightness > 230) {
+            buckets.mono++; total++; continue
+          }
+          // HSL의 hue 계산
+          let h = 0
+          if (max === r) h = ((g - b) / (max - min)) % 6
+          else if (max === g) h = (b - r) / (max - min) + 2
+          else h = (r - g) / (max - min) + 4
+          h = h * 60
+          if (h < 0) h += 360
+
+          // hue 기준 색상 분류
+          if (h < 15 || h >= 345) buckets.red++
+          else if (h < 45) buckets.orange++
+          else if (h < 70) buckets.yellow++
+          else if (h < 170) buckets.green++
+          else if (h < 250) buckets.blue++
+          else if (h < 290) buckets.purple++
+          else buckets.red++
+          total++
+        }
+
+        if (total === 0) { resolve('mono'); return }
+        // 모노가 70% 이상이면 모노, 아니면 가장 많은 컬러
+        if (buckets.mono / total > 0.7) { resolve('mono'); return }
+        // 모노 제외하고 최다 색상
+        delete buckets.mono
+        let bestColor = 'red', bestCount = 0
+        Object.entries(buckets).forEach(([k, v]) => {
+          if (v > bestCount) { bestCount = v; bestColor = k }
+        })
+        resolve(bestColor)
+      } catch (err) {
+        resolve('mono')
+      }
+    }
+    img.onerror = () => resolve('mono')
+    // File인지 URL인지 처리
+    if (imageSource instanceof File || imageSource instanceof Blob) {
+      img.src = URL.createObjectURL(imageSource)
+    } else {
+      img.src = imageSource
+    }
+  })
+}
+
+// ============ UPLOAD MODES ============
+let uploadMode = 'single'  // 'single' | 'multi' | 'url'
+let multiFiles = []  // [{file, preview, status, error}]
+let urlItems = []    // [{url, preview, status, error}]
+
+// 이미지를 2400px 이하로 리사이즈 (원본이 더 작으면 그대로 반환)
+// PNG는 무손실 보존, JPEG는 품질 0.9
+// + EXIF orientation을 자동으로 인식해서 똑바로 세움
+async function resizeImageForUpload(file, maxSize = 2400, quality = 0.9) {
+  const isPng = (file.type === 'image/png')
+  
+  // createImageBitmap에 imageOrientation: 'from-image' 옵션 — EXIF 회전 자동 적용
+  let bitmap
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+  } catch (e) {
+    // 옵션 지원 안 하는 옛 브라우저 폴백
+    try {
+      bitmap = await createImageBitmap(file)
+    } catch (e2) {
+      return file
+    }
+  }
+  
+  // 원본이 이미 작으면 그대로 (다만 EXIF 회전은 적용된 채로 저장해야 하므로 강제 재인코딩)
+  const needsResize = Math.max(bitmap.width, bitmap.height) > maxSize
+  const w = needsResize ? Math.round(bitmap.width * (maxSize / Math.max(bitmap.width, bitmap.height))) : bitmap.width
+  const h = needsResize ? Math.round(bitmap.height * (maxSize / Math.max(bitmap.width, bitmap.height))) : bitmap.height
+  
+  let blob
+  try {
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const canvas = new OffscreenCanvas(w, h)
+      const ctx = canvas.getContext('2d')
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(bitmap, 0, 0, w, h)
+      bitmap.close && bitmap.close()
+      const outType = isPng ? 'image/png' : 'image/jpeg'
+      blob = await canvas.convertToBlob({ type: outType, quality })
+    } else {
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(bitmap, 0, 0, w, h)
+      bitmap.close && bitmap.close()
+      blob = await new Promise(res => canvas.toBlob(res, isPng ? 'image/png' : 'image/jpeg', quality))
+    }
+  } catch (e) {
+    return file
+  }
+  
+  if (!blob) return file
+  // 리사이즈 안 했고 결과가 커졌으면 원본 (다만 EXIF 회전이 필요하면 어쩔 수 없이 큰 거 씀)
+  if (!needsResize && blob.size > file.size * 1.3) return file
+  
+  const newName = file.name.replace(/\.(png|jpg|jpeg|webp|heic|heif)$/i, '') + (isPng ? '.png' : '.jpg')
+  return new File([blob], newName, { type: blob.type })
+}
+
+function switchUploadMode(mode) {
+  uploadMode = mode
+  document.querySelectorAll('.upload-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mode === mode)
+  })
+  document.querySelectorAll('.upload-mode').forEach(m => m.classList.remove('active'))
+  document.getElementById(`mode${mode.charAt(0).toUpperCase() + mode.slice(1)}`).classList.add('active')
+  const isBatch = mode !== 'single'
+  document.getElementById('batchNotice').style.display = isBatch ? 'block' : 'none'
+  const btn = document.getElementById('btnSubmit')
+  if (!editingId) {
+    btn.textContent = isBatch ? '일괄 업로드' : '업로드'
+  }
+  // 한 장 모드 + 이미 이미지 선택된 상태면 AI 패널 유지, 아니면 숨김
+  if (mode === 'single' && selectedFile) {
+    showAiPanel()
+  } else {
+    hideAiPanel()
+  }
+}
+
+function setupFileInput() {
+  // 한 장 업로드
+  document.getElementById('fileInput').addEventListener('change', e => {
+    const f = e.target.files[0]
+    if (!f) return
+    if (f.size > 20*1024*1024) { toast('파일이 너무 커요 (최대 20MB)'); return }
+    selectedFile = f
+    const url = URL.createObjectURL(f)
+    document.getElementById('fileZoneContent').innerHTML = `<img src="${url}" class="preview" alt="">`
+    document.getElementById('fileZone').classList.add('has-file')
+    // AI 패널 표시 (결과는 비워둠)
+    showAiPanel()
+    resetAiResult()
+  })
+
+  // 여러 장 업로드
+  document.getElementById('multiFileInput').addEventListener('change', e => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    addMultiFiles(files)
+    // 같은 파일 다시 선택 가능하게
+    e.target.value = ''
+  })
+
+  // 업로드 모드 탭
+  document.querySelectorAll('.upload-tab').forEach(t => {
+    t.onclick = () => switchUploadMode(t.dataset.mode)
+  })
+}
+
+function addMultiFiles(files) {
+  const available = 200 - multiFiles.length
+  if (available <= 0) {
+    toast('최대 200장까지 선택 가능해요')
+    return
+  }
+  const toAdd = files.slice(0, available)
+  if (files.length > available) {
+    toast(`${available}장만 추가됨 (최대 200장)`)
+  }
+  // 유효한 파일만 일단 빈 미리보기로 추가 (UI 즉시 반응)
+  const newItems = []
+  toAdd.forEach(f => {
+    if (f.size > 20*1024*1024) return
+    if (!f.type.startsWith('image/')) return
+    const item = {
+      file: f,
+      preview: '',  // 비워두고 비동기로 채움
+      status: 'pending',
+      error: null
+    }
+    multiFiles.push(item)
+    newItems.push(item)
+  })
+  // 즉시 한 번 렌더 (스켈레톤 표시)
+  renderMultiPreview()
+  // 백그라운드에서 썸네일 생성 (블로킹 없이)
+  generateThumbnailsAsync(newItems)
+}
+
+// 작은 썸네일 dataURL을 비동기로 생성하면서, 한 번에 폰을 막지 않게 청크 단위로 처리
+async function generateThumbnailsAsync(items) {
+  const CONCURRENCY = 3  // 동시에 처리할 썸네일 개수
+  let renderTimer = null
+  const scheduleRender = () => {
+    if (renderTimer) return
+    renderTimer = setTimeout(() => {
+      renderTimer = null
+      renderMultiPreview()
+    }, 100)
+  }
+
+  // 작업 큐 방식: CONCURRENCY 만큼 동시에 워커 돌리기
+  let cursor = 0
+  async function worker() {
+    while (cursor < items.length) {
+      const idx = cursor++
+      const item = items[idx]
+      if (!item || !item.file) continue
+      try {
+        const thumb = await fileToThumbnail(item.file, 200, 0.7)
+        item.preview = thumb
+        scheduleRender()
+      } catch (e) {
+        console.warn('thumbnail failed', e)
+      }
+      // 메인 스레드에 양보
+      await new Promise(r => setTimeout(r, 0))
+    }
+  }
+  
+  const workers = []
+  for (let i = 0; i < CONCURRENCY; i++) workers.push(worker())
+  await Promise.all(workers)
+  // 최종 한 번 더 렌더
+  renderMultiPreview()
+}
+
+// 파일을 작은 JPEG dataURL로 변환 (대용량 사진 메모리 폭발 방지)
+// createImageBitmap을 우선 사용 — 메인 스레드를 거의 막지 않음
+async function fileToThumbnail(file, maxSize = 200, quality = 0.7) {
+  // createImageBitmap이 지원되면 그걸로 (모던 모바일 브라우저 대부분 지원)
+  if (typeof createImageBitmap === 'function') {
+    try {
+      const bitmap = await createImageBitmap(file)
+      const ratio = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height))
+      const w = Math.max(1, Math.round(bitmap.width * ratio))
+      const h = Math.max(1, Math.round(bitmap.height * ratio))
+      // OffscreenCanvas가 있으면 그걸 사용 (워커처럼 동작)
+      let canvas
+      if (typeof OffscreenCanvas !== 'undefined') {
+        canvas = new OffscreenCanvas(w, h)
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(bitmap, 0, 0, w, h)
+        bitmap.close && bitmap.close()
+        const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality })
+        return await blobToDataURL(blob)
+      } else {
+        canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(bitmap, 0, 0, w, h)
+        bitmap.close && bitmap.close()
+        return canvas.toDataURL('image/jpeg', quality)
+      }
+    } catch (e) {
+      // createImageBitmap 실패 시 폴백 (예: HEIC 등)
+      console.warn('createImageBitmap failed, fallback:', e)
+    }
+  }
+  // 폴백: 기존 방식
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      try {
+        const ratio = Math.min(1, maxSize / Math.max(img.naturalWidth, img.naturalHeight))
+        const w = Math.round(img.naturalWidth * ratio)
+        const h = Math.round(img.naturalHeight * ratio)
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+        const dataUrl = canvas.toDataURL('image/jpeg', quality)
+        URL.revokeObjectURL(url)
+        resolve(dataUrl)
+      } catch (e) {
+        URL.revokeObjectURL(url)
+        reject(e)
+      }
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('image load failed'))
+    }
+    img.src = url
+  })
+}
+
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result)
+    r.onerror = () => reject(new Error('FileReader failed'))
+    r.readAsDataURL(blob)
+  })
+}
+
+function renderMultiPreview() {
+  const wrap = document.getElementById('multiPreview')
+  const countWrap = document.getElementById('multiCount')
+  document.getElementById('multiNum').textContent = multiFiles.length
+  countWrap.style.display = multiFiles.length > 0 ? 'flex' : 'none'
+
+  // 현재 DOM 아이템 수와 multiFiles 수 비교 → 추가/제거만 처리
+  const currentItems = wrap.querySelectorAll('.mp-item')
+  const currentCount = currentItems.length
+  const targetCount = multiFiles.length
+
+  // 1) 개수가 줄었으면 뒤쪽 제거 (또는 전체가 달라졌으면 통째로 다시)
+  if (currentCount > targetCount) {
+    // 줄어든 만큼 뒤에서 제거
+    for (let i = currentCount - 1; i >= targetCount; i--) {
+      currentItems[i].remove()
+    }
+  }
+
+  // 2) 각 아이템 갱신 (인덱스가 어긋났을 수도 있으므로 data-index로 매칭)
+  for (let i = 0; i < multiFiles.length; i++) {
+    const m = multiFiles[i]
+    let el = wrap.children[i]
+    
+    if (!el) {
+      // 새 아이템 생성
+      el = document.createElement('div')
+      el.className = 'mp-item ' + m.status
+      el.dataset.idx = i
+      el.innerHTML = renderMpItemInner(m, i)
+      wrap.appendChild(el)
+    } else {
+      // 기존 아이템: 상태나 미리보기가 바뀐 경우만 업데이트
+      const currentStatus = el.className.replace('mp-item', '').trim()
+      const needsImageUpdate = m.preview && !el.querySelector('img')?.src
+      if (currentStatus !== m.status || needsImageUpdate || el.dataset.idx !== String(i)) {
+        el.className = 'mp-item ' + m.status
+        el.dataset.idx = i
+        el.innerHTML = renderMpItemInner(m, i)
+      }
+    }
+  }
+}
+
+function renderMpItemInner(m, i) {
+  let statusOverlay = ''
+  if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
+  else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
+  else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
+  const removeBtn = m.status === 'pending' || m.status === 'error'
+    ? `<button class="mp-remove" onclick="removeMultiFile(${i})">×</button>` : ''
+  const imgSrc = m.preview || ''
+  const placeholder = imgSrc ? '' : `<div class="mp-skel"></div>`
+  return `${imgSrc ? `<img src="${imgSrc}" alt="" loading="lazy">` : ''}${placeholder}${statusOverlay}${removeBtn}`
+}
+
+window.removeMultiFile = (i) => {
+  multiFiles.splice(i, 1)
+  renderMultiPreview()
+}
+
+window.clearMultiFiles = () => {
+  if (multiFiles.some(m => m.status === 'uploading')) {
+    toast('업로드 중에는 지울 수 없어요')
+    return
+  }
+  multiFiles = []
+  renderMultiPreview()
+}
+
+// URL 업로드
+window.checkUrls = () => {
+  const text = document.getElementById('urlInput').value
+  const urls = text.split(/[\s,]+/).map(u => u.trim()).filter(u => u.match(/^https?:\/\//i))
+  if (urls.length === 0) {
+    toast('유효한 URL이 없어요')
+    return
+  }
+  if (urls.length > 200) {
+    toast('최대 200개까지만 가능해요')
+    urls.length = 200
+  }
+  urlItems = urls.map(url => ({
+    url,
+    preview: url,
+    status: 'pending',
+    error: null
+  }))
+  renderUrlPreview()
+  toast(`${urls.length}개 URL 인식됨`)
+}
+
+function renderUrlPreview() {
+  const wrap = document.getElementById('urlPreview')
+  const countWrap = document.getElementById('urlCount')
+  document.getElementById('urlNum').textContent = urlItems.length
+  countWrap.style.display = urlItems.length > 0 ? 'flex' : 'none'
+
+  wrap.innerHTML = urlItems.map((m, i) => {
+    let statusOverlay = ''
+    if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
+    else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
+    else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
+    const removeBtn = m.status === 'pending' || m.status === 'error'
+      ? `<button class="mp-remove" onclick="removeUrlItem(${i})">×</button>` : ''
+    return `<div class="mp-item ${m.status}">
+      <img src="${m.preview}" alt="" onerror="this.style.opacity=.3">
+      ${statusOverlay}
+      ${removeBtn}
+    </div>`
+  }).join('')
+}
+
+window.removeUrlItem = (i) => {
+  urlItems.splice(i, 1)
+  renderUrlPreview()
+}
+
+// ============ 공통 메타 수집 ============
+function collectMeta() {
+  return {
+    category: document.getElementById('fCategory').value,
+    tags: document.getElementById('fTags').value.split(/[,\s]+/).map(t => t.replace(/^#/,'').trim()).filter(Boolean),
+    memo: document.getElementById('fMemo').value.trim() || null
+  }
+}
+
+// 자동 제목 생성: 태그 첫 항목 → 카테고리명 → "작품"
+function generateAutoTitle(meta, fileName) {
+  if (meta.tags && meta.tags.length > 0) return '#' + meta.tags[0]
+  const cat = categories.find(c => c.id === meta.category)
+  if (cat) return cat.name
+  if (fileName) return fileName.replace(/\.[^.]+$/, '').slice(0, 30)
+  return '작품'
+}
+
+// 진행률 UI
+function setProgress(label, current, total) {
+  const pct = total === 0 ? 0 : Math.round(current / total * 100)
+  document.getElementById('progressLabel').textContent = label
+  document.getElementById('progressPct').textContent = pct + '%'
+  document.getElementById('progressFill').style.width = pct + '%'
+}
+
+function showProgress(show) {
+  document.getElementById('progressZone').style.display = show ? 'block' : 'none'
+}
+
+// ============ 파일 1장 업로드 (재사용) ============
+async function uploadSingleFile(file, meta, customTitle, opts = {}) {
+  // opts.preview: 이미 만들어둔 썸네일 dataURL이 있으면 컬러 추출에 재활용 (속도)
+  
+  // 1) 업로드 전 자동 리사이즈 (2400px, 품질 0.9) — 화질 거의 보존, 용량 1/2~1/3
+  let uploadFile = file
+  try {
+    uploadFile = await resizeImageForUpload(file, 2400, 0.9)
+  } catch (e) {
+    uploadFile = file
+  }
+  
+  // 2) 색상 추출 — 썸네일이 있으면 재활용 (훨씬 빠름)
+  let mainColor = 'mono'
+  try {
+    if (opts.preview) {
+      mainColor = await extractMainColor(opts.preview)
+    } else {
+      mainColor = await extractMainColor(uploadFile)
+    }
+  } catch(e) {}
+
+  const ext = (uploadFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
+  const filePath = `gallery/${fileName}`
+  const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, uploadFile, {cacheControl:'3600', upsert:false})
+  if (upErr) throw upErr
+  const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
+  // 자동 제목
+  const title = customTitle || generateAutoTitle(meta, uploadFile.name)
+  const {error} = await supabase.from('artworks').insert({
+    ...meta,
+    title,
+    main_color: mainColor,
+    image_url: publicUrl,
+    storage_path: filePath
+  })
+  if (error) throw error
+}
+
+// URL에서 이미지 가져와서 업로드
+async function uploadFromUrl(url, meta, customTitle) {
+  const res = await fetch(url, { mode: 'cors' })
+  if (!res.ok) throw new Error('이미지를 가져올 수 없어요')
+  const blob = await res.blob()
+  if (blob.size > 20*1024*1024) throw new Error('파일이 너무 커요')
+  if (!blob.type.startsWith('image/')) throw new Error('이미지가 아니에요')
+  const urlPath = new URL(url).pathname
+  const fileName = (urlPath.split('/').pop() || 'image.jpg')
+  const file = new File([blob], fileName, { type: blob.type })
+  await uploadSingleFile(file, meta, customTitle || null)
+}
+
+// ============ MAIN SUBMIT ============
+window.submitArtwork = async () => {
+  const meta = collectMeta()
+  const btn = document.getElementById('btnSubmit')
+
+  // 수정 모드: 상세 정보까지 전부 업데이트 가능
+  if (editingId) {
+    btn.disabled = true
+    btn.textContent = '저장 중...'
+    try {
+      const payload = { ...meta }
+      // 수정 모드에서는 상세 폼에서 학생/학교/날짜 등도 받음
+      const detail = collectDetailMeta()
+      Object.assign(payload, detail)
+      if (selectedFile) {
+        let mainColor = 'mono'
+        try { mainColor = await extractMainColor(selectedFile) } catch(e) {}
+        const ext = (selectedFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+        const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
+        const filePath = `gallery/${fileName}`
+        const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, selectedFile, {cacheControl:'3600', upsert:false})
+        if (upErr) throw upErr
+        const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
+        payload.image_url = publicUrl
+        payload.storage_path = filePath
+        payload.main_color = mainColor
+      }
+      // 자동 제목이 비어있다면 생성
+      if (!payload.title || !payload.title.trim()) {
+        payload.title = generateAutoTitle(meta, '')
+      }
+      const {error} = await supabase.from('artworks').update(payload).eq('id', editingId)
+      if (error) throw error
+      toast('수정 완료')
+      await loadData()
+      showGallery()
+    } catch (err) {
+      toast('수정 실패: ' + err.message)
+    } finally {
+      btn.disabled = false
+      btn.textContent = '수정 저장'
+    }
+    return
+  }
+
+  // 단일 업로드
+  if (uploadMode === 'single') {
+    if (!selectedFile) { toast('이미지를 선택해 주세요'); return }
+    btn.disabled = true
+    btn.textContent = '저장 중...'
+    try {
+      await uploadSingleFile(selectedFile, meta, null)
+      toast('업로드 완료')
+      await loadData()
+      showGallery()
+    } catch (err) {
+      toast('업로드 실패: ' + err.message)
+    } finally {
+      btn.disabled = false
+      btn.textContent = '업로드'
+    }
+    return
+  }
+
+  // 여러 장 업로드 — 병렬 5장 동시
+  if (uploadMode === 'multi') {
+    if (multiFiles.length === 0) { toast('이미지를 선택해 주세요'); return }
+    btn.disabled = true
+    showProgress(true)
+    
+    const CONCURRENCY = 5  // 동시 업로드 개수
+    let done = 0, failed = 0, firstError = null
+    
+    // 작업 큐 — 인덱스 순서대로, 워커 5명이 한 장씩 집어감
+    let cursor = 0
+    const updateProgress = () => {
+      const processed = done + failed
+      setProgress(`업로드 중 (${processed}/${multiFiles.length})${failed > 0 ? ` · ${failed}장 실패` : ''}`, processed, multiFiles.length)
+    }
+    
+    async function worker() {
+      while (cursor < multiFiles.length) {
+        const i = cursor++
+        const m = multiFiles[i]
+        if (!m || m.status === 'done') {
+          if (m && m.status === 'done') done++
+          continue
+        }
+        m.status = 'uploading'
+        // 너무 자주 렌더하지 않게 — 다른 워커가 함께 작동
+        try {
+          await uploadSingleFile(m.file, meta, null, { preview: m.preview })
+          m.status = 'done'
+          done++
+        } catch (err) {
+          m.status = 'error'
+          m.error = (err && err.message) ? err.message : String(err)
+          if (!firstError) firstError = m.error
+          failed++
+        }
+        updateProgress()
+      }
+    }
+    
+    // 주기적 미리보기 갱신 — 별도 타이머
+    const refreshTimer = setInterval(() => renderMultiPreview(), 500)
+    
+    const workers = []
+    for (let k = 0; k < CONCURRENCY; k++) workers.push(worker())
+    await Promise.all(workers)
+    
+    clearInterval(refreshTimer)
+    renderMultiPreview()
+    
+    const summary = `완료: ${done}장 성공${failed > 0 ? ` · ${failed}장 실패` : ''}`
+    setProgress(summary + (firstError && failed > 0 ? `\n첫 실패 사유: ${firstError.slice(0,80)}` : ''), multiFiles.length, multiFiles.length)
+    toast(`${done}장 업로드 완료${failed > 0 ? ` · ${failed}장 실패` : ''}`)
+    await loadData()
+    btn.disabled = false
+    if (failed === 0) {
+      setTimeout(() => { showGallery(); showProgress(false) }, 1200)
+    } else {
+      btn.textContent = '실패 항목 재시도'
+    }
+    return
+  }
+
+  // URL 업로드
+  if (uploadMode === 'url') {
+    if (urlItems.length === 0) { toast('URL 미리보기 먼저 확인해 주세요'); return }
+    btn.disabled = true
+    showProgress(true)
+    let done = 0, failed = 0
+    for (let i = 0; i < urlItems.length; i++) {
+      const m = urlItems[i]
+      if (m.status === 'done') { done++; continue }
+      m.status = 'uploading'
+      renderUrlPreview()
+      setProgress(`가져오는 중 (${i+1}/${urlItems.length})`, i, urlItems.length)
+      try {
+        await uploadFromUrl(m.url, meta, null)
+        m.status = 'done'
+        done++
+      } catch (err) {
+        m.status = 'error'
+        m.error = err.message
+        failed++
+      }
+      renderUrlPreview()
+    }
+    setProgress(`완료: ${done}개 성공${failed > 0 ? `, ${failed}개 실패` : ''}`, urlItems.length, urlItems.length)
+    if (failed > 0) {
+      toast(`${done}개 성공, ${failed}개 실패. 핀터레스트는 직접 다운로드 후 "여러 장"으로 업로드해 보세요`)
+    } else {
+      toast(`${done}개 업로드 완료`)
+    }
+    await loadData()
+    btn.disabled = false
+    if (failed === 0) {
+      setTimeout(() => { showGallery(); showProgress(false) }, 1200)
+    } else {
+      btn.textContent = '실패 항목 재시도'
+    }
+    return
+  }
+}
+
+// 수정 모드에서 상세 폼 데이터 수집
+function collectDetailMeta() {
+  const result = {}
+  const title = document.getElementById('fTitleDetail')
+  const student = document.getElementById('fStudentDetail')
+  const school = document.getElementById('fSchoolDetail')
+  const subject = document.getElementById('fSubjectDetail')
+  const date = document.getElementById('fDateDetail')
+  if (title) result.title = title.value.trim() || generateAutoTitle(collectMeta(), '')
+  if (student) result.student_name = student.value.trim() || null
+  if (school) result.school = school.value.trim() || null
+  if (subject) result.subject = subject.value.trim() || null
+  if (date) result.artwork_date = date.value || null
+  return result
+}
+
+// ============ WEB SHARE TARGET (PWA로 설치 후) ============
+// 다른 앱에서 "공유"를 통해 들어오면 자동으로 업로드 화면 + 파일 채우기
+function handleShareTarget() {
+  const params = new URLSearchParams(location.search)
+  if (params.has('share') || params.has('shared_url')) {
+    // URL이 공유된 경우
+    const sharedUrl = params.get('shared_url') || params.get('url')
+    if (sharedUrl && sharedUrl.match(/^https?:\/\//i)) {
+      switchUploadMode('url')
+      document.getElementById('urlInput').value = sharedUrl
+      checkUrls()
+      showUpload()
+      toast('공유된 URL을 가져왔어요')
+    }
+    // history 정리
+    history.replaceState(null, '', location.pathname)
+  }
+}
+
+// ============ NAVIGATION (v4: !important + 강제 reflow) ============
+// CSS에 !important를 박았으니 어떤 inline style이나 다른 규칙도 못 이김.
+// 추가로 클래스 변경 후 강제로 reflow를 트리거해서 모바일 브라우저 렌더링 캐시 우회.
+
+function _clearInlineLayout(el) {
+  if (!el) return
+  // 이전 버전들이 남긴 inline 스타일을 모두 제거
+  el.style.position = ''
+  el.style.left = ''
+  el.style.top = ''
+  el.style.width = ''
+  el.style.visibility = ''
+  el.style.pointerEvents = ''
+  el.style.zIndex = ''
+  el.style.display = ''
+}
+
+function _forceReflow(el) {
+  // 강제 reflow 트리거 — 모바일 Chrome이 클래스 변경을 무시할 때 우회
+  if (!el) return
+  void el.offsetHeight
+}
+
+function _updateDebugBar(label) {
+  const bar = document.getElementById('debugBar')
+  if (!bar) return
+  const g = document.getElementById('galleryPage')
+  const u = document.getElementById('uploadPage')
+  const gDisp = g ? getComputedStyle(g).display : '?'
+  const uDisp = u ? getComputedStyle(u).display : '?'
+  const gH = g ? Math.round(g.getBoundingClientRect().height) : '?'
+  const uH = u ? Math.round(u.getBoundingClientRect().height) : '?'
+  const gridC = document.getElementById('gridContainer')
+  const gridH = gridC ? Math.round(gridC.getBoundingClientRect().height) : '?'
+  const gridD = gridC ? getComputedStyle(gridC).display : '?'
+  bar.textContent = `v5-NUKE [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px`
+}
+
+function showOnlyGallery() {
+  const gallery = document.getElementById('galleryPage')
+  const upload = document.getElementById('uploadPage')
+  if (gallery) {
+    _clearInlineLayout(gallery)
+    gallery.classList.remove('hidden')
+    gallery.classList.remove('offscreen-parked')
+    // 모든 inline 격리 스타일 제거 (확실히)
+    gallery.style.visibility = ''
+    gallery.style.position = ''
+    gallery.style.left = ''
+    gallery.style.top = ''
+    gallery.style.height = ''
+    gallery.style.overflow = ''
+    _forceReflow(gallery)
+  }
+  if (upload) {
+    _clearInlineLayout(upload)
+    upload.classList.remove('show')
+    upload.classList.remove('offscreen-parked')
+    upload.style.visibility = ''
+    upload.style.position = ''
+    _forceReflow(upload)
+  }
+  window.scrollTo(0, 0)
+  _updateDebugBar('GALLERY')
+}
+
+function showOnlyUpload() {
+  const gallery = document.getElementById('galleryPage')
+  const upload = document.getElementById('uploadPage')
+  if (gallery) {
+    _clearInlineLayout(gallery)
+    gallery.classList.add('hidden')
+    // 추가 강제 차단: visibility + position
+    gallery.style.visibility = 'hidden'
+    gallery.style.position = 'absolute'
+    gallery.style.left = '-99999px'
+    gallery.style.top = '-99999px'
+    gallery.style.height = '0'
+    gallery.style.overflow = 'hidden'
+    _forceReflow(gallery)
+  }
+  if (upload) {
+    _clearInlineLayout(upload)
+    upload.classList.add('show')
+    upload.style.visibility = 'visible'
+    upload.style.position = 'relative'
+    _forceReflow(upload)
+  }
+  window.scrollTo(0, 0)
+  _updateDebugBar('UPLOAD')
+}
+
+function hideAllPages() {
+  // 호환성 유지 (기존 코드가 호출함)
+}
+
+function clearBnavActive() {
+  document.querySelectorAll('.bnav-item').forEach(el => el.classList.remove('active'))
+}
+
+window.showGallery = () => {
+  showOnlyGallery()
+  clearBnavActive()
+  document.getElementById('navGallery').classList.add('active')
+  resetUploadForm()
+}
+
+window.showUpload = () => {
+  editingId = null
+  const existing = document.getElementById('detailFormZone')
+  if (existing) existing.remove()
+  resetUploadForm()
+  showOnlyUpload()
+  clearBnavActive()
+  document.getElementById('navUpload').classList.add('active')
+  window.scrollTo(0,0)
+}
+
+function showUploadPage() {
+  showOnlyUpload()
+  clearBnavActive()
+  document.getElementById('navUpload').classList.add('active')
+  window.scrollTo(0,0)
+}
+
+function resetUploadForm() {
+  if (editingId) return
+  const _v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val }
+  const _t = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val }
+  const _h = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val }
+  _v('fTags', '')
+  _v('fMemo', '')
+  _v('fileInput', '')
+  _v('multiFileInput', '')
+  _v('urlInput', '')
+  selectedFile = null
+  const fz = document.getElementById('fileZone'); if (fz) fz.classList.remove('has-file')
+  _h('fileZoneContent', `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`)
+  hideAiPanel()
+  multiFiles = []
+  urlItems = []
+  renderMultiPreview()
+  renderUrlPreview()
+  showProgress(false)
+  _t('upTitle', '새 ')
+  _t('upTitleEm', '업로드')
+  _t('upSubtitle', 'Add New Artwork')
+  _t('btnSubmit', uploadMode === 'single' ? '업로드' : '일괄 업로드')
+}
+
+// ============ SLIDESHOW ============
+window.startSlideshow = () => {
+  const list = getFiltered()
+  if (list.length === 0) { toast('표시할 작품이 없어요'); return }
+  slideIdx = 0
+  showSlide(list)
+  slideTimer = setInterval(() => {
+    slideIdx = (slideIdx + 1) % list.length
+    showSlide(list)
+  }, 3000)
+  document.getElementById('slideshow').classList.add('show')
+}
+
+function showSlide(list) {
+  if (slideZoom) slideZoom.reset()
+  document.getElementById('slideImg').src = list[slideIdx].image_url
+  document.getElementById('slideCount').textContent = (slideIdx+1) + ' / ' + list.length
+}
+
+window.exitSlideshow = () => {
+  clearInterval(slideTimer)
+  document.getElementById('slideshow').classList.remove('show')
+}
+
+// ============ PDF EXPORT ============
+let pdfLibLoaded = false
+
+async function loadPdfLib() {
+  if (pdfLibLoaded) return
+  // jsPDF CDN 로드
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script')
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+    s.onload = resolve
+    s.onerror = () => reject(new Error('jsPDF 로드 실패'))
+    document.head.appendChild(s)
+  })
+  pdfLibLoaded = true
+}
+
+let pdfOverrideList = null
+let pdfOverrideTitle = null
+
+function openPdfModal() {
+  const list = pdfOverrideList || getFiltered()
+  if (list.length === 0) {
+    toast('표시할 작품이 없어요')
+    return
+  }
+  const titleSuffix = pdfOverrideTitle ? ` · ${pdfOverrideTitle}` : ''
+  document.getElementById('pdfModalTitle').textContent = `PDF로 내보내기${titleSuffix}`
+  document.getElementById('pdfModalSub').textContent = pdfOverrideTitle 
+    ? `"${pdfOverrideTitle}" 컬렉션의 ${list.length}장을 PDF로 저장합니다.`
+    : `현재 보이는 작품 ${list.length}장을 PDF 포트폴리오로 저장합니다.`
+  document.getElementById('pdfProgressWrap').style.display = 'none'
+  document.getElementById('pdfProgressText').style.display = 'none'
+  document.getElementById('pdfStartBtn').disabled = false
+  document.getElementById('pdfStartBtn').textContent = 'PDF 생성'
+  document.getElementById('pdfCancelBtn').textContent = '취소'
+  document.getElementById('pdfModal').classList.add('show')
+}
+window.openPdfModal = openPdfModal
+
+function closePdfModal() {
+  document.getElementById('pdfModal').classList.remove('show')
+  // 컬렉션 PDF 오버라이드 초기화
+  pdfOverrideList = null
+  pdfOverrideTitle = null
+}
+window.closePdfModal = closePdfModal
+
+function updatePdfProgress(current, total, msg) {
+  document.getElementById('pdfProgressWrap').style.display = 'block'
+  document.getElementById('pdfProgressText').style.display = 'block'
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0
+  document.getElementById('pdfProgressBar').style.width = pct + '%'
+  document.getElementById('pdfProgressText').textContent = msg || `${current} / ${total}`
+}
+
+// 이미지를 PDF에 넣을 비율(가로/세로)에 맞게 크기 계산
+function fitImageInBox(imgW, imgH, boxW, boxH) {
+  const ratio = Math.min(boxW / imgW, boxH / imgH)
+  return { w: imgW * ratio, h: imgH * ratio }
+}
+
+// 이미지 URL → HTMLImageElement (CORS 우회: Supabase는 CORS 허용됨)
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error('image load failed: ' + url))
+    img.src = url
+  })
+}
+
+// 이미지를 JPEG dataURL로 변환 (PDF 크기 줄이기 위해)
+function imageToJpegDataUrl(img, maxW = 1200, quality = 0.82) {
+  const ratio = Math.min(1, maxW / img.naturalWidth)
+  const w = Math.round(img.naturalWidth * ratio)
+  const h = Math.round(img.naturalHeight * ratio)
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, w, h)
+  ctx.drawImage(img, 0, 0, w, h)
+  return { dataUrl: canvas.toDataURL('image/jpeg', quality), w, h }
+}
+
+// 한글 텍스트를 캔버스에 그려 이미지로 변환 → PDF에 삽입 (한글 폰트 임베딩 우회)
+function textBlockToImage(opts) {
+  const {
+    lines,        // [{text, size, color, weight, align}]
+    width,        // px
+    padding = 0,
+    bg = '#ffffff'
+  } = opts
+  const dpr = 2  // 선명도 위해 2배
+  // 측정용 캔버스
+  const measureCanvas = document.createElement('canvas')
+  const mctx = measureCanvas.getContext('2d')
+  const lineHeights = lines.map(l => Math.round((l.size || 14) * 1.5))
+  const totalHeight = lineHeights.reduce((s, h) => s + h, 0) + padding * 2
+  const canvas = document.createElement('canvas')
+  canvas.width = (width + padding * 2) * dpr
+  canvas.height = totalHeight * dpr
+  const ctx = canvas.getContext('2d')
+  ctx.scale(dpr, dpr)
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, width + padding * 2, totalHeight)
+  let y = padding
+  lines.forEach((line, i) => {
+    const size = line.size || 14
+    const weight = line.weight || 400
+    ctx.font = `${weight} ${size}px "Nanum Gothic", sans-serif`
+    ctx.fillStyle = line.color || '#1a1a1a'
+    ctx.textBaseline = 'top'
+    const text = line.text || ''
+    // 단순 줄바꿈 (긴 줄 자동 줄바꿈)
+    const maxW = width
+    const words = text.split('')
+    let curLine = ''
+    const wrapped = []
+    for (let j = 0; j < words.length; j++) {
+      const test = curLine + words[j]
+      if (ctx.measureText(test).width > maxW && curLine) {
+        wrapped.push(curLine)
+        curLine = words[j]
+      } else {
+        curLine = test
+      }
+    }
+    if (curLine) wrapped.push(curLine)
+    // 줄바꿈 처리: \n도 지원
+    const finalLines = []
+    wrapped.forEach(w => {
+      w.split('\n').forEach(p => finalLines.push(p))
+    })
+    finalLines.forEach((fl, idx) => {
+      const lineH = Math.round(size * 1.5)
+      if (line.align === 'center') {
+        ctx.textAlign = 'center'
+        ctx.fillText(fl, (width + padding * 2) / 2, y + idx * lineH)
+      } else if (line.align === 'right') {
+        ctx.textAlign = 'right'
+        ctx.fillText(fl, width + padding, y + idx * lineH)
+      } else {
+        ctx.textAlign = 'left'
+        ctx.fillText(fl, padding, y + idx * lineH)
+      }
+    })
+    y += Math.max(lineHeights[i], finalLines.length * Math.round(size * 1.5))
+  })
+  // 실제 높이로 잘라낸 캔버스 반환
+  return {
+    dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+    w: canvas.width / dpr,
+    h: canvas.height / dpr
+  }
+}
+
+async function generatePdf() {
+  const list = pdfOverrideList || getFiltered()
+  if (list.length === 0) { toast('표시할 작품이 없어요'); return }
+
+  const startBtn = document.getElementById('pdfStartBtn')
+  const cancelBtn = document.getElementById('pdfCancelBtn')
+  startBtn.disabled = true
+  startBtn.textContent = '생성 중...'
+
+  try {
+    updatePdfProgress(0, list.length, '라이브러리 로딩 중...')
+    await loadPdfLib()
+
+    const { jsPDF } = window.jspdf
+    // A4 세로, 단위 mm
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+    const pageW = 210, pageH = 297
+    const margin = 15
+
+    // ── 1) 표지 페이지 (미니멀)
+    updatePdfProgress(0, list.length, '표지 생성 중...')
+    // 상단 빨간 띠
+    pdf.setFillColor(192, 57, 43)
+    pdf.rect(0, 0, pageW, 8, 'F')
+    // Hi5 로고 (간단히 빨간 사각형 + 텍스트로 표현)
+    const logoImg = textBlockToImage({
+      lines: [
+        { text: 'Hi5', size: 64, weight: 800, color: '#c0392b', align: 'center' }
+      ],
+      width: 600,
+      padding: 20,
+      bg: '#ffffff'
+    })
+    const logoMm = 30
+    pdf.addImage(logoImg.dataUrl, 'JPEG', (pageW - logoMm) / 2, 100, logoMm, logoMm * (logoImg.h / logoImg.w))
+
+    // 메인 타이틀
+    const today = new Date()
+    const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`
+    const coverLines = pdfOverrideTitle ? [
+      { text: pdfOverrideTitle, size: 22, weight: 800, color: '#1a1a1a', align: 'center' },
+      { text: 'Collection', size: 28, weight: 400, color: '#1a1a1a', align: 'center' },
+      { text: '', size: 12 },
+      { text: `부산 센텀점 · 작품 ${list.length}장 · ${dateStr}`, size: 12, color: '#666', align: 'center' }
+    ] : [
+      { text: '부산 센텀점', size: 22, weight: 800, color: '#1a1a1a', align: 'center' },
+      { text: 'Portfolio', size: 32, weight: 400, color: '#1a1a1a', align: 'center' },
+      { text: '', size: 12 },
+      { text: `작품 ${list.length}장 · ${dateStr}`, size: 12, color: '#666', align: 'center' }
+    ]
+    const coverImg = textBlockToImage({
+      lines: coverLines,
+      width: 600,
+      padding: 20
+    })
+    const coverMm = 120
+    pdf.addImage(coverImg.dataUrl, 'JPEG', (pageW - coverMm) / 2, 145, coverMm, coverMm * (coverImg.h / coverImg.w))
+
+    // 하단 빨간 띠
+    pdf.setFillColor(192, 57, 43)
+    pdf.rect(0, pageH - 8, pageW, 8, 'F')
+
+    // ── 2) 작품 페이지들
+    const cats = Object.fromEntries(categories.map(c => [c.id, c]))
+    const catNames = new Set(categories.map(c => c.name))
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i]
+      updatePdfProgress(i + 1, list.length, `작품 ${i+1}/${list.length} 처리 중...`)
+      
+      pdf.addPage()
+      
+      // 상단 헤더 (얇은 빨간 띠)
+      pdf.setFillColor(192, 57, 43)
+      pdf.rect(0, 0, pageW, 3, 'F')
+      
+      // 이미지 로드 & 압축
+      let img, jpeg
+      try {
+        img = await loadImage(a.image_url)
+        jpeg = imageToJpegDataUrl(img, 1600, 0.85)
+      } catch (e) {
+        console.warn('image load failed for', a.id, e)
+      }
+      
+      // 이미지 박스 — 페이지의 약 75% 차지 (대폭 확대)
+      const imgBoxX = margin
+      const imgBoxY = 8
+      const imgBoxW = pageW - margin * 2
+      const imgBoxH = 220
+      
+      if (jpeg) {
+        const fit = fitImageInBox(jpeg.w, jpeg.h, imgBoxW, imgBoxH)
+        const ix = imgBoxX + (imgBoxW - fit.w) / 2
+        const iy = imgBoxY + (imgBoxH - fit.h) / 2
+        pdf.addImage(jpeg.dataUrl, 'JPEG', ix, iy, fit.w, fit.h)
+      } else {
+        pdf.setFontSize(10)
+        pdf.setTextColor(150)
+        pdf.text('(이미지를 불러올 수 없습니다)', pageW / 2, imgBoxY + imgBoxH / 2, { align: 'center' })
+      }
+      
+      // 구분선
+      const sepY = imgBoxY + imgBoxH + 4
+      pdf.setDrawColor(192, 57, 43)
+      pdf.setLineWidth(0.4)
+      pdf.line(margin, sepY, pageW - margin, sepY)
+      
+      // ── 메타정보 (중복 제거 후 한 줄로 깔끔하게) ──
+      const cat = cats[a.category]
+      const catName = cat ? cat.name : ''
+      const rawTitle = (a.title || '').trim()
+      // 제목이 카테고리명과 같거나 비어있으면 생략
+      const title = (!rawTitle || rawTitle === catName || catNames.has(rawTitle)) ? '' : rawTitle
+      
+      // 학생/학교/과목/날짜
+      const metaParts = [a.student_name, a.school, a.subject].filter(Boolean).join(' · ')
+      const dateMeta = a.artwork_date ? new Date(a.artwork_date).toLocaleDateString('ko-KR') : ''
+      const subMeta = [metaParts, dateMeta].filter(Boolean).join(' · ')
+      
+      // 태그 — 제목/카테고리와 동일한 건 제외
+      const titleLower = (rawTitle || '').toLowerCase()
+      const filteredTags = (a.tags || []).filter(t => {
+        const tl = String(t).toLowerCase()
+        return tl !== titleLower && tl !== catName.toLowerCase()
+      })
+      const tags = filteredTags.map(t => '#' + t).join('  ')
+      
+      const memo = (a.memo || '').trim()
+      
+      // 첫 줄: 카테고리 + (제목)
+      const headLine = [catName, title].filter(Boolean).join('  ·  ')
+      
+      const metaLines = []
+      if (headLine) {
+        metaLines.push({
+          text: headLine,
+          size: 16, weight: 800, color: '#1a1a1a'
+        })
+      }
+      if (subMeta) {
+        metaLines.push({ text: subMeta, size: 11, color: '#666' })
+      }
+      if (tags) {
+        if (metaLines.length) metaLines.push({ text: '', size: 4 })
+        metaLines.push({ text: tags, size: 11, color: '#c0392b', weight: 700 })
+      }
+      if (memo) {
+        if (metaLines.length) metaLines.push({ text: '', size: 6 })
+        metaLines.push({ text: memo, size: 12, color: '#1a1a1a' })
+      }
+      
+      if (metaLines.length > 0) {
+        const metaImg = textBlockToImage({
+          lines: metaLines,
+          width: 740,
+          padding: 8
+        })
+        const metaW = pageW - margin * 2
+        const metaH = metaW * (metaImg.h / metaImg.w)
+        const maxMetaH = pageH - sepY - 14
+        const finalMetaH = Math.min(metaH, maxMetaH)
+        const finalMetaW = metaH > maxMetaH ? maxMetaH * (metaImg.w / metaImg.h) : metaW
+        pdf.addImage(
+          metaImg.dataUrl, 'JPEG',
+          margin + (metaW - finalMetaW) / 2,
+          sepY + 3,
+          finalMetaW, finalMetaH
+        )
+      }
+      
+      // 페이지 번호 (하단)
+      pdf.setFontSize(9)
+      pdf.setTextColor(150)
+      pdf.text(`${i + 1} / ${list.length}`, pageW / 2, pageH - 5, { align: 'center' })
+    }
+
+    // ── 저장
+    updatePdfProgress(list.length, list.length, '저장 중...')
+    const fileName = pdfOverrideTitle 
+      ? `Hi5_${pdfOverrideTitle.replace(/[\\/:*?"<>|]/g,'_')}_${dateStr.replace(/\./g, '')}.pdf`
+      : `Hi5_부산센텀점_Portfolio_${dateStr.replace(/\./g, '')}.pdf`
+
+    // 모바일: Web Share API로 공유, 데스크톱: 다운로드
+    const blob = pdf.output('blob')
+    let shared = false
+    if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/pdf' })] })) {
+      try {
+        const file = new File([blob], fileName, { type: 'application/pdf' })
+        await navigator.share({ files: [file], title: 'Hi5 Portfolio' })
+        shared = true
+      } catch (e) {
+        // 사용자가 취소했거나 share 실패 → 다운로드로 폴백
+        console.log('share cancelled or failed, falling back to download', e)
+      }
+    }
+    if (!shared) {
+      // 폴백: 다운로드
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    }
+
+    startBtn.textContent = '✓ 완료'
+    cancelBtn.textContent = '닫기'
+    updatePdfProgress(list.length, list.length, '✓ PDF 생성 완료!')
+    setTimeout(() => closePdfModal(), 1500)
+
+  } catch (err) {
+    console.error('PDF 생성 실패:', err)
+    toast('PDF 생성 실패: ' + (err.message || err))
+    startBtn.disabled = false
+    startBtn.textContent = 'PDF 생성'
+    document.getElementById('pdfProgressText').textContent = '⚠ 실패: ' + String(err.message || err).slice(0, 60)
+  }
+}
+window.generatePdf = generatePdf
+
+// ============ GALLERY CONTROLS (정렬·열수) ============
+const SORT_LABELS = {
+  newest: '최신순',
+  oldest: '오래된순',
+  artwork_date: '작품 날짜순',
+  favorite: '즐겨찾기 먼저'
+}
+
+function toggleSortMenu(event) {
+  if (event) event.stopPropagation()
+  const menu = document.getElementById('sortMenu')
+  menu.classList.toggle('show')
+  // 메뉴 내 active 표시
+  menu.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === sortMode)
+  })
+}
+window.toggleSortMenu = toggleSortMenu
+
+function setSortMode(mode) {
+  if (!SORT_LABELS[mode]) return
+  sortMode = mode
+  document.getElementById('sortLabel').textContent = SORT_LABELS[mode]
+  document.getElementById('sortMenu').classList.remove('show')
+  renderGrid()
+  try { localStorage.setItem('hi5_sort', mode) } catch(e) {}
+}
+
+function setGridCols(n) {
+  n = parseInt(n)
+  if (![1,2,3].includes(n)) return
+  gridCols = n
+  document.querySelectorAll('#colsToggle button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.cols) === n)
+  })
+  // grid가 이미 렌더된 상태면 클래스만 교체 (전체 리렌더 안 함, 빠름)
+  const grid = document.querySelector('#gridContainer .grid')
+  if (grid) {
+    grid.classList.remove('cols-1', 'cols-2', 'cols-3')
+    grid.classList.add(`cols-${n}`)
+  } else {
+    renderGrid()
+  }
+  try { localStorage.setItem('hi5_cols', n) } catch(e) {}
+}
+
+function setupGalleryControls() {
+  // 저장된 설정 불러오기
+  try {
+    const savedSort = localStorage.getItem('hi5_sort')
+    if (savedSort && SORT_LABELS[savedSort]) {
+      sortMode = savedSort
+      document.getElementById('sortLabel').textContent = SORT_LABELS[savedSort]
+    }
+    const savedCols = parseInt(localStorage.getItem('hi5_cols'))
+    if ([1,2,3].includes(savedCols)) gridCols = savedCols
+  } catch(e) {}
+  
+  // 컬럼 토글 active 초기 표시
+  document.querySelectorAll('#colsToggle button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.cols) === gridCols)
+    b.onclick = () => setGridCols(b.dataset.cols)
+  })
+  
+  // 정렬 메뉴 클릭
+  document.querySelectorAll('#sortMenu button').forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); setSortMode(b.dataset.sort) }
+  })
+  
+  // 바깥 클릭 시 정렬 메뉴 닫기
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('sortMenu')
+    const btn = document.getElementById('sortBtn')
+    if (menu && menu.classList.contains('show') && !btn.contains(e.target)) {
+      menu.classList.remove('show')
+    }
+  })
+  
+  // 핀치 줌으로 카드 크기 변경 — gridContainer에 두 손가락 제스처
+  setupGridPinchZoom()
+}
+
+function setupGridPinchZoom() {
+  const container = document.getElementById('gridContainer')
+  if (!container) return
+  
+  let startDist = 0
+  let startCols = gridCols
+  let pinching = false
+  
+  const getDist = (touches) => {
+    const dx = touches[0].clientX - touches[1].clientX
+    const dy = touches[0].clientY - touches[1].clientY
+    return Math.sqrt(dx*dx + dy*dy)
+  }
+  
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      startDist = getDist(e.touches)
+      startCols = gridCols
+      pinching = true
+    }
+  }, { passive: true })
+  
+  container.addEventListener('touchmove', (e) => {
+    if (!pinching || e.touches.length !== 2) return
+    e.preventDefault()
+    const dist = getDist(e.touches)
+    const ratio = dist / startDist
+    // 펼치면(ratio>1) 카드 커짐(=열 수 줄음), 좁히면 카드 작아짐(=열 수 늘음)
+    let newCols = startCols
+    if (ratio > 1.25) newCols = Math.max(1, startCols - 1)
+    else if (ratio > 1.7) newCols = Math.max(1, startCols - 2)
+    else if (ratio < 0.8) newCols = Math.min(3, startCols + 1)
+    else if (ratio < 0.55) newCols = Math.min(3, startCols + 2)
+    
+    if (newCols !== gridCols) {
+      // 한 단계만 가도록 잠금 (한 핀치에 한 번만)
+      setGridCols(newCols)
+      pinching = false  // 다음 핀치까지 잠금
+      // 햅틱 피드백
+      if (navigator.vibrate) navigator.vibrate(30)
+    }
+  }, { passive: false })
+  
+  const endPinch = () => { pinching = false }
+  container.addEventListener('touchend', endPinch, { passive: true })
+  container.addEventListener('touchcancel', endPinch, { passive: true })
+}
+
+// ============ SELECT MODE & ROTATION ============
+function toggleSelectMode() {
+  if (selectMode) {
+    cancelSelectMode()
+  } else {
+    enterSelectMode()
+  }
+}
+window.toggleSelectMode = toggleSelectMode
+
+function enterSelectMode() {
+  selectMode = true
+  selectedIds.clear()
+  document.body.classList.add('select-mode')
+  document.getElementById('selectBtn').classList.add('active')
+  document.getElementById('selectBar').classList.add('show')
+  // FAB은 숨김 (선택 바와 겹침)
+  document.getElementById('fab').style.display = 'none'
+  document.getElementById('fabPdf').style.display = 'none'
+  updateSelectBarCount()
+  renderGrid()
+}
+
+function cancelSelectMode() {
+  selectMode = false
+  selectedIds.clear()
+  document.body.classList.remove('select-mode')
+  document.getElementById('selectBtn').classList.remove('active')
+  document.getElementById('selectBar').classList.remove('show')
+  // FAB 복원
+  const list = getFiltered()
+  document.getElementById('fab').style.display = list.length > 0 ? 'flex' : 'none'
+  document.getElementById('fabPdf').style.display = list.length > 0 ? 'flex' : 'none'
+  renderGrid()
+}
+window.cancelSelectMode = cancelSelectMode
+
+function toggleSelectArtwork(id) {
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id)
+  } else {
+    selectedIds.add(id)
+  }
+  // 개별 카드만 업데이트 (전체 리렌더 안 함, 빠름)
+  const card = document.querySelector(`.card[data-id="${id}"]`)
+  if (card) {
+    const sel = selectedIds.has(id)
+    card.classList.toggle('selected', sel)
+    const chk = card.querySelector('.select-check')
+    if (chk) chk.textContent = sel ? '✓' : ''
+  }
+  updateSelectBarCount()
+}
+
+function selectAllVisible() {
+  const list = getFiltered()
+  // 전체 선택 토글: 다 선택돼 있으면 해제, 아니면 다 선택
+  const allSelected = list.every(a => selectedIds.has(a.id))
+  if (allSelected) {
+    list.forEach(a => selectedIds.delete(a.id))
+  } else {
+    list.forEach(a => selectedIds.add(a.id))
+  }
+  updateSelectBarCount()
+  renderGrid()
+}
+window.selectAllVisible = selectAllVisible
+
+function updateSelectBarCount() {
+  document.getElementById('selectCount').textContent = selectedIds.size
+  const disabled = selectedIds.size === 0
+  const cw = document.getElementById('rotateCwBtn')
+  const ccw = document.getElementById('rotateCcwBtn')
+  if (cw) cw.disabled = disabled
+  if (ccw) ccw.disabled = disabled
+}
+
+// 이미지 회전: 다운로드 → 캔버스로 90도 회전 → 같은 경로에 덮어쓰기
+async function rotateArtworkImage(artwork, degrees = 90) {
+  // 1) 이미지 다운로드 (이미 캐시에 있으면 빠름)
+  const res = await fetch(artwork.image_url, { mode: 'cors' })
+  if (!res.ok) throw new Error('이미지 다운로드 실패')
+  const blob = await res.blob()
+  
+  // 2) createImageBitmap으로 디코딩
+  const bitmap = await createImageBitmap(blob)
+  const srcW = bitmap.width
+  const srcH = bitmap.height
+  
+  // 3) 회전된 캔버스 만들기
+  // degrees는 시계방향 90의 배수 (90, 180, 270, -90)
+  const deg = ((degrees % 360) + 360) % 360
+  const rad = (deg * Math.PI) / 180
+  const dstW = (deg === 90 || deg === 270) ? srcH : srcW
+  const dstH = (deg === 90 || deg === 270) ? srcW : srcH
+  
+  let blob2
+  if (typeof OffscreenCanvas !== 'undefined') {
+    const canvas = new OffscreenCanvas(dstW, dstH)
+    const ctx = canvas.getContext('2d')
+    ctx.translate(dstW / 2, dstH / 2)
+    ctx.rotate(rad)
+    ctx.drawImage(bitmap, -srcW / 2, -srcH / 2)
+    bitmap.close && bitmap.close()
+    // JPEG로 저장 (PNG는 너무 큼)
+    const outType = (blob.type === 'image/png') ? 'image/png' : 'image/jpeg'
+    blob2 = await canvas.convertToBlob({ type: outType, quality: 0.92 })
+  } else {
+    const canvas = document.createElement('canvas')
+    canvas.width = dstW
+    canvas.height = dstH
+    const ctx = canvas.getContext('2d')
+    ctx.translate(dstW / 2, dstH / 2)
+    ctx.rotate(rad)
+    ctx.drawImage(bitmap, -srcW / 2, -srcH / 2)
+    bitmap.close && bitmap.close()
+    const outType = (blob.type === 'image/png') ? 'image/png' : 'image/jpeg'
+    blob2 = await new Promise(r => canvas.toBlob(r, outType, 0.92))
+  }
+  if (!blob2) throw new Error('회전 처리 실패')
+  
+  // 4) Storage에 같은 경로로 덮어쓰기
+  const storagePath = artwork.storage_path
+  if (!storagePath) throw new Error('storage_path가 없어요 (옛날 작품일 수 있음)')
+  
+  const { error: upErr } = await supabase.storage.from('artworks').upload(storagePath, blob2, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: blob2.type
+  })
+  if (upErr) throw upErr
+  
+  // 5) DB의 image_url에 캐시 무효화 쿼리 추가 (?v=타임스탬프)
+  const { data: { publicUrl } } = supabase.storage.from('artworks').getPublicUrl(storagePath)
+  const newUrl = publicUrl + '?v=' + Date.now()
+  const { error: dbErr } = await supabase.from('artworks').update({ image_url: newUrl }).eq('id', artwork.id)
+  if (dbErr) throw dbErr
+  
+  // 로컬 artworks 배열에도 반영
+  const local = artworks.find(x => x.id === artwork.id)
+  if (local) local.image_url = newUrl
+}
+
+async function rotateSelected(degrees = 90) {
+  if (selectedIds.size === 0) return
+  const ids = Array.from(selectedIds)
+  const dir = degrees > 0 ? '시계방향' : '반시계방향'
+  const arrow = degrees > 0 ? '↻' : '↺'
+  
+  // 모달 표시
+  const modal = document.getElementById('rotateModal')
+  modal.classList.add('show')
+  document.getElementById('rotateModalTitle').textContent = `${arrow} 작품 회전 중`
+  document.getElementById('rotateModalSub').textContent = `${ids.length}장을 ${dir} 90°로 처리합니다.`
+  document.getElementById('rtProgressBar').style.width = '0%'
+  document.getElementById('rtProgressText').textContent = '준비 중...'
+  document.getElementById('rotateCloseBtn').disabled = true
+  
+  const CONCURRENCY = 5
+  let done = 0, failed = 0, firstError = null
+  let cursor = 0
+  
+  const update = () => {
+    const processed = done + failed
+    const pct = Math.round((processed / ids.length) * 100)
+    document.getElementById('rtProgressBar').style.width = pct + '%'
+    document.getElementById('rtProgressText').textContent = 
+      `${processed}/${ids.length} 처리 중${failed > 0 ? ` · ${failed}장 실패` : ''}`
+  }
+  
+  async function worker() {
+    while (cursor < ids.length) {
+      const i = cursor++
+      const id = ids[i]
+      const art = artworks.find(x => x.id === id)
+      if (!art) { failed++; update(); continue }
+      try {
+        await rotateArtworkImage(art, degrees)
+        done++
+      } catch (err) {
+        console.error('rotate failed', id, err)
+        failed++
+        if (!firstError) firstError = err.message || String(err)
+      }
+      update()
+    }
+  }
+  
+  const workers = []
+  for (let k = 0; k < CONCURRENCY; k++) workers.push(worker())
+  await Promise.all(workers)
+  
+  document.getElementById('rtProgressText').textContent = 
+    `완료: ${done}장 성공${failed > 0 ? ` · ${failed}장 실패\n첫 오류: ${(firstError||'').slice(0,60)}` : ''}`
+  document.getElementById('rotateCloseBtn').disabled = false
+  
+  renderGrid()
+}
+window.rotateSelected = rotateSelected
+
+function closeRotateModal() {
+  document.getElementById('rotateModal').classList.remove('show')
+  // 회전 끝나면 선택 모드 자동 해제
+  cancelSelectMode()
+}
+window.closeRotateModal = closeRotateModal
+
+// ============ AI ANALYSIS ============
+let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
+
+function showAiPanel() {
+  document.getElementById('aiPanel').classList.add('show')
+}
+
+function hideAiPanel() {
+  document.getElementById('aiPanel').classList.remove('show')
+  resetAiResult()
+}
+
+function resetAiResult() {
+  aiResultData = null
+  const result = document.getElementById('aiResult')
+  result.classList.remove('show')
+  result.innerHTML = ''
+  const trigger = document.getElementById('aiTrigger')
+  trigger.disabled = false
+  document.getElementById('aiTriggerText').textContent = 'AI로 태그 추천받기'
+}
+
+async function runAiAnalysis() {
+  if (!selectedFile) {
+    toast('먼저 이미지를 선택해주세요')
+    return
+  }
+
+  const trigger = document.getElementById('aiTrigger')
+  const result = document.getElementById('aiResult')
+  trigger.disabled = true
+  document.getElementById('aiTriggerText').textContent = '분석 중'
+  result.classList.add('show')
+  result.innerHTML = `<div class="ai-loading">Claude가 작품을 보고 있어요<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>`
+
+  try {
+    // 1. 파일을 임시 Supabase Storage에 업로드 (Claude가 접근할 수 있도록)
+    const ext = (selectedFile.name.split('.').pop() || 'jpg').toLowerCase()
+    const tempPath = `temp/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`
+    const { error: upErr } = await supabase.storage.from('artworks').upload(tempPath, selectedFile, {
+      contentType: selectedFile.type,
+      upsert: false
+    })
+    if (upErr) throw new Error('이미지 업로드 실패: ' + upErr.message)
+
+    const { data: pub } = supabase.storage.from('artworks').getPublicUrl(tempPath)
+    const tempUrl = pub.publicUrl
+
+    // 2. Edge Function 호출
+    const { data: { session } } = await supabase.auth.getSession()
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`
+    }
+    const fnUrl = `${SUPABASE_URL}/functions/v1/analyze-artwork`
+    const res = await fetch(fnUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ image_url: tempUrl })
+    })
+
+    // 3. 임시 파일 삭제 (분석 끝났으니 지움)
+    supabase.storage.from('artworks').remove([tempPath]).catch(() => {})
+
+    if (!res.ok) {
+      const errBody = await res.text()
+      throw new Error(`서버 오류 (${res.status}): ${errBody.slice(0, 200)}`)
+    }
+
+    const data = await res.json()
+    if (data.error) throw new Error(data.error + (data.detail ? '\n' + data.detail : ''))
+
+    aiResultData = {
+      tags: data.tags || [],
+      comment: data.comment || '',
+      pickedTags: new Set()
+    }
+    renderAiResult()
+
+  } catch (err) {
+    console.error('AI 분석 실패:', err)
+    result.innerHTML = `<div class="ai-error">⚠ 분석 실패<br><span style="font-size:11px;color:var(--mute)">${escapeHtml(String(err.message || err))}</span></div>`
+    trigger.disabled = false
+    document.getElementById('aiTriggerText').textContent = '다시 시도'
+  }
+}
+window.runAiAnalysis = runAiAnalysis
+
+function renderAiResult() {
+  if (!aiResultData) return
+  const result = document.getElementById('aiResult')
+  const tags = aiResultData.tags
+  const comment = aiResultData.comment
+
+  // 현재 입력란에 이미 있는 태그 자동 체크
+  const currentTags = new Set(
+    (document.getElementById('fTags').value || '')
+      .split(/[\s,]+/).filter(Boolean).map(t => t.replace(/^#/, ''))
+  )
+  tags.forEach(t => { if (currentTags.has(t)) aiResultData.pickedTags.add(t) })
+
+  result.innerHTML = `
+    ${tags.length ? `
+      <div class="ai-result-title">✨ 추천 태그 (탭해서 선택)</div>
+      <div class="ai-tag-list">
+        ${tags.map(t => `<button class="ai-tag ${aiResultData.pickedTags.has(t)?'picked':''}" onclick="toggleAiTag('${escapeAttr(t)}')">${escapeHtml(t)}</button>`).join('')}
+      </div>
+    ` : ''}
+    ${comment ? `
+      <div class="ai-result-title">📝 분석 코멘트</div>
+      <div class="ai-comment-box">${escapeHtml(comment)}</div>
+      <div class="ai-comment-actions">
+        <button onclick="useAiComment('replace')">코멘트로 교체</button>
+        <button class="primary" onclick="useAiComment('append')">코멘트에 추가</button>
+      </div>
+    ` : ''}
+  `
+  document.getElementById('aiTriggerText').textContent = '✓ 분석 완료 · 다시 분석'
+  document.getElementById('aiTrigger').disabled = false
+}
+
+function toggleAiTag(tag) {
+  if (!aiResultData) return
+  if (aiResultData.pickedTags.has(tag)) {
+    aiResultData.pickedTags.delete(tag)
+  } else {
+    aiResultData.pickedTags.add(tag)
+  }
+  // 입력란 동기화
+  syncTagsInput()
+  // UI 갱신
+  document.querySelectorAll('.ai-tag').forEach(el => {
+    const t = el.textContent
+    el.classList.toggle('picked', aiResultData.pickedTags.has(t))
+  })
+}
+window.toggleAiTag = toggleAiTag
+
+function syncTagsInput() {
+  if (!aiResultData) return
+  const fTags = document.getElementById('fTags')
+  // 기존 사용자 입력 태그 (AI 추천 외의 것) 보존
+  const aiTagSet = new Set(aiResultData.tags)
+  const existing = (fTags.value || '').split(/[\s,]+/).filter(Boolean).map(t => t.replace(/^#/, ''))
+  const userTags = existing.filter(t => !aiTagSet.has(t))
+  const picked = Array.from(aiResultData.pickedTags)
+  fTags.value = [...userTags, ...picked].join(', ')
+}
+
+function useAiComment(mode) {
+  if (!aiResultData?.comment) return
+  const fMemo = document.getElementById('fMemo')
+  if (!fMemo) { toast('코멘트 입력란을 찾을 수 없어요'); return }
+  if (mode === 'replace') {
+    fMemo.value = aiResultData.comment
+  } else {
+    const cur = fMemo.value.trim()
+    fMemo.value = cur ? cur + '\n\n' + aiResultData.comment : aiResultData.comment
+  }
+  toast('코멘트 적용됨')
+}
+window.useAiComment = useAiComment
+
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '\\"')
+}
+
+// ============ SEARCH ============
+function toggleSearch() {
+  const bar = document.getElementById('searchBar')
+  const btn = document.getElementById('searchBtn')
+  const input = document.getElementById('searchInput')
+  const isShown = bar.classList.contains('show')
+  if (isShown) {
+    // 닫기: 검색어도 초기화
+    bar.classList.remove('show')
+    btn.classList.remove('active')
+    if (searchQuery) {
+      input.value = ''
+      searchQuery = ''
+      document.getElementById('searchClear').classList.remove('show')
+      updateSearchInfo()
+      renderGrid()
+    }
+  } else {
+    bar.classList.add('show')
+    btn.classList.add('active')
+    setTimeout(() => input.focus(), 50)
+  }
+}
+window.toggleSearch = toggleSearch
+
+function clearSearch() {
+  const input = document.getElementById('searchInput')
+  input.value = ''
+  searchQuery = ''
+  document.getElementById('searchClear').classList.remove('show')
+  updateSearchInfo()
+  renderGrid()
+  input.focus()
+}
+window.clearSearch = clearSearch
+
+function updateSearchInfo() {
+  const info = document.getElementById('searchResultInfo')
+  if (!searchQuery) {
+    info.classList.remove('show')
+    info.textContent = ''
+    return
+  }
+  const count = getFiltered().length
+  info.textContent = `"${searchQuery}" — ${count}개 결과`
+  info.classList.add('show')
+}
+
+// 입력 핸들러는 DOMContentLoaded에서 바인딩
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('searchInput')
+  const clear = document.getElementById('searchClear')
+  if (input) {
+    input.addEventListener('input', e => {
+      searchQuery = e.target.value
+      clear.classList.toggle('show', !!searchQuery)
+      updateSearchInfo()
+      renderGrid()
+    })
+  }
+})
+
+// ============ UTILS ============
+let toastTimer = null
+function toast(msg) {
+  const t = document.getElementById('toast')
+  t.textContent = msg
+  t.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2000)
+}
+window.toast = toast
+
+function escapeHtml(s) {
+  if (!s) return ''
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))
+}
+</script>
+</body>
+</html>
