@@ -80,6 +80,32 @@ img{display:block;max-width:100%}
 .color-dot.active{transform:scale(1.15);border-color:var(--ink)}
 
 .grid{padding:8px 14px;column-count:2;column-gap:8px}
+.grid.cols-1{column-count:1}
+.grid.cols-2{column-count:2}
+.grid.cols-3{column-count:3;column-gap:6px}
+.grid.cols-3 .card .info{padding:6px 8px}
+.grid.cols-3 .card .info .ttl{font-size:10px}
+.grid.cols-3 .card .info .tag{font-size:8px}
+.grid.cols-3 .card .badge{font-size:8px;padding:2px 5px}
+.grid.cols-3 .card .fav,.grid.cols-3 .card .select-check{width:22px;height:22px;font-size:11px}
+.grid.cols-1 .card .info{padding:12px 14px}
+.grid.cols-1 .card .info .ttl{font-size:14px}
+.grid.cols-1 .card .info .tag{font-size:11px}
+
+/* 갤러리 컨트롤 바 (정렬 + 카드 크기) */
+.gallery-controls{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 0;gap:8px}
+.gc-sort{position:relative;display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--ink);letter-spacing:.3px;background:none;border:none;cursor:pointer;padding:6px 4px;text-transform:uppercase}
+.gc-sort .gc-sort-icon{font-size:13px}
+.gc-sort .gc-sort-arrow{font-size:8px;color:var(--mute);margin-left:2px}
+.gc-sort-menu{display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--line);border-radius:4px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:50;min-width:140px;margin-top:4px;overflow:hidden}
+.gc-sort-menu.show{display:block}
+.gc-sort-menu button{display:block;width:100%;text-align:left;padding:10px 14px;font-size:12px;background:#fff;border:none;cursor:pointer;color:var(--ink);font-weight:500;border-bottom:1px solid #f5f5f5}
+.gc-sort-menu button:last-child{border-bottom:none}
+.gc-sort-menu button.active{color:var(--red);font-weight:700;background:#fff5f5}
+.gc-sort-menu button:active{background:#f0f0f0}
+.gc-cols{display:inline-flex;background:#f5f5f5;border-radius:4px;padding:2px;gap:2px}
+.gc-cols button{padding:5px 8px;font-size:13px;background:none;border:none;cursor:pointer;color:var(--mute);border-radius:3px;line-height:1;font-weight:700}
+.gc-cols button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
 .card{break-inside:avoid;margin-bottom:8px;position:relative;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:pointer}
 .card:active{transform:scale(.98)}
 .card img{width:100%;height:auto}
@@ -308,6 +334,26 @@ body.select-mode .card .select-check{display:flex}
   <div class="tabs" id="tabs"></div>
   <div class="chips" id="chips"></div>
   <div class="color-strip" id="colors"></div>
+
+  <div class="gallery-controls">
+    <button class="gc-sort" id="sortBtn" onclick="toggleSortMenu(event)">
+      <span class="gc-sort-icon">⇅</span>
+      <span id="sortLabel">최신순</span>
+      <span class="gc-sort-arrow">▾</span>
+      <div class="gc-sort-menu" id="sortMenu">
+        <button data-sort="newest">최신순</button>
+        <button data-sort="oldest">오래된순</button>
+        <button data-sort="artwork_date">작품 날짜순</button>
+        <button data-sort="favorite">즐겨찾기 먼저</button>
+      </div>
+    </button>
+    <div class="gc-cols" id="colsToggle">
+      <button data-cols="1" title="크게">▭</button>
+      <button data-cols="2" title="기본">▦</button>
+      <button data-cols="3" title="작게">⋮⋮⋮</button>
+    </div>
+  </div>
+
   <div id="gridContainer"></div>
 
   <button class="fab-pdf" id="fabPdf" onclick="openPdfModal()" title="PDF 내보내기">📄</button>
@@ -523,6 +569,8 @@ let activeColor = 'all'
 let searchQuery = ''
 let selectMode = false
 let selectedIds = new Set()
+let sortMode = 'newest'  // 'newest' | 'oldest' | 'artwork_date' | 'favorite'
+let gridCols = 2  // 1 | 2 | 3
 let currentId = null
 let editingId = null
 let selectedFile = null
@@ -745,6 +793,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   modalZoom = createPinchZoom(document.getElementById('zoomContainer'))
   slideZoom = createPinchZoom(document.getElementById('slideZoomContainer'))
   setupFileInput()
+  setupGalleryControls()
   renderColors()
   await loadData()
   handleShareTarget()
@@ -855,7 +904,36 @@ function getFiltered() {
       return haystack.includes(q)
     })
   }
-  return list
+  return applySorting(list)
+}
+
+function applySorting(list) {
+  // 원본 보존을 위해 복사 후 정렬
+  const arr = list.slice()
+  const getCreated = a => new Date(a.created_at || 0).getTime()
+  if (sortMode === 'newest') {
+    // 기본: created_at 내림차순 (artworks는 이미 그렇게 들어옴, 안전하게 한 번 더)
+    arr.sort((a, b) => getCreated(b) - getCreated(a))
+  } else if (sortMode === 'oldest') {
+    arr.sort((a, b) => getCreated(a) - getCreated(b))
+  } else if (sortMode === 'artwork_date') {
+    // artwork_date 내림차순 (null은 맨 뒤로)
+    arr.sort((a, b) => {
+      const ad = a.artwork_date ? new Date(a.artwork_date).getTime() : -Infinity
+      const bd = b.artwork_date ? new Date(b.artwork_date).getTime() : -Infinity
+      if (bd !== ad) return bd - ad
+      return getCreated(b) - getCreated(a)
+    })
+  } else if (sortMode === 'favorite') {
+    // 즐겨찾기 먼저, 그 안에선 최신순
+    arr.sort((a, b) => {
+      const fa = a.is_favorite ? 1 : 0
+      const fb = b.is_favorite ? 1 : 0
+      if (fb !== fa) return fb - fa
+      return getCreated(b) - getCreated(a)
+    })
+  }
+  return arr
 }
 
 function renderGrid() {
@@ -901,7 +979,7 @@ function renderGrid() {
         </div>
       </div>`
   }).join('')
-  container.innerHTML = `<div class="grid">${cards}</div>`
+  container.innerHTML = `<div class="grid cols-${gridCols}">${cards}</div>`
 
   document.querySelectorAll('.card').forEach(el => {
     el.onclick = e => {
@@ -2254,6 +2332,85 @@ async function generatePdf() {
   }
 }
 window.generatePdf = generatePdf
+
+// ============ GALLERY CONTROLS (정렬·열수) ============
+const SORT_LABELS = {
+  newest: '최신순',
+  oldest: '오래된순',
+  artwork_date: '작품 날짜순',
+  favorite: '즐겨찾기 먼저'
+}
+
+function toggleSortMenu(event) {
+  if (event) event.stopPropagation()
+  const menu = document.getElementById('sortMenu')
+  menu.classList.toggle('show')
+  // 메뉴 내 active 표시
+  menu.querySelectorAll('button').forEach(b => {
+    b.classList.toggle('active', b.dataset.sort === sortMode)
+  })
+}
+window.toggleSortMenu = toggleSortMenu
+
+function setSortMode(mode) {
+  if (!SORT_LABELS[mode]) return
+  sortMode = mode
+  document.getElementById('sortLabel').textContent = SORT_LABELS[mode]
+  document.getElementById('sortMenu').classList.remove('show')
+  renderGrid()
+  try { localStorage.setItem('hi5_sort', mode) } catch(e) {}
+}
+
+function setGridCols(n) {
+  n = parseInt(n)
+  if (![1,2,3].includes(n)) return
+  gridCols = n
+  document.querySelectorAll('#colsToggle button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.cols) === n)
+  })
+  // grid가 이미 렌더된 상태면 클래스만 교체 (전체 리렌더 안 함, 빠름)
+  const grid = document.querySelector('#gridContainer .grid')
+  if (grid) {
+    grid.classList.remove('cols-1', 'cols-2', 'cols-3')
+    grid.classList.add(`cols-${n}`)
+  } else {
+    renderGrid()
+  }
+  try { localStorage.setItem('hi5_cols', n) } catch(e) {}
+}
+
+function setupGalleryControls() {
+  // 저장된 설정 불러오기
+  try {
+    const savedSort = localStorage.getItem('hi5_sort')
+    if (savedSort && SORT_LABELS[savedSort]) {
+      sortMode = savedSort
+      document.getElementById('sortLabel').textContent = SORT_LABELS[savedSort]
+    }
+    const savedCols = parseInt(localStorage.getItem('hi5_cols'))
+    if ([1,2,3].includes(savedCols)) gridCols = savedCols
+  } catch(e) {}
+  
+  // 컬럼 토글 active 초기 표시
+  document.querySelectorAll('#colsToggle button').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.cols) === gridCols)
+    b.onclick = () => setGridCols(b.dataset.cols)
+  })
+  
+  // 정렬 메뉴 클릭
+  document.querySelectorAll('#sortMenu button').forEach(b => {
+    b.onclick = (e) => { e.stopPropagation(); setSortMode(b.dataset.sort) }
+  })
+  
+  // 바깥 클릭 시 정렬 메뉴 닫기
+  document.addEventListener('click', (e) => {
+    const menu = document.getElementById('sortMenu')
+    const btn = document.getElementById('sortBtn')
+    if (menu && menu.classList.contains('show') && !btn.contains(e.target)) {
+      menu.classList.remove('show')
+    }
+  })
+}
 
 // ============ SELECT MODE & ROTATION ============
 function toggleSelectMode() {
