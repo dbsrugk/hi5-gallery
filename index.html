@@ -801,6 +801,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupFileInput()
   setupGalleryControls()
   renderColors()
+  // 페이지 시작 시 업로드 페이지는 DOM에서 빼둠 (갤러리만 보임)
+  parkPages()
+  showOnlyGallery()
   await loadData()
   handleShareTarget()
 })
@@ -1961,9 +1964,55 @@ function handleShareTarget() {
 }
 
 // ============ NAVIGATION ============
+// DOM에서 직접 제거/삽입하는 핵 옵션 (CSS는 신뢰 못 함)
+let galleryParked = null  // DOM에서 빼놓은 갤러리 페이지
+let uploadParked = null   // DOM에서 빼놓은 업로드 페이지
+let pageHost = null       // 페이지가 들어가는 부모 (body)
+
+function parkPages() {
+  pageHost = document.body
+  // 시작 시점에 두 페이지를 찾아 변수에 저장
+  if (!galleryParked) galleryParked = document.getElementById('galleryPage')
+  if (!uploadParked) uploadParked = document.getElementById('uploadPage')
+}
+
+function showOnlyGallery() {
+  parkPages()
+  // 업로드 페이지를 DOM에서 제거
+  if (uploadParked && uploadParked.parentNode) {
+    uploadParked.parentNode.removeChild(uploadParked)
+  }
+  // 갤러리는 DOM에 있어야 함
+  if (galleryParked && !galleryParked.parentNode) {
+    pageHost.appendChild(galleryParked)
+  }
+  // 클래스/스타일 정리
+  if (galleryParked) {
+    galleryParked.classList.remove('hidden')
+    galleryParked.style.display = 'block'
+  }
+}
+
+function showOnlyUpload() {
+  parkPages()
+  // 갤러리 페이지를 DOM에서 제거
+  if (galleryParked && galleryParked.parentNode) {
+    galleryParked.parentNode.removeChild(galleryParked)
+  }
+  // 업로드는 DOM에 있어야 함
+  if (uploadParked && !uploadParked.parentNode) {
+    pageHost.appendChild(uploadParked)
+  }
+  // 클래스/스타일 정리
+  if (uploadParked) {
+    uploadParked.classList.add('show')
+    uploadParked.style.display = 'block'
+  }
+}
+
 function hideAllPages() {
-  document.getElementById('galleryPage').classList.add('hidden')
-  document.getElementById('uploadPage').classList.remove('show')
+  // 호환성 유지 (기존 코드가 호출함)
+  // 실제 페이지 표시는 showOnly* 함수가 담당
 }
 
 function clearBnavActive() {
@@ -1971,8 +2020,7 @@ function clearBnavActive() {
 }
 
 window.showGallery = () => {
-  hideAllPages()
-  document.getElementById('galleryPage').classList.remove('hidden')
+  showOnlyGallery()
   clearBnavActive()
   document.getElementById('navGallery').classList.add('active')
   resetUploadForm()
@@ -1983,12 +2031,14 @@ window.showUpload = () => {
   const existing = document.getElementById('detailFormZone')
   if (existing) existing.remove()
   resetUploadForm()
-  showUploadPage()
+  showOnlyUpload()
+  clearBnavActive()
+  document.getElementById('navUpload').classList.add('active')
+  window.scrollTo(0,0)
 }
 
 function showUploadPage() {
-  hideAllPages()
-  document.getElementById('uploadPage').classList.add('show')
+  showOnlyUpload()
   clearBnavActive()
   document.getElementById('navUpload').classList.add('active')
   window.scrollTo(0,0)
