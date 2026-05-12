@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
 <title>Hi5 Gallery · 부산 센텀점</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='10' fill='%23c0392b'/><text x='50%25' y='50%25' dy='.04em' text-anchor='middle' dominant-baseline='central' font-family='Bodoni Moda, Bodoni 72, Didot, Georgia, serif' font-size='46' font-style='italic' font-weight='700' fill='%23ffffff'>G</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='28' fill='%23c0392b'/><text x='50%25' y='50%25' dy='.04em' text-anchor='middle' dominant-baseline='central' font-family='Bodoni Moda, Bodoni 72, Didot, Georgia, serif' font-size='128' font-style='italic' font-weight='700' fill='%23ffffff'>G</text></svg>">
 <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIkhpNSBHYWxsZXJ5IiwgInNob3J0X25hbWUiOiAiSGk1IEdhbGxlcnkiLCAic3RhcnRfdXJsIjogIi4vIiwgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsICJvcmllbnRhdGlvbiI6ICJwb3J0cmFpdCIsICJ0aGVtZV9jb2xvciI6ICIjYzAzOTJiIiwgImJhY2tncm91bmRfY29sb3IiOiAiI2ZhZmFmNyIsICJzaGFyZV90YXJnZXQiOiB7ImFjdGlvbiI6ICIuLz9zaGFyZT0xIiwgIm1ldGhvZCI6ICJHRVQiLCAiZW5jdHlwZSI6ICJhcHBsaWNhdGlvbi94LXd3dy1mb3JtLXVybGVuY29kZWQiLCAicGFyYW1zIjogeyJ0aXRsZSI6ICJ0aXRsZSIsICJ0ZXh0IjogInRleHQiLCAidXJsIjogInNoYXJlZF91cmwifX19">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -195,6 +197,8 @@ img{display:block;max-width:100%}
 .multi-preview .mp-item.error .mp-status{background:rgba(192,57,43,.85)}
 .multi-preview .mp-item.uploading .mp-status{background:rgba(0,0,0,.5)}
 .multi-preview .mp-item .mp-remove{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:2}
+.multi-preview .mp-item .mp-skel{position:absolute;inset:0;background:linear-gradient(90deg,#eee 0%,#f5f5f5 50%,#eee 100%);background-size:200% 100%;animation:mp-skel-anim 1.4s infinite}
+@keyframes mp-skel-anim{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 .multi-count{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;font-size:12px}
 .multi-count .num{font-weight:800;color:var(--red);font-size:14px}
@@ -1161,17 +1165,77 @@ function addMultiFiles(files) {
   if (files.length > available) {
     toast(`${available}장만 추가됨 (최대 200장)`)
   }
+  // 유효한 파일만 일단 빈 미리보기로 추가 (UI 즉시 반응)
+  const newItems = []
   toAdd.forEach(f => {
     if (f.size > 20*1024*1024) return
     if (!f.type.startsWith('image/')) return
-    multiFiles.push({
+    const item = {
       file: f,
-      preview: URL.createObjectURL(f),
+      preview: '',  // 비워두고 비동기로 채움
       status: 'pending',
       error: null
-    })
+    }
+    multiFiles.push(item)
+    newItems.push(item)
   })
+  // 즉시 한 번 렌더 (스켈레톤 표시)
   renderMultiPreview()
+  // 백그라운드에서 썸네일 생성 (블로킹 없이)
+  generateThumbnailsAsync(newItems)
+}
+
+// 작은 썸네일 dataURL을 비동기로 생성하면서, 한 번에 폰을 막지 않게 청크 단위로 처리
+async function generateThumbnailsAsync(items) {
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i]
+    if (!item.file) continue
+    try {
+      const thumb = await fileToThumbnail(item.file, 240, 0.75)
+      // 객체 자체가 multiFiles 배열에 들어있으므로 참조로 업데이트됨
+      item.preview = thumb
+      // 5장마다 한 번씩만 다시 그려서 렌더 오버헤드 줄임
+      if (i % 5 === 0 || i === items.length - 1) {
+        renderMultiPreview()
+        // 메인 스레드에 숨 쉴 시간 주기
+        await new Promise(r => setTimeout(r, 0))
+      }
+    } catch (e) {
+      console.warn('thumbnail failed', e)
+    }
+  }
+  renderMultiPreview()
+}
+
+// 파일을 작은 JPEG dataURL로 변환 (대용량 사진 메모리 폭발 방지)
+function fileToThumbnail(file, maxSize = 240, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      try {
+        const ratio = Math.min(1, maxSize / Math.max(img.naturalWidth, img.naturalHeight))
+        const w = Math.round(img.naturalWidth * ratio)
+        const h = Math.round(img.naturalHeight * ratio)
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, w, h)
+        const dataUrl = canvas.toDataURL('image/jpeg', quality)
+        URL.revokeObjectURL(url)
+        resolve(dataUrl)
+      } catch (e) {
+        URL.revokeObjectURL(url)
+        reject(e)
+      }
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('image load failed'))
+    }
+    img.src = url
+  })
 }
 
 function renderMultiPreview() {
@@ -1180,23 +1244,57 @@ function renderMultiPreview() {
   document.getElementById('multiNum').textContent = multiFiles.length
   countWrap.style.display = multiFiles.length > 0 ? 'flex' : 'none'
 
-  wrap.innerHTML = multiFiles.map((m, i) => {
-    let statusOverlay = ''
-    if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
-    else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
-    else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
-    const removeBtn = m.status === 'pending' || m.status === 'error'
-      ? `<button class="mp-remove" onclick="removeMultiFile(${i})">×</button>` : ''
-    return `<div class="mp-item ${m.status}">
-      <img src="${m.preview}" alt="">
-      ${statusOverlay}
-      ${removeBtn}
-    </div>`
-  }).join('')
+  // 현재 DOM 아이템 수와 multiFiles 수 비교 → 추가/제거만 처리
+  const currentItems = wrap.querySelectorAll('.mp-item')
+  const currentCount = currentItems.length
+  const targetCount = multiFiles.length
+
+  // 1) 개수가 줄었으면 뒤쪽 제거 (또는 전체가 달라졌으면 통째로 다시)
+  if (currentCount > targetCount) {
+    // 줄어든 만큼 뒤에서 제거
+    for (let i = currentCount - 1; i >= targetCount; i--) {
+      currentItems[i].remove()
+    }
+  }
+
+  // 2) 각 아이템 갱신 (인덱스가 어긋났을 수도 있으므로 data-index로 매칭)
+  for (let i = 0; i < multiFiles.length; i++) {
+    const m = multiFiles[i]
+    let el = wrap.children[i]
+    
+    if (!el) {
+      // 새 아이템 생성
+      el = document.createElement('div')
+      el.className = 'mp-item ' + m.status
+      el.dataset.idx = i
+      el.innerHTML = renderMpItemInner(m, i)
+      wrap.appendChild(el)
+    } else {
+      // 기존 아이템: 상태나 미리보기가 바뀐 경우만 업데이트
+      const currentStatus = el.className.replace('mp-item', '').trim()
+      const needsImageUpdate = m.preview && !el.querySelector('img')?.src
+      if (currentStatus !== m.status || needsImageUpdate || el.dataset.idx !== String(i)) {
+        el.className = 'mp-item ' + m.status
+        el.dataset.idx = i
+        el.innerHTML = renderMpItemInner(m, i)
+      }
+    }
+  }
+}
+
+function renderMpItemInner(m, i) {
+  let statusOverlay = ''
+  if (m.status === 'uploading') statusOverlay = `<div class="mp-status">올리는 중...</div>`
+  else if (m.status === 'done') statusOverlay = `<div class="mp-status">✓ 완료</div>`
+  else if (m.status === 'error') statusOverlay = `<div class="mp-status">✗ 실패</div>`
+  const removeBtn = m.status === 'pending' || m.status === 'error'
+    ? `<button class="mp-remove" onclick="removeMultiFile(${i})">×</button>` : ''
+  const imgSrc = m.preview || ''
+  const placeholder = imgSrc ? '' : `<div class="mp-skel"></div>`
+  return `${imgSrc ? `<img src="${imgSrc}" alt="" loading="lazy">` : ''}${placeholder}${statusOverlay}${removeBtn}`
 }
 
 window.removeMultiFile = (i) => {
-  URL.revokeObjectURL(multiFiles[i].preview)
   multiFiles.splice(i, 1)
   renderMultiPreview()
 }
@@ -1206,7 +1304,6 @@ window.clearMultiFiles = () => {
     toast('업로드 중에는 지울 수 없어요')
     return
   }
-  multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
   multiFiles = []
   renderMultiPreview()
 }
@@ -1537,7 +1634,6 @@ function resetUploadForm() {
   document.getElementById('fileZone').classList.remove('has-file')
   document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
   hideAiPanel()
-  multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
   multiFiles = []
   urlItems = []
   renderMultiPreview()
