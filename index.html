@@ -211,7 +211,8 @@ body.select-mode .card .select-check{display:flex}
 .collections-page:not(.show),
 .collection-detail-page:not(.show),
 .upload-page:not(.show){display:none !important;visibility:hidden !important}
-.gallery-page.hidden{display:none !important;visibility:hidden !important}
+.gallery-page.hidden,
+.gallery-page.hidden *{display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important}
 .col-card{display:flex;gap:14px;padding:16px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;transition:background .15s}
 .col-card:active{background:#fafafa}
 .col-card .col-cover{width:84px;height:84px;flex-shrink:0;border-radius:6px;overflow:hidden;background:var(--line);position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px}
@@ -2093,6 +2094,8 @@ function handleShareTarget() {
 }
 
 // ============ NAVIGATION ============
+let savedGalleryHTML = null
+
 function hideAllPages() {
   const gal = document.getElementById('galleryPage')
   const upl = document.getElementById('uploadPage')
@@ -2102,6 +2105,11 @@ function hideAllPages() {
     gal.classList.add('hidden')
     gal.style.display = 'none'
     gal.style.visibility = 'hidden'
+    gal.style.position = 'absolute'
+    gal.style.left = '-99999px'
+    gal.style.top = '-99999px'
+    gal.style.opacity = '0'
+    gal.style.pointerEvents = 'none'
   }
   if (upl) {
     upl.classList.remove('show')
@@ -2130,6 +2138,11 @@ window.showGallery = () => {
   gal.classList.remove('hidden')
   gal.style.display = 'block'
   gal.style.visibility = 'visible'
+  gal.style.position = 'static'
+  gal.style.left = 'auto'
+  gal.style.top = 'auto'
+  gal.style.opacity = '1'
+  gal.style.pointerEvents = 'auto'
   clearBnavActive()
   document.getElementById('navGallery').classList.add('active')
   resetUploadForm()
@@ -2922,7 +2935,6 @@ window.closeRotateModal = closeRotateModal
 
 // ============ COLLECTIONS ============
 window.showCollections = () => {
-  showDebug('showCollections 호출됨')
   hideAllPages()
   const col = document.getElementById('collectionsPage')
   if (!col) return
@@ -2934,33 +2946,6 @@ window.showCollections = () => {
   document.getElementById('navCollections').classList.add('active')
   renderCollectionsList()
   window.scrollTo(0,0)
-  // 디버그: 모든 페이지 상태
-  setTimeout(() => {
-    const pages = ['galleryPage','uploadPage','collectionsPage','collectionDetailPage']
-    const status = pages.map(id => {
-      const el = document.getElementById(id)
-      if (!el) return `${id.slice(0,3)}:없음`
-      const s = window.getComputedStyle(el)
-      return `${id.slice(0,3).toUpperCase()}:${s.display==='none'?'X':'O'}`
-    }).join(' ')
-    showDebug(status)
-  }, 100)
-}
-
-function showDebug(msg) {
-  let d = document.getElementById('debugPanel')
-  if (!d) {
-    d = document.createElement('div')
-    d.id = 'debugPanel'
-    d.style.cssText = 'position:fixed;top:60px;left:10px;right:10px;background:rgba(0,0,0,.9);color:#0f0;padding:10px;font-size:11px;font-family:monospace;border-radius:4px;z-index:9999;max-height:160px;overflow-y:auto;pointer-events:none'
-    document.body.appendChild(d)
-  }
-  const time = new Date().toTimeString().slice(0,8)
-  d.innerHTML = `<div>${time} - ${msg}</div>` + d.innerHTML
-  setTimeout(() => {
-    const lines = d.querySelectorAll('div')
-    if (lines.length > 10) lines[lines.length - 1].remove()
-  }, 5000)
 }
 
 function getCollectionArtworks(colId) {
