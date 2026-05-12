@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v4-debug-visible">
+<meta name="hi5-version" content="2026-05-12-v4-debug2-sizes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -298,7 +298,7 @@ body.select-mode .card .select-check{display:flex}
 </style>
 </head>
 <body>
-<div id="debugBar" style="position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;font:bold 11px monospace;padding:6px 10px;z-index:99999;text-align:center;letter-spacing:0.5px">v4-important-reflow · loading...</div>
+<div id="debugBar" style="position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;font:bold 9px monospace;padding:4px 6px;z-index:99999;text-align:center;letter-spacing:0.3px;white-space:nowrap;overflow:hidden">v4-debug · loading...</div>
 
 <!-- ============ GALLERY PAGE ============ -->
 <div class="gallery-page" id="galleryPage">
@@ -2002,11 +2002,14 @@ function _updateDebugBar(label) {
   if (!bar) return
   const g = document.getElementById('galleryPage')
   const u = document.getElementById('uploadPage')
-  const gCls = g ? g.className : 'NULL'
-  const uCls = u ? u.className : 'NULL'
   const gDisp = g ? getComputedStyle(g).display : '?'
   const uDisp = u ? getComputedStyle(u).display : '?'
-  bar.textContent = `v4 [${label}] G:${gDisp} U:${uDisp}`
+  const gH = g ? Math.round(g.getBoundingClientRect().height) : '?'
+  const uH = u ? Math.round(u.getBoundingClientRect().height) : '?'
+  const gridC = document.getElementById('gridContainer')
+  const gridH = gridC ? Math.round(gridC.getBoundingClientRect().height) : '?'
+  const gridD = gridC ? getComputedStyle(gridC).display : '?'
+  bar.textContent = `v4 [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px`
 }
 
 function showOnlyGallery() {
