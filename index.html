@@ -1782,13 +1782,14 @@ async function generatePdf() {
 
     // ── 2) 작품 페이지들
     const cats = Object.fromEntries(categories.map(c => [c.id, c]))
+    const catNames = new Set(categories.map(c => c.name))
     for (let i = 0; i < list.length; i++) {
       const a = list[i]
       updatePdfProgress(i + 1, list.length, `작품 ${i+1}/${list.length} 처리 중...`)
       
       pdf.addPage()
       
-      // 상단 헤더 (얇은 빨간 띠 + 페이지 번호)
+      // 상단 헤더 (얇은 빨간 띠)
       pdf.setFillColor(192, 57, 43)
       pdf.rect(0, 0, pageW, 3, 'F')
       
@@ -1796,17 +1797,16 @@ async function generatePdf() {
       let img, jpeg
       try {
         img = await loadImage(a.image_url)
-        jpeg = imageToJpegDataUrl(img, 1400, 0.82)
+        jpeg = imageToJpegDataUrl(img, 1600, 0.85)
       } catch (e) {
         console.warn('image load failed for', a.id, e)
-        // 이미지 로드 실패해도 메타정보는 출력
       }
       
-      // 이미지 박스 (페이지의 60% 높이까지)
+      // 이미지 박스 — 페이지의 약 75% 차지 (대폭 확대)
       const imgBoxX = margin
-      const imgBoxY = 15
+      const imgBoxY = 8
       const imgBoxW = pageW - margin * 2
-      const imgBoxH = 150
+      const imgBoxH = 220
       
       if (jpeg) {
         const fit = fitImageInBox(jpeg.w, jpeg.h, imgBoxW, imgBoxH)
@@ -1820,63 +1820,78 @@ async function generatePdf() {
       }
       
       // 구분선
-      const sepY = imgBoxY + imgBoxH + 8
+      const sepY = imgBoxY + imgBoxH + 4
       pdf.setDrawColor(192, 57, 43)
-      pdf.setLineWidth(0.5)
+      pdf.setLineWidth(0.4)
       pdf.line(margin, sepY, pageW - margin, sepY)
       
-      // 메타정보 (한글 → 이미지로)
+      // ── 메타정보 (중복 제거 후 한 줄로 깔끔하게) ──
       const cat = cats[a.category]
-      const tags = (a.tags || []).map(t => '#' + t).join('  ')
+      const catName = cat ? cat.name : ''
+      const rawTitle = (a.title || '').trim()
+      // 제목이 카테고리명과 같거나 비어있으면 생략
+      const title = (!rawTitle || rawTitle === catName || catNames.has(rawTitle)) ? '' : rawTitle
+      
+      // 학생/학교/과목/날짜
       const metaParts = [a.student_name, a.school, a.subject].filter(Boolean).join(' · ')
       const dateMeta = a.artwork_date ? new Date(a.artwork_date).toLocaleDateString('ko-KR') : ''
-      const memo = a.memo || ''
+      const subMeta = [metaParts, dateMeta].filter(Boolean).join(' · ')
+      
+      // 태그 — 제목/카테고리와 동일한 건 제외
+      const titleLower = (rawTitle || '').toLowerCase()
+      const filteredTags = (a.tags || []).filter(t => {
+        const tl = String(t).toLowerCase()
+        return tl !== titleLower && tl !== catName.toLowerCase()
+      })
+      const tags = filteredTags.map(t => '#' + t).join('  ')
+      
+      const memo = (a.memo || '').trim()
+      
+      // 첫 줄: 카테고리 + (제목)
+      const headLine = [catName, title].filter(Boolean).join('  ·  ')
       
       const metaLines = []
-      // 카테고리 + 제목
-      metaLines.push({
-        text: (cat ? cat.name + '  ·  ' : '') + (a.title || '제목 없음'),
-        size: 16, weight: 800, color: '#1a1a1a'
-      })
-      // 학생/학교/과목/날짜
-      if (metaParts || dateMeta) {
+      if (headLine) {
         metaLines.push({
-          text: [metaParts, dateMeta].filter(Boolean).join(' · '),
-          size: 11, color: '#666'
+          text: headLine,
+          size: 16, weight: 800, color: '#1a1a1a'
         })
       }
-      // 태그
+      if (subMeta) {
+        metaLines.push({ text: subMeta, size: 11, color: '#666' })
+      }
       if (tags) {
-        metaLines.push({ text: '', size: 4 })
+        if (metaLines.length) metaLines.push({ text: '', size: 4 })
         metaLines.push({ text: tags, size: 11, color: '#c0392b', weight: 700 })
       }
-      // 코멘트
       if (memo) {
-        metaLines.push({ text: '', size: 6 })
+        if (metaLines.length) metaLines.push({ text: '', size: 6 })
         metaLines.push({ text: memo, size: 12, color: '#1a1a1a' })
       }
       
-      const metaImg = textBlockToImage({
-        lines: metaLines,
-        width: 740,
-        padding: 12
-      })
-      const metaW = pageW - margin * 2
-      const metaH = metaW * (metaImg.h / metaImg.w)
-      const maxMetaH = pageH - sepY - 18
-      const finalMetaH = Math.min(metaH, maxMetaH)
-      const finalMetaW = metaH > maxMetaH ? maxMetaH * (metaImg.w / metaImg.h) : metaW
-      pdf.addImage(
-        metaImg.dataUrl, 'JPEG',
-        margin + (metaW - finalMetaW) / 2,
-        sepY + 5,
-        finalMetaW, finalMetaH
-      )
+      if (metaLines.length > 0) {
+        const metaImg = textBlockToImage({
+          lines: metaLines,
+          width: 740,
+          padding: 8
+        })
+        const metaW = pageW - margin * 2
+        const metaH = metaW * (metaImg.h / metaImg.w)
+        const maxMetaH = pageH - sepY - 14
+        const finalMetaH = Math.min(metaH, maxMetaH)
+        const finalMetaW = metaH > maxMetaH ? maxMetaH * (metaImg.w / metaImg.h) : metaW
+        pdf.addImage(
+          metaImg.dataUrl, 'JPEG',
+          margin + (metaW - finalMetaW) / 2,
+          sepY + 3,
+          finalMetaW, finalMetaH
+        )
+      }
       
       // 페이지 번호 (하단)
       pdf.setFontSize(9)
       pdf.setTextColor(150)
-      pdf.text(`${i + 1} / ${list.length}`, pageW / 2, pageH - 6, { align: 'center' })
+      pdf.text(`${i + 1} / ${list.length}`, pageW / 2, pageH - 5, { align: 'center' })
     }
 
     // ── 저장
