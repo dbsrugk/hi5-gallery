@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v5-live-monitor">
+<meta name="hi5-version" content="2026-05-12-v6-DOM-cut">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -202,12 +202,6 @@ body.select-mode .card .select-check{display:flex}
 .upload-page{padding:20px;display:none !important}
 .upload-page.show{display:block !important}
 
-/* === v5-NUKE 진단용: 어느 부모에 속한 카드인지 시각화 === */
-#gridContainer { outline: 4px solid red !important; }
-#gridContainer .card { outline: 3px solid blue !important; }
-#uploadPage { outline: 4px solid lime !important; }
-#uploadPage .card { outline: 3px solid orange !important; }
-
 .upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
 .upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
 .upload-page .subtitle{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:22px}
@@ -304,7 +298,7 @@ body.select-mode .card .select-check{display:flex}
 </style>
 </head>
 <body>
-<div id="debugBar" style="position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;font:bold 9px monospace;padding:4px 6px;z-index:99999;text-align:center;letter-spacing:0.3px;white-space:nowrap;overflow:hidden">v5-NUKE · clearing caches...</div>
+<div id="debugBar" style="position:fixed;top:0;left:0;right:0;background:#c0392b;color:#fff;font:bold 9px monospace;padding:4px 6px;z-index:99999;text-align:center;letter-spacing:0.3px;white-space:nowrap;overflow:hidden">v6-DOM · clearing caches...</div>
 <script>
 // PWA Service Worker 강제 제거 + 캐시 박살
 (async function nukePWA() {
@@ -2005,25 +1999,38 @@ function handleShareTarget() {
   }
 }
 
-// ============ NAVIGATION (v4: !important + 강제 reflow) ============
-// CSS에 !important를 박았으니 어떤 inline style이나 다른 규칙도 못 이김.
-// 추가로 클래스 변경 후 강제로 reflow를 트리거해서 모바일 브라우저 렌더링 캐시 우회.
+// ============ NAVIGATION (v6: DOM 잘라내기 - 핵 옵션) ============
+// CSS는 못 믿는다는 게 4번의 시도로 확정됨.
+// 갤러리/업로드 페이지를 DOM에서 직접 잘라내서 보관함.
+// 모든 함수에 null 가드가 있어서 안전함.
 
-function _clearInlineLayout(el) {
-  if (!el) return
-  // 이전 버전들이 남긴 inline 스타일을 모두 제거
-  el.style.position = ''
-  el.style.left = ''
-  el.style.top = ''
-  el.style.width = ''
-  el.style.visibility = ''
-  el.style.pointerEvents = ''
-  el.style.zIndex = ''
-  el.style.display = ''
+let _galleryNode = null      // 잘라낸 갤러리 페이지 보관
+let _uploadNode = null       // 잘라낸 업로드 페이지 보관
+let _galleryAnchor = null    // 갤러리가 원래 있던 위치 (placeholder)
+let _uploadAnchor = null     // 업로드가 원래 있던 위치 (placeholder)
+let _navInitialized = false
+
+function _initNav() {
+  if (_navInitialized) return
+  const gallery = document.getElementById('galleryPage')
+  const upload = document.getElementById('uploadPage')
+  if (!gallery || !upload) return
+
+  // 각 페이지가 원래 있던 자리에 placeholder를 박아둠
+  _galleryAnchor = document.createComment('gallery-anchor')
+  _uploadAnchor = document.createComment('upload-anchor')
+  gallery.parentNode.insertBefore(_galleryAnchor, gallery)
+  upload.parentNode.insertBefore(_uploadAnchor, upload)
+
+  _galleryNode = gallery
+  _uploadNode = upload
+
+  // 시작 상태: 업로드는 잘라서 보관, 갤러리만 DOM에 남김
+  upload.parentNode.removeChild(upload)
+  _navInitialized = true
 }
 
 function _forceReflow(el) {
-  // 강제 reflow 트리거 — 모바일 Chrome이 클래스 변경을 무시할 때 우회
   if (!el) return
   void el.offsetHeight
 }
@@ -2033,15 +2040,46 @@ function _updateDebugBar(label) {
   if (!bar) return
   const g = document.getElementById('galleryPage')
   const u = document.getElementById('uploadPage')
-  const gDisp = g ? getComputedStyle(g).display : '?'
-  const uDisp = u ? getComputedStyle(u).display : '?'
-  const gH = g ? Math.round(g.getBoundingClientRect().height) : '?'
-  const uH = u ? Math.round(u.getBoundingClientRect().height) : '?'
+  const gIn = g ? 'IN' : 'OUT'
+  const uIn = u ? 'IN' : 'OUT'
   const gridC = document.getElementById('gridContainer')
-  const gridH = gridC ? Math.round(gridC.getBoundingClientRect().height) : '?'
-  const gridD = gridC ? getComputedStyle(gridC).display : '?'
   const cardCount = document.querySelectorAll('#gridContainer .card').length
-  bar.textContent = `v5-live [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px cards:${cardCount}`
+  bar.textContent = `v6-DOM [${label}] G:${gIn} U:${uIn} cards:${cardCount}`
+}
+
+function showOnlyGallery() {
+  _initNav()
+  // 업로드를 DOM에서 제거
+  if (_uploadNode && _uploadNode.parentNode) {
+    _uploadNode.parentNode.removeChild(_uploadNode)
+  }
+  // 갤러리를 DOM에 다시 삽입 (없는 경우)
+  if (_galleryNode && !_galleryNode.parentNode && _galleryAnchor && _galleryAnchor.parentNode) {
+    _galleryAnchor.parentNode.insertBefore(_galleryNode, _galleryAnchor.nextSibling)
+  }
+  if (_galleryNode) _galleryNode.classList.remove('hidden')
+  if (_uploadNode) _uploadNode.classList.remove('show')
+  window.scrollTo(0, 0)
+  _updateDebugBar('GALLERY')
+}
+
+function showOnlyUpload() {
+  _initNav()
+  // 갤러리를 DOM에서 제거
+  if (_galleryNode && _galleryNode.parentNode) {
+    _galleryNode.parentNode.removeChild(_galleryNode)
+  }
+  // 업로드를 DOM에 다시 삽입 (없는 경우)
+  if (_uploadNode && !_uploadNode.parentNode && _uploadAnchor && _uploadAnchor.parentNode) {
+    _uploadAnchor.parentNode.insertBefore(_uploadNode, _uploadAnchor.nextSibling)
+  }
+  if (_uploadNode) _uploadNode.classList.add('show')
+  window.scrollTo(0, 0)
+  _updateDebugBar('UPLOAD')
+}
+
+function hideAllPages() {
+  // 호환성 유지
 }
 
 // 디버그 바 1초마다 자동 갱신
@@ -2054,64 +2092,6 @@ setInterval(() => {
   else if (text.includes('[UPLOAD]')) label = 'UPLOAD'
   _updateDebugBar(label)
 }, 1000)
-
-function showOnlyGallery() {
-  const gallery = document.getElementById('galleryPage')
-  const upload = document.getElementById('uploadPage')
-  if (gallery) {
-    _clearInlineLayout(gallery)
-    gallery.classList.remove('hidden')
-    gallery.classList.remove('offscreen-parked')
-    // 모든 inline 격리 스타일 제거 (확실히)
-    gallery.style.visibility = ''
-    gallery.style.position = ''
-    gallery.style.left = ''
-    gallery.style.top = ''
-    gallery.style.height = ''
-    gallery.style.overflow = ''
-    _forceReflow(gallery)
-  }
-  if (upload) {
-    _clearInlineLayout(upload)
-    upload.classList.remove('show')
-    upload.classList.remove('offscreen-parked')
-    upload.style.visibility = ''
-    upload.style.position = ''
-    _forceReflow(upload)
-  }
-  window.scrollTo(0, 0)
-  _updateDebugBar('GALLERY')
-}
-
-function showOnlyUpload() {
-  const gallery = document.getElementById('galleryPage')
-  const upload = document.getElementById('uploadPage')
-  if (gallery) {
-    _clearInlineLayout(gallery)
-    gallery.classList.add('hidden')
-    // 추가 강제 차단: visibility + position
-    gallery.style.visibility = 'hidden'
-    gallery.style.position = 'absolute'
-    gallery.style.left = '-99999px'
-    gallery.style.top = '-99999px'
-    gallery.style.height = '0'
-    gallery.style.overflow = 'hidden'
-    _forceReflow(gallery)
-  }
-  if (upload) {
-    _clearInlineLayout(upload)
-    upload.classList.add('show')
-    upload.style.visibility = 'visible'
-    upload.style.position = 'relative'
-    _forceReflow(upload)
-  }
-  window.scrollTo(0, 0)
-  _updateDebugBar('UPLOAD')
-}
-
-function hideAllPages() {
-  // 호환성 유지 (기존 코드가 호출함)
-}
 
 function clearBnavActive() {
   document.querySelectorAll('.bnav-item').forEach(el => el.classList.remove('active'))
