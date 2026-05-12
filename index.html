@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-stable-rollback">
+<meta name="hi5-version" content="2026-05-13-gallery-hide-fix">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -294,8 +294,13 @@ body.select-mode .card .select-check{display:flex}
 .empty .em-icon{font-size:40px;margin-bottom:12px;opacity:.3}
 .loading{text-align:center;padding:40px;color:var(--mute);font-size:12px;letter-spacing:1px;text-transform:uppercase}
 .gallery-page{display:block}
-.gallery-page.hidden{display:none}
-.gallery-page.hidden *{display:none !important}
+.gallery-page.hidden{display:none !important}
+.gallery-page.hidden,
+.gallery-page.hidden *,
+.gallery-page.hidden .grid,
+.gallery-page.hidden .card,
+.gallery-page.hidden .fab,
+.gallery-page.hidden .fab-pdf{display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important}
 </style>
 </head>
 <body>
