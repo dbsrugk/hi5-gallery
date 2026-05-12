@@ -1964,50 +1964,30 @@ function handleShareTarget() {
 }
 
 // ============ NAVIGATION ============
-// DOM에서 직접 제거/삽입하는 핵 옵션 (CSS는 신뢰 못 함)
-let galleryParked = null  // DOM에서 빼놓은 갤러리 페이지
-let uploadParked = null   // DOM에서 빼놓은 업로드 페이지
-let pageHost = null       // 페이지가 들어가는 부모 (body)
+// 페이지 전환: CSS 클래스 토글 방식 (DOM은 건드리지 않음)
+let galleryParked = null  // 갤러리 페이지 참조 (호환성 유지)
+let uploadParked = null   // 업로드 페이지 참조 (호환성 유지)
+let pageHost = null       // 호환성 유지
 
 function parkPages() {
+  // 페이지 요소 참조만 캐싱 (DOM 조작 없음)
   pageHost = document.body
-  // 시작 시점에 두 페이지를 찾아 변수에 저장
   if (!galleryParked) galleryParked = document.getElementById('galleryPage')
   if (!uploadParked) uploadParked = document.getElementById('uploadPage')
 }
 
 function showOnlyGallery() {
   parkPages()
-  // 업로드 페이지를 DOM에서 제거
-  if (uploadParked && uploadParked.parentNode) {
-    uploadParked.parentNode.removeChild(uploadParked)
-  }
-  // 갤러리는 DOM에 있어야 함
-  if (galleryParked && !galleryParked.parentNode) {
-    pageHost.appendChild(galleryParked)
-  }
-  // 클래스/스타일 정리
-  if (galleryParked) {
-    galleryParked.classList.remove('hidden')
-    galleryParked.style.display = 'block'
-  }
+  // 갤러리 보임 / 업로드 숨김 — 클래스만 토글
+  if (galleryParked) galleryParked.classList.remove('hidden')
+  if (uploadParked) uploadParked.classList.remove('show')
 }
 
 function showOnlyUpload() {
   parkPages()
-  // 갤러리 페이지를 DOM에서 제거
-  if (galleryParked && galleryParked.parentNode) {
-    galleryParked.parentNode.removeChild(galleryParked)
-  }
-  // 업로드는 DOM에 있어야 함
-  if (uploadParked && !uploadParked.parentNode) {
-    pageHost.appendChild(uploadParked)
-  }
-  // 클래스/스타일 정리
-  if (uploadParked) {
-    uploadParked.classList.add('show')
-    uploadParked.style.display = 'block'
-  }
+  // 업로드 보임 / 갤러리 숨김 — 클래스만 토글
+  if (galleryParked) galleryParked.classList.add('hidden')
+  if (uploadParked) uploadParked.classList.add('show')
 }
 
 function hideAllPages() {
