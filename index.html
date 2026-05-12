@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-13-gallery-hide-fix">
+<meta name="hi5-version" content="2026-05-13-debug-box">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -2004,6 +2004,44 @@ function showOnlyUpload() {
     uploadParked.classList.add('show')
     uploadParked.style.display = 'block'
   }
+  // 🔍 디버그: 0.3초 후 실제 상태 화면에 표시
+  setTimeout(() => {
+    const g = document.getElementById('galleryPage')
+    const u = document.getElementById('uploadPage')
+    const gStyle = g ? window.getComputedStyle(g) : null
+    const uStyle = u ? window.getComputedStyle(u) : null
+    const visibleCards = document.querySelectorAll('.card')
+    let cardInfo = []
+    visibleCards.forEach((c, i) => {
+      if (i < 3) {
+        const r = c.getBoundingClientRect()
+        const cs = window.getComputedStyle(c)
+        cardInfo.push(`카드${i}: display=${cs.display} visible=${r.width>0&&r.height>0} parent=${c.parentElement?.id||c.parentElement?.className||'?'}`)
+      }
+    })
+    showDebugBox([
+      `갤러리 class: "${g?.className||'없음'}"`,
+      `갤러리 display(computed): ${gStyle?.display}`,
+      `갤러리 display(inline): ${g?.style.display}`,
+      `갤러리 visible: ${g && g.getBoundingClientRect().height > 0}`,
+      `업로드 class: "${u?.className||'없음'}"`,
+      `업로드 display(computed): ${uStyle?.display}`,
+      `--- .card 총 ${visibleCards.length}개 ---`,
+      ...cardInfo
+    ])
+  }, 300)
+}
+
+function showDebugBox(lines) {
+  let box = document.getElementById('hi5DebugBox')
+  if (!box) {
+    box = document.createElement('div')
+    box.id = 'hi5DebugBox'
+    box.style.cssText = 'position:fixed;top:60px;left:8px;right:8px;background:rgba(0,0,0,.92);color:#0f0;font-family:monospace;font-size:10px;padding:10px;border-radius:6px;z-index:99999;white-space:pre-wrap;line-height:1.5;max-height:50vh;overflow-y:auto;border:2px solid #0f0'
+    box.onclick = () => box.remove()
+    document.body.appendChild(box)
+  }
+  box.textContent = '🔍 디버그 (탭하면 닫힘)\n' + lines.join('\n')
 }
 
 function hideAllPages() {
