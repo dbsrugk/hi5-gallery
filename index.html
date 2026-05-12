@@ -371,6 +371,7 @@ body.select-mode .card .select-check{display:flex}
     <button onclick="selectAllVisible()">전체</button>
     <button onclick="rotateSelected(-90)" class="primary" id="rotateCcwBtn" title="반시계 90°">↺</button>
     <button onclick="rotateSelected(90)" class="primary" id="rotateCwBtn" title="시계 90°">↻</button>
+    <button onclick="deleteSelected()" class="danger" id="deleteSelectedBtn" title="선택 삭제">🗑</button>
     <button onclick="cancelSelectMode()">취소</button>
   </div>
 </div>
@@ -2798,6 +2799,51 @@ function closeRotateModal() {
   cancelSelectMode()
 }
 window.closeRotateModal = closeRotateModal
+
+// 선택된 작품 일괄 삭제
+async function deleteSelected() {
+  const ids = Array.from(selectedIds)
+  if (ids.length === 0) { toast('선택된 작품이 없어요'); return }
+  if (!confirm(`선택한 ${ids.length}장을 정말 삭제하시겠어요?`)) return
+
+  const btn = document.getElementById('deleteSelectedBtn')
+  if (btn) btn.disabled = true
+
+  let done = 0, failed = 0, firstError = ''
+
+  for (const id of ids) {
+    const a = artworks.find(x => x.id === id)
+    if (!a) { failed++; continue }
+    try {
+      // 1) Storage에서 이미지 파일 삭제 (있는 경우만)
+      if (a.storage_path) {
+        await supabase.storage.from('artworks').remove([a.storage_path])
+      }
+      // 2) DB에서 레코드 삭제
+      const { error } = await supabase.from('artworks').delete().eq('id', a.id)
+      if (error) throw error
+      // 3) 로컬 배열에서도 제거
+      artworks = artworks.filter(x => x.id !== a.id)
+      done++
+    } catch (err) {
+      failed++
+      if (!firstError) firstError = err.message || String(err)
+      console.error('delete failed', id, err)
+    }
+  }
+
+  if (btn) btn.disabled = false
+
+  if (failed === 0) {
+    toast(`${done}장 삭제 완료`)
+  } else {
+    toast(`${done}장 삭제 · ${failed}장 실패`)
+  }
+
+  // 선택 모드 해제 + 화면 갱신
+  cancelSelectMode()
+}
+window.deleteSelected = deleteSelected
 
 // ============ AI ANALYSIS ============
 let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
