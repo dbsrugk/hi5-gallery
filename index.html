@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v4-debug2-sizes">
+<meta name="hi5-version" content="2026-05-12-v5-force-offscreen">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -2019,12 +2019,21 @@ function showOnlyGallery() {
     _clearInlineLayout(gallery)
     gallery.classList.remove('hidden')
     gallery.classList.remove('offscreen-parked')
+    // 모든 inline 격리 스타일 제거 (확실히)
+    gallery.style.visibility = ''
+    gallery.style.position = ''
+    gallery.style.left = ''
+    gallery.style.top = ''
+    gallery.style.height = ''
+    gallery.style.overflow = ''
     _forceReflow(gallery)
   }
   if (upload) {
     _clearInlineLayout(upload)
     upload.classList.remove('show')
     upload.classList.remove('offscreen-parked')
+    upload.style.visibility = ''
+    upload.style.position = ''
     _forceReflow(upload)
   }
   window.scrollTo(0, 0)
@@ -2037,11 +2046,20 @@ function showOnlyUpload() {
   if (gallery) {
     _clearInlineLayout(gallery)
     gallery.classList.add('hidden')
+    // 추가 강제 차단: visibility + position
+    gallery.style.visibility = 'hidden'
+    gallery.style.position = 'absolute'
+    gallery.style.left = '-99999px'
+    gallery.style.top = '-99999px'
+    gallery.style.height = '0'
+    gallery.style.overflow = 'hidden'
     _forceReflow(gallery)
   }
   if (upload) {
     _clearInlineLayout(upload)
     upload.classList.add('show')
+    upload.style.visibility = 'visible'
+    upload.style.position = 'relative'
     _forceReflow(upload)
   }
   window.scrollTo(0, 0)
