@@ -2072,10 +2072,18 @@ function handleShareTarget() {
 
 // ============ NAVIGATION ============
 function hideAllPages() {
-  document.getElementById('galleryPage').classList.add('hidden')
-  document.getElementById('uploadPage').classList.remove('show')
-  document.getElementById('collectionsPage').classList.remove('show')
-  document.getElementById('collectionDetailPage').classList.remove('show')
+  const gal = document.getElementById('galleryPage')
+  const upl = document.getElementById('uploadPage')
+  const col = document.getElementById('collectionsPage')
+  const cd  = document.getElementById('collectionDetailPage')
+  gal.classList.add('hidden')
+  gal.style.display = 'none'
+  upl.classList.remove('show')
+  upl.style.display = 'none'
+  col.classList.remove('show')
+  col.style.display = 'none'
+  cd.classList.remove('show')
+  cd.style.display = 'none'
 }
 
 function clearBnavActive() {
@@ -2084,7 +2092,9 @@ function clearBnavActive() {
 
 window.showGallery = () => {
   hideAllPages()
-  document.getElementById('galleryPage').classList.remove('hidden')
+  const gal = document.getElementById('galleryPage')
+  gal.classList.remove('hidden')
+  gal.style.display = 'block'
   clearBnavActive()
   document.getElementById('navGallery').classList.add('active')
   resetUploadForm()
@@ -2100,7 +2110,9 @@ window.showUpload = () => {
 
 function showUploadPage() {
   hideAllPages()
-  document.getElementById('uploadPage').classList.add('show')
+  const upl = document.getElementById('uploadPage')
+  upl.classList.add('show')
+  upl.style.display = 'block'
   clearBnavActive()
   document.getElementById('navUpload').classList.add('active')
   window.scrollTo(0,0)
@@ -2824,7 +2836,9 @@ window.closeRotateModal = closeRotateModal
 // ============ COLLECTIONS ============
 window.showCollections = () => {
   hideAllPages()
-  document.getElementById('collectionsPage').classList.add('show')
+  const col = document.getElementById('collectionsPage')
+  col.classList.add('show')
+  col.style.display = 'block'
   clearBnavActive()
   document.getElementById('navCollections').classList.add('active')
   renderCollectionsList()
@@ -2880,7 +2894,9 @@ window.showCollectionDetail = (id) => {
   if (!c) return
   currentCollectionId = id
   hideAllPages()
-  document.getElementById('collectionDetailPage').classList.add('show')
+  const cd = document.getElementById('collectionDetailPage')
+  cd.classList.add('show')
+  cd.style.display = 'block'
   clearBnavActive()
   document.getElementById('navCollections').classList.add('active')
   
