@@ -125,11 +125,11 @@ body.select-mode .card .select-check{display:flex}
 .card.selected .select-check{background:var(--red);border-color:var(--red);color:#fff}
 
 /* 선택 모드 하단 액션 바 */
-.select-bar{display:none;position:fixed;bottom:calc(72px + var(--safe));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:420px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;z-index:150;align-items:center;gap:8px}
+.select-bar{display:none;position:fixed;bottom:calc(72px + var(--safe));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:440px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;z-index:150;align-items:center;gap:6px}
 .select-bar.show{display:flex}
-.select-bar .sb-count{flex:1;font-size:12px;font-weight:700;color:var(--ink);padding-left:6px}
-.select-bar button{padding:9px 12px;font-size:12px;font-weight:700;border-radius:4px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
-.select-bar button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.select-bar .sb-count{flex:1;font-size:12px;font-weight:700;color:var(--ink);padding-left:6px;min-width:0}
+.select-bar button{padding:9px 10px;font-size:13px;font-weight:700;border-radius:4px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap;line-height:1}
+.select-bar button.primary{background:var(--red);color:#fff;border-color:var(--red);font-size:15px;padding:9px 11px}
 .select-bar button.danger{background:#fff;color:var(--red);border-color:var(--red)}
 .select-bar button:disabled{opacity:.5;cursor:not-allowed}
 
@@ -361,9 +361,10 @@ body.select-mode .card .select-check{display:flex}
 
   <!-- 선택 모드 하단 액션 바 -->
   <div class="select-bar" id="selectBar">
-    <div class="sb-count"><span id="selectCount">0</span>장 선택</div>
+    <div class="sb-count"><span id="selectCount">0</span>장</div>
     <button onclick="selectAllVisible()">전체</button>
-    <button onclick="rotateSelected()" class="primary" id="rotateBtn">↻ 90°</button>
+    <button onclick="rotateSelected(-90)" class="primary" id="rotateCcwBtn" title="반시계 90°">↺</button>
+    <button onclick="rotateSelected(90)" class="primary" id="rotateCwBtn" title="시계 90°">↻</button>
     <button onclick="cancelSelectMode()">취소</button>
   </div>
 </div>
@@ -982,9 +983,69 @@ function renderGrid() {
   container.innerHTML = `<div class="grid cols-${gridCols}">${cards}</div>`
 
   document.querySelectorAll('.card').forEach(el => {
+    const id = parseInt(el.dataset.id)
+    
+    // 길게 누르기 핸들러
+    let pressTimer = null
+    let longPressed = false
+    let startX = 0, startY = 0
+    
+    const startPress = (e) => {
+      longPressed = false
+      const t = e.touches ? e.touches[0] : e
+      startX = t.clientX
+      startY = t.clientY
+      pressTimer = setTimeout(() => {
+        longPressed = true
+        // 햅틱 피드백
+        if (navigator.vibrate) navigator.vibrate(40)
+        // 선택 모드 진입 + 이 카드 선택
+        if (!selectMode) enterSelectMode()
+        if (!selectedIds.has(id)) {
+          selectedIds.add(id)
+          el.classList.add('selected')
+          const chk = el.querySelector('.select-check')
+          if (chk) chk.textContent = '✓'
+          updateSelectBarCount()
+        }
+      }, 450)
+    }
+    
+    const cancelPress = (e) => {
+      // 스크롤 등으로 손가락 움직였으면 길게 누르기 취소
+      if (e && (e.touches || e.changedTouches)) {
+        const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0])
+        if (t) {
+          const dx = Math.abs(t.clientX - startX)
+          const dy = Math.abs(t.clientY - startY)
+          if (dx > 10 || dy > 10) {
+            clearTimeout(pressTimer)
+            pressTimer = null
+            return
+          }
+        }
+      }
+      clearTimeout(pressTimer)
+      pressTimer = null
+    }
+    
+    el.addEventListener('touchstart', startPress, { passive: true })
+    el.addEventListener('touchend', cancelPress, { passive: true })
+    el.addEventListener('touchmove', cancelPress, { passive: true })
+    el.addEventListener('touchcancel', cancelPress, { passive: true })
+    el.addEventListener('mousedown', startPress)
+    el.addEventListener('mouseup', cancelPress)
+    el.addEventListener('mouseleave', cancelPress)
+    
     el.onclick = e => {
+      // 길게 눌러서 선택된 경우 클릭 이벤트 무시
+      if (longPressed) {
+        longPressed = false
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
       if (e.target.classList.contains('fav')) return
-      const id = parseInt(el.dataset.id)
       if (selectMode) {
         toggleSelectArtwork(id)
       } else {
@@ -2482,7 +2543,11 @@ window.selectAllVisible = selectAllVisible
 
 function updateSelectBarCount() {
   document.getElementById('selectCount').textContent = selectedIds.size
-  document.getElementById('rotateBtn').disabled = selectedIds.size === 0
+  const disabled = selectedIds.size === 0
+  const cw = document.getElementById('rotateCwBtn')
+  const ccw = document.getElementById('rotateCcwBtn')
+  if (cw) cw.disabled = disabled
+  if (ccw) ccw.disabled = disabled
 }
 
 // 이미지 회전: 다운로드 → 캔버스로 90도 회전 → 같은 경로에 덮어쓰기
@@ -2551,23 +2616,25 @@ async function rotateArtworkImage(artwork, degrees = 90) {
   if (local) local.image_url = newUrl
 }
 
-async function rotateSelected() {
+async function rotateSelected(degrees = 90) {
   if (selectedIds.size === 0) return
   const ids = Array.from(selectedIds)
+  const dir = degrees > 0 ? '시계방향' : '반시계방향'
+  const arrow = degrees > 0 ? '↻' : '↺'
   
   // 확인
-  if (!confirm(`${ids.length}장을 시계방향 90도로 회전할까요?\n원본을 덮어쓰며, 작업에 시간이 걸려요.`)) return
+  if (!confirm(`${ids.length}장을 ${dir} 90° 회전할까요?\n원본을 덮어쓰며, 작업에 시간이 걸려요.`)) return
   
   // 모달 표시
   const modal = document.getElementById('rotateModal')
   modal.classList.add('show')
-  document.getElementById('rotateModalTitle').textContent = '작품 회전 중'
-  document.getElementById('rotateModalSub').textContent = `${ids.length}장을 시계방향 90°로 처리합니다.`
+  document.getElementById('rotateModalTitle').textContent = `${arrow} 작품 회전 중`
+  document.getElementById('rotateModalSub').textContent = `${ids.length}장을 ${dir} 90°로 처리합니다.`
   document.getElementById('rtProgressBar').style.width = '0%'
   document.getElementById('rtProgressText').textContent = '준비 중...'
   document.getElementById('rotateCloseBtn').disabled = true
   
-  const CONCURRENCY = 3
+  const CONCURRENCY = 5
   let done = 0, failed = 0, firstError = null
   let cursor = 0
   
@@ -2586,7 +2653,7 @@ async function rotateSelected() {
       const art = artworks.find(x => x.id === id)
       if (!art) { failed++; update(); continue }
       try {
-        await rotateArtworkImage(art, 90)
+        await rotateArtworkImage(art, degrees)
         done++
       } catch (err) {
         console.error('rotate failed', id, err)
@@ -2601,12 +2668,10 @@ async function rotateSelected() {
   for (let k = 0; k < CONCURRENCY; k++) workers.push(worker())
   await Promise.all(workers)
   
-  // 완료
   document.getElementById('rtProgressText').textContent = 
     `완료: ${done}장 성공${failed > 0 ? ` · ${failed}장 실패\n첫 오류: ${(firstError||'').slice(0,60)}` : ''}`
   document.getElementById('rotateCloseBtn').disabled = false
   
-  // 갤러리 새로고침
   renderGrid()
 }
 window.rotateSelected = rotateSelected
