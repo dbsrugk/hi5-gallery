@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-collection-v3">
+<meta name="hi5-version" content="2026-05-12-stable-rollback">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -199,46 +199,9 @@ body.select-mode .card .select-check{display:flex}
 .slideshow-exit{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);color:#fff;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
 .slideshow-count{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#fff;font-family:'Bodoni Moda',serif;font-size:14px;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:20px}
 
-.upload-page{padding:20px;display:none;background:var(--bg);position:relative;z-index:5;min-height:100vh}
+.upload-page{padding:20px;display:none}
 .upload-page.show{display:block}
 
-/* 컬렉션 페이지 */
-.collections-page{padding-bottom:90px;display:none;background:var(--bg);position:relative;z-index:5;min-height:100vh}
-.collections-page.show{display:block}
-.collection-detail-page{padding-bottom:90px;display:none;background:var(--bg);position:relative;z-index:5;min-height:100vh}
-.collection-detail-page.show{display:block}
-/* 안전장치: show 클래스 없으면 무조건 숨김 강제 */
-.collections-page:not(.show),
-.collection-detail-page:not(.show),
-.upload-page:not(.show){display:none !important;visibility:hidden !important}
-.gallery-page.hidden,
-.gallery-page.hidden *{display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important}
-.col-card{display:flex;gap:14px;padding:16px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;transition:background .15s}
-.col-card:active{background:#fafafa}
-.col-card .col-cover{width:84px;height:84px;flex-shrink:0;border-radius:6px;overflow:hidden;background:var(--line);position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px}
-.col-card .col-cover img{width:100%;height:100%;object-fit:cover}
-.col-card .col-cover.empty{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--mute);background:#f5f5f5}
-.col-card .col-info{flex:1;min-width:0}
-.col-card .col-info .col-name{font-family:'Bodoni Moda',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.2}
-.col-card .col-info .col-desc{font-size:11px;color:var(--mute);line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;margin-bottom:6px}
-.col-card .col-info .col-meta{font-size:10px;color:var(--red);font-weight:700;letter-spacing:.8px;text-transform:uppercase}
-.col-card .col-arrow{color:var(--mute);font-size:22px;flex-shrink:0;font-weight:300}
-
-/* 컬렉션 메뉴 모달 아이템 */
-.cm-item{display:block;width:100%;text-align:left;padding:14px 16px;font-size:13px;font-weight:600;background:#fff;border:none;cursor:pointer;color:var(--ink);border-radius:4px}
-.cm-item:active{background:#f5f5f5}
-.cm-item.danger{color:var(--red)}
-
-/* 컬렉션 추가 모달의 컬렉션 항목 */
-.atc-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:6px;margin-bottom:6px;cursor:pointer;background:#fff}
-.atc-item:active{background:#f5f5f5}
-.atc-item.added{border-color:#27ae60;background:#f0fdf4}
-.atc-item .atc-cover{width:36px;height:36px;border-radius:4px;background:var(--line);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--mute)}
-.atc-item .atc-cover img{width:100%;height:100%;object-fit:cover}
-.atc-item .atc-info{flex:1;min-width:0}
-.atc-item .atc-name{font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.atc-item .atc-meta{font-size:10px;color:var(--mute);margin-top:1px}
-.atc-item .atc-state{font-size:12px;font-weight:700;color:#27ae60}
 .upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
 .upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
 .upload-page .subtitle{font-size:11px;color:var(--mute);letter-spacing:1px;text-transform:uppercase;margin-bottom:22px}
@@ -405,7 +368,6 @@ body.select-mode .card .select-check{display:flex}
   <div class="select-bar" id="selectBar">
     <div class="sb-count"><span id="selectCount">0</span>장</div>
     <button onclick="selectAllVisible()">전체</button>
-    <button onclick="openAddToCollectionModal()" title="컬렉션에 추가">📁</button>
     <button onclick="rotateSelected(-90)" class="primary" id="rotateCcwBtn" title="반시계 90°">↺</button>
     <button onclick="rotateSelected(90)" class="primary" id="rotateCwBtn" title="시계 90°">↻</button>
     <button onclick="cancelSelectMode()">취소</button>
@@ -438,88 +400,6 @@ body.select-mode .card .select-check{display:flex}
     <div class="pdf-modal-actions">
       <button onclick="closeRotateModal()" id="rotateCloseBtn" disabled>닫기</button>
     </div>
-  </div>
-</div>
-
-<!-- ============ COLLECTIONS PAGE ============ -->
-<div class="collections-page" id="collectionsPage">
-  <div class="hero">
-    <div class="hero-top">
-      <div class="hero-avatar" style="background:#1a1a1a">📁</div>
-      <div class="hero-info">
-        <h1>컬렉션</h1>
-        <div class="handle">@hi5_collections · Curated Sets</div>
-        <div class="hero-stats" id="collectionsHeroStats">
-          <div class="hero-stat"><strong id="colStatTotal">0</strong><span>컬렉션</span></div>
-          <div class="hero-stat"><strong id="colStatArts">0</strong><span>작품</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="hero-bio">큐레이션으로 정리한 작품 모음. <span class="bio-em">#한양대합격 #6월오픈 #베스트</span></div>
-  </div>
-  
-  <div style="padding:14px 16px 6px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line)">
-    <button class="btn-primary" style="width:auto;padding:9px 14px;font-size:11px;letter-spacing:.5px;margin:0;border-radius:4px" onclick="openNewCollectionModal()">+ 새 컬렉션</button>
-    <div style="flex:1"></div>
-    <div style="font-size:10px;color:var(--mute);letter-spacing:.5px;text-transform:uppercase" id="collectionCount"></div>
-  </div>
-  <div id="collectionsList"></div>
-</div>
-
-<!-- ============ COLLECTION DETAIL PAGE ============ -->
-<div class="collection-detail-page" id="collectionDetailPage">
-  <div style="padding:14px 16px 6px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)">
-    <button onclick="closeCollectionDetail()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:4px 8px">←</button>
-    <div style="flex:1;min-width:0">
-      <div style="font-size:9px;color:var(--mute);letter-spacing:1.5px;text-transform:uppercase">Collection</div>
-      <h1 id="cdTitle" style="font-family:'Bodoni Moda',serif;font-size:24px;font-weight:700;line-height:1.1;letter-spacing:-.3px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></h1>
-      <div id="cdSub" style="font-size:11px;color:var(--mute);margin-top:2px;letter-spacing:.3px"></div>
-    </div>
-    <button onclick="openCollectionMenu()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:4px 10px">⋮</button>
-  </div>
-  <div id="cdDescription" style="padding:14px 16px 12px;font-size:13px;color:var(--ink);line-height:1.5;display:none;border-bottom:1px solid var(--line)"></div>
-  <div id="cdGridContainer"></div>
-</div>
-
-<!-- ============ 컬렉션 추가 모달 (작품 → 컬렉션) ============ -->
-<div class="pdf-modal" id="addToCollectionModal">
-  <div class="pdf-modal-box" style="max-width:340px;text-align:left">
-    <h3 style="margin-bottom:6px">컬렉션에 추가</h3>
-    <div class="pdf-sub" id="atcSub" style="margin-bottom:14px">작품을 추가할 컬렉션을 선택하세요.</div>
-    <div id="atcList" style="max-height:260px;overflow-y:auto;margin-bottom:14px"></div>
-    <button class="btn-primary" style="width:100%;margin:0 0 8px;padding:10px;font-size:12px" onclick="openNewCollectionModal(true)">+ 새 컬렉션 만들기</button>
-    <div class="pdf-modal-actions">
-      <button onclick="closeAddToCollectionModal()">취소</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 새 컬렉션 만들기 모달 ============ -->
-<div class="pdf-modal" id="newCollectionModal">
-  <div class="pdf-modal-box" style="max-width:340px;text-align:left">
-    <h3 id="ncmTitle" style="margin-bottom:14px">새 컬렉션 만들기</h3>
-    <div class="form-row" style="margin-bottom:10px">
-      <label>이름 *</label>
-      <input type="text" id="ncmName" placeholder="예: 한양대 합격 모음" maxlength="60">
-    </div>
-    <div class="form-row" style="margin-bottom:16px">
-      <label>설명 (선택)</label>
-      <textarea id="ncmDescription" rows="2" placeholder="이 컬렉션에 대한 짧은 설명" maxlength="200"></textarea>
-    </div>
-    <div class="pdf-modal-actions">
-      <button onclick="closeNewCollectionModal()">취소</button>
-      <button class="primary" onclick="saveNewCollection()" id="ncmSaveBtn">만들기</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ 컬렉션 메뉴 (수정/삭제) ============ -->
-<div class="pdf-modal" id="collectionMenuModal">
-  <div class="pdf-modal-box" style="max-width:280px;padding:8px;text-align:left">
-    <button class="cm-item" onclick="openEditCollection()">✏ 이름·설명 수정</button>
-    <button class="cm-item" onclick="exportCollectionAsPdf()">📄 PDF로 내보내기</button>
-    <button class="cm-item danger" onclick="deleteCurrentCollection()">🗑 컬렉션 삭제</button>
-    <button class="cm-item" onclick="closeCollectionMenu()" style="border-top:1px solid var(--line);margin-top:4px;padding-top:14px">취소</button>
   </div>
 </div>
 
@@ -631,7 +511,7 @@ body.select-mode .card .select-check{display:flex}
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
     <span>업로드</span>
   </button>
-  <button class="bnav-item" id="navCollections" onclick="showCollections()">
+  <button class="bnav-item" onclick="toast('컬렉션 — 추후 업데이트')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg>
     <span>컬렉션</span>
   </button>
@@ -697,10 +577,6 @@ let selectMode = false
 let selectedIds = new Set()
 let sortMode = 'newest'
 let gridCols = 2
-let collections = []           // [{id, name, description, cover_url, ...}]
-let collectionItemsMap = {}    // { [collection_id]: Set<artwork_id> }
-let currentCollectionId = null // 현재 보고 있는 컬렉션
-let editingCollectionId = null // 수정 중인 컬렉션
 let currentId = null
 let editingId = null
 let selectedFile = null
@@ -932,21 +808,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function loadData() {
   document.getElementById('gridContainer').innerHTML = '<div class="loading">불러오는 중...</div>'
   try {
-    const [{data: cats}, {data: arts}, {data: cols}, {data: items}] = await Promise.all([
+    const [{data: cats}, {data: arts}] = await Promise.all([
       supabase.from('categories').select('*').order('sort_order'),
-      supabase.from('artworks').select('*').order('created_at',{ascending:false}).limit(500),
-      supabase.from('collections').select('*').order('created_at',{ascending:false}),
-      supabase.from('collection_items').select('*')
+      supabase.from('artworks').select('*').order('created_at',{ascending:false}).limit(500)
     ])
     categories = cats || []
     artworks = arts || []
-    collections = cols || []
-    // 매핑 재구성
-    collectionItemsMap = {}
-    ;(items || []).forEach(it => {
-      if (!collectionItemsMap[it.collection_id]) collectionItemsMap[it.collection_id] = new Set()
-      collectionItemsMap[it.collection_id].add(it.artwork_id)
-    })
     renderAll()
   } catch (err) {
     console.error(err)
@@ -2094,38 +1961,9 @@ function handleShareTarget() {
 }
 
 // ============ NAVIGATION ============
-let savedGalleryHTML = null
-
 function hideAllPages() {
-  const gal = document.getElementById('galleryPage')
-  const upl = document.getElementById('uploadPage')
-  const col = document.getElementById('collectionsPage')
-  const cd  = document.getElementById('collectionDetailPage')
-  if (gal) {
-    gal.classList.add('hidden')
-    gal.style.display = 'none'
-    gal.style.visibility = 'hidden'
-    gal.style.position = 'absolute'
-    gal.style.left = '-99999px'
-    gal.style.top = '-99999px'
-    gal.style.opacity = '0'
-    gal.style.pointerEvents = 'none'
-  }
-  if (upl) {
-    upl.classList.remove('show')
-    upl.style.display = 'none'
-    upl.style.visibility = 'hidden'
-  }
-  if (col) {
-    col.classList.remove('show')
-    col.style.display = 'none'
-    col.style.visibility = 'hidden'
-  }
-  if (cd) {
-    cd.classList.remove('show')
-    cd.style.display = 'none'
-    cd.style.visibility = 'hidden'
-  }
+  document.getElementById('galleryPage').classList.add('hidden')
+  document.getElementById('uploadPage').classList.remove('show')
 }
 
 function clearBnavActive() {
@@ -2134,15 +1972,7 @@ function clearBnavActive() {
 
 window.showGallery = () => {
   hideAllPages()
-  const gal = document.getElementById('galleryPage')
-  gal.classList.remove('hidden')
-  gal.style.display = 'block'
-  gal.style.visibility = 'visible'
-  gal.style.position = 'static'
-  gal.style.left = 'auto'
-  gal.style.top = 'auto'
-  gal.style.opacity = '1'
-  gal.style.pointerEvents = 'auto'
+  document.getElementById('galleryPage').classList.remove('hidden')
   clearBnavActive()
   document.getElementById('navGallery').classList.add('active')
   resetUploadForm()
@@ -2158,10 +1988,7 @@ window.showUpload = () => {
 
 function showUploadPage() {
   hideAllPages()
-  const upl = document.getElementById('uploadPage')
-  upl.classList.add('show')
-  upl.style.display = 'block'
-  upl.style.visibility = 'visible'
+  document.getElementById('uploadPage').classList.add('show')
   clearBnavActive()
   document.getElementById('navUpload').classList.add('active')
   window.scrollTo(0,0)
@@ -2932,330 +2759,6 @@ function closeRotateModal() {
   cancelSelectMode()
 }
 window.closeRotateModal = closeRotateModal
-
-// ============ COLLECTIONS ============
-window.showCollections = () => {
-  hideAllPages()
-  const col = document.getElementById('collectionsPage')
-  if (!col) return
-  col.classList.add('show')
-  col.style.display = 'block'
-  col.style.visibility = 'visible'
-  if (selectMode) cancelSelectMode()
-  clearBnavActive()
-  document.getElementById('navCollections').classList.add('active')
-  renderCollectionsList()
-  window.scrollTo(0,0)
-}
-
-function getCollectionArtworks(colId) {
-  const ids = collectionItemsMap[colId]
-  if (!ids) return []
-  return artworks.filter(a => ids.has(a.id))
-}
-
-function renderCollectionsList() {
-  const wrap = document.getElementById('collectionsList')
-  const countEl = document.getElementById('collectionCount')
-  countEl.textContent = `${collections.length}개`
-  
-  // 통계 채우기 (hero stats)
-  const totalArts = collections.reduce((sum, c) => {
-    return sum + ((collectionItemsMap[c.id] && collectionItemsMap[c.id].size) || 0)
-  }, 0)
-  const totalEl = document.getElementById('colStatTotal')
-  const artsEl = document.getElementById('colStatArts')
-  if (totalEl) totalEl.textContent = collections.length
-  if (artsEl) artsEl.textContent = totalArts
-  
-  if (collections.length === 0) {
-    wrap.innerHTML = `<div class="empty" style="padding:60px 20px"><div class="em-icon" style="font-size:42px;margin-bottom:14px">📁</div><div>아직 컬렉션이 없어요</div><div style="margin-top:8px;font-size:11px">+ 새 컬렉션 버튼으로<br>첫 컬렉션을 만들어 보세요</div></div>`
-    return
-  }
-  
-  wrap.innerHTML = collections.map(c => {
-    const arts = getCollectionArtworks(c.id)
-    const previewArts = arts.slice(0, 4)
-    let cover
-    if (previewArts.length === 0) {
-      cover = `<div class="col-cover empty">📁</div>`
-    } else if (previewArts.length === 1) {
-      cover = `<div class="col-cover" style="display:block"><img src="${previewArts[0].image_url}" loading="lazy"></div>`
-    } else {
-      const cells = previewArts.map(a => `<img src="${a.image_url}" loading="lazy">`).join('')
-      const style = previewArts.length === 2 ? 'grid-template-columns:1fr 1fr;grid-template-rows:1fr' : 'grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr'
-      cover = `<div class="col-cover" style="${style}">${cells}</div>`
-    }
-    return `
-      <div class="col-card" onclick="showCollectionDetail(${c.id})">
-        ${cover}
-        <div class="col-info">
-          <div class="col-name">${escapeHtml(c.name)}</div>
-          ${c.description ? `<div class="col-desc">${escapeHtml(c.description)}</div>` : ''}
-          <div class="col-meta">${arts.length}개 작품</div>
-        </div>
-        <div class="col-arrow">›</div>
-      </div>`
-  }).join('')
-}
-
-window.showCollectionDetail = (id) => {
-  const c = collections.find(x => x.id === id)
-  if (!c) return
-  currentCollectionId = id
-  hideAllPages()
-  const cd = document.getElementById('collectionDetailPage')
-  cd.classList.add('show')
-  cd.style.display = 'block'
-  cd.style.visibility = 'visible'
-  clearBnavActive()
-  document.getElementById('navCollections').classList.add('active')
-  
-  document.getElementById('cdTitle').textContent = c.name
-  const arts = getCollectionArtworks(id)
-  document.getElementById('cdSub').textContent = `${arts.length}개 작품`
-  const descEl = document.getElementById('cdDescription')
-  if (c.description) {
-    descEl.textContent = c.description
-    descEl.style.display = 'block'
-  } else {
-    descEl.style.display = 'none'
-  }
-  renderCollectionDetail(arts)
-  window.scrollTo(0,0)
-}
-
-function renderCollectionDetail(arts) {
-  const container = document.getElementById('cdGridContainer')
-  if (arts.length === 0) {
-    container.innerHTML = `<div class="empty" style="padding:60px 20px"><div class="em-icon">🖼</div><div>아직 작품이 없어요</div><div style="margin-top:8px;font-size:11px">갤러리에서 작품을 선택해<br>이 컬렉션에 추가해 보세요</div></div>`
-    return
-  }
-  const cards = arts.map(a => {
-    const badge = (a.tags||[]).includes('합격작') ? '합격작' : (a.tags||[]).includes('우수작') ? '우수작' : a.category==='best' ? 'BEST' : null
-    const tagText = ((a.tags||[]).slice(0,2).map(t => '#'+t).join(' '))
-    const studentText = a.student_name ? a.student_name + (tagText ? ' · ' : '') : ''
-    return `
-      <div class="card" onclick="openModal(${a.id})">
-        ${badge ? `<div class="badge">${badge}</div>` : ''}
-        <img src="${a.image_url}" alt="${escapeHtml(a.title)}" loading="lazy">
-        <div class="info">
-          <div class="ttl">${escapeHtml(a.title)}</div>
-          <div class="tag">${escapeHtml(studentText + tagText)}</div>
-        </div>
-      </div>`
-  }).join('')
-  container.innerHTML = `<div class="grid cols-${gridCols}">${cards}</div>`
-}
-
-window.closeCollectionDetail = () => {
-  currentCollectionId = null
-  showCollections()
-}
-
-// 컬렉션에 추가 모달 (선택 모드에서 호출)
-window.openAddToCollectionModal = () => {
-  if (selectedIds.size === 0) {
-    toast('먼저 작품을 선택해 주세요')
-    return
-  }
-  const sub = document.getElementById('atcSub')
-  sub.textContent = `선택한 ${selectedIds.size}장을 어느 컬렉션에 추가할까요?`
-  renderAtcList()
-  document.getElementById('addToCollectionModal').classList.add('show')
-}
-
-function renderAtcList() {
-  const wrap = document.getElementById('atcList')
-  if (collections.length === 0) {
-    wrap.innerHTML = `<div style="font-size:12px;color:var(--mute);text-align:center;padding:20px">아직 컬렉션이 없어요<br>아래 버튼으로 새 컬렉션을 만들어 보세요</div>`
-    return
-  }
-  wrap.innerHTML = collections.map(c => {
-    // 선택된 작품 중 몇 개가 이미 이 컬렉션에 있는지
-    const ids = collectionItemsMap[c.id] || new Set()
-    const alreadyIn = Array.from(selectedIds).filter(id => ids.has(id)).length
-    const allIn = (alreadyIn === selectedIds.size && selectedIds.size > 0)
-    const arts = getCollectionArtworks(c.id)
-    const previewArt = arts[0]
-    return `
-      <div class="atc-item ${allIn ? 'added' : ''}" onclick="toggleArtworksInCollection(${c.id})">
-        <div class="atc-cover">${previewArt ? `<img src="${previewArt.image_url}">` : '📁'}</div>
-        <div class="atc-info">
-          <div class="atc-name">${escapeHtml(c.name)}</div>
-          <div class="atc-meta">${arts.length}개${alreadyIn > 0 ? ` · ${alreadyIn}장 이미 포함됨` : ''}</div>
-        </div>
-        ${allIn ? '<div class="atc-state">✓ 추가됨</div>' : ''}
-      </div>`
-  }).join('')
-}
-
-window.closeAddToCollectionModal = () => {
-  document.getElementById('addToCollectionModal').classList.remove('show')
-}
-
-// 작품들을 컬렉션에 추가 (선택된 작품 일괄)
-window.toggleArtworksInCollection = async (colId) => {
-  const c = collections.find(x => x.id === colId)
-  if (!c) return
-  const ids = Array.from(selectedIds)
-  if (ids.length === 0) return
-  
-  // 이미 있는 것 제외, 새로 추가할 것만
-  const existing = collectionItemsMap[colId] || new Set()
-  const toAdd = ids.filter(id => !existing.has(id))
-  
-  if (toAdd.length === 0) {
-    toast('이미 모두 추가되어 있어요')
-    return
-  }
-  
-  const rows = toAdd.map(aid => ({ collection_id: colId, artwork_id: aid }))
-  const { error } = await supabase.from('collection_items').insert(rows)
-  if (error) {
-    toast('추가 실패: ' + error.message)
-    return
-  }
-  
-  // 로컬 매핑 갱신
-  if (!collectionItemsMap[colId]) collectionItemsMap[colId] = new Set()
-  toAdd.forEach(aid => collectionItemsMap[colId].add(aid))
-  
-  toast(`"${c.name}"에 ${toAdd.length}장 추가됨`)
-  renderAtcList()
-  // 자동으로 모달 닫고 선택 해제
-  setTimeout(() => {
-    closeAddToCollectionModal()
-    cancelSelectMode()
-  }, 600)
-}
-
-// 새 컬렉션 만들기 모달
-window.openNewCollectionModal = (fromAddToCollection = false) => {
-  editingCollectionId = null
-  document.getElementById('ncmTitle').textContent = '새 컬렉션 만들기'
-  document.getElementById('ncmName').value = ''
-  document.getElementById('ncmDescription').value = ''
-  document.getElementById('ncmSaveBtn').textContent = '만들기'
-  document.getElementById('ncmSaveBtn').dataset.fromAdd = fromAddToCollection ? '1' : ''
-  document.getElementById('newCollectionModal').classList.add('show')
-  setTimeout(() => document.getElementById('ncmName').focus(), 100)
-}
-
-window.closeNewCollectionModal = () => {
-  document.getElementById('newCollectionModal').classList.remove('show')
-}
-
-window.saveNewCollection = async () => {
-  const name = document.getElementById('ncmName').value.trim()
-  const description = document.getElementById('ncmDescription').value.trim()
-  if (!name) {
-    toast('컬렉션 이름을 입력해 주세요')
-    return
-  }
-  const saveBtn = document.getElementById('ncmSaveBtn')
-  saveBtn.disabled = true
-  saveBtn.textContent = '저장 중...'
-  
-  try {
-    if (editingCollectionId) {
-      // 수정
-      const { error } = await supabase.from('collections')
-        .update({ name, description: description || null })
-        .eq('id', editingCollectionId)
-      if (error) throw error
-      const c = collections.find(x => x.id === editingCollectionId)
-      if (c) { c.name = name; c.description = description || null }
-      toast('수정됨')
-      closeNewCollectionModal()
-      // 상세 보기 중이면 갱신
-      if (currentCollectionId === editingCollectionId) {
-        showCollectionDetail(editingCollectionId)
-      } else {
-        renderCollectionsList()
-      }
-    } else {
-      // 생성
-      const { data, error } = await supabase.from('collections')
-        .insert({ name, description: description || null })
-        .select()
-        .single()
-      if (error) throw error
-      collections.unshift(data)
-      collectionItemsMap[data.id] = new Set()
-      
-      const fromAdd = saveBtn.dataset.fromAdd === '1'
-      closeNewCollectionModal()
-      
-      if (fromAdd) {
-        // 만들고 바로 그 컬렉션에 추가
-        await toggleArtworksInCollection(data.id)
-      } else {
-        toast(`"${name}" 컬렉션이 만들어졌어요`)
-        renderCollectionsList()
-      }
-    }
-  } catch (err) {
-    toast('저장 실패: ' + (err.message || err))
-  } finally {
-    saveBtn.disabled = false
-    saveBtn.textContent = editingCollectionId ? '저장' : '만들기'
-  }
-}
-
-// 컬렉션 메뉴
-window.openCollectionMenu = () => {
-  document.getElementById('collectionMenuModal').classList.add('show')
-}
-window.closeCollectionMenu = () => {
-  document.getElementById('collectionMenuModal').classList.remove('show')
-}
-
-window.openEditCollection = () => {
-  const c = collections.find(x => x.id === currentCollectionId)
-  if (!c) return
-  closeCollectionMenu()
-  editingCollectionId = currentCollectionId
-  document.getElementById('ncmTitle').textContent = '컬렉션 수정'
-  document.getElementById('ncmName').value = c.name
-  document.getElementById('ncmDescription').value = c.description || ''
-  document.getElementById('ncmSaveBtn').textContent = '저장'
-  document.getElementById('ncmSaveBtn').dataset.fromAdd = ''
-  document.getElementById('newCollectionModal').classList.add('show')
-}
-
-window.deleteCurrentCollection = async () => {
-  const c = collections.find(x => x.id === currentCollectionId)
-  if (!c) return
-  if (!confirm(`"${c.name}" 컬렉션을 삭제할까요?\n(작품 자체는 삭제되지 않아요)`)) return
-  closeCollectionMenu()
-  const { error } = await supabase.from('collections').delete().eq('id', currentCollectionId)
-  if (error) {
-    toast('삭제 실패: ' + error.message)
-    return
-  }
-  collections = collections.filter(x => x.id !== currentCollectionId)
-  delete collectionItemsMap[currentCollectionId]
-  currentCollectionId = null
-  toast('삭제됨')
-  showCollections()
-}
-
-// 컬렉션 PDF 내보내기 (기존 generatePdf 재활용)
-window.exportCollectionAsPdf = async () => {
-  closeCollectionMenu()
-  const c = collections.find(x => x.id === currentCollectionId)
-  if (!c) return
-  const arts = getCollectionArtworks(currentCollectionId)
-  if (arts.length === 0) {
-    toast('이 컬렉션엔 작품이 없어요')
-    return
-  }
-  // openPdfModal 그대로 활용하되, 대상 작품 목록을 컬렉션으로 오버라이드
-  pdfOverrideList = arts
-  pdfOverrideTitle = c.name
-  openPdfModal()
-}
 
 // ============ AI ANALYSIS ============
 let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
