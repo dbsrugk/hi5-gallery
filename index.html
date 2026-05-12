@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v3-null-safe">
+<meta name="hi5-version" content="2026-05-12-v4-important-reflow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -199,8 +199,8 @@ body.select-mode .card .select-check{display:flex}
 .slideshow-exit{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.1);color:#fff;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px}
 .slideshow-count{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);color:#fff;font-family:'Bodoni Moda',serif;font-size:14px;background:rgba(0,0,0,.5);padding:6px 14px;border-radius:20px}
 
-.upload-page{padding:20px;display:none}
-.upload-page.show{display:block}
+.upload-page{padding:20px;display:none !important}
+.upload-page.show{display:block !important}
 
 .upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
 .upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
@@ -293,8 +293,8 @@ body.select-mode .card .select-check{display:flex}
 .empty{text-align:center;padding:60px 20px;color:var(--mute);font-size:13px}
 .empty .em-icon{font-size:40px;margin-bottom:12px;opacity:.3}
 .loading{text-align:center;padding:40px;color:var(--mute);font-size:12px;letter-spacing:1px;text-transform:uppercase}
-.gallery-page{display:block}
-.gallery-page.hidden{display:none}
+.gallery-page{display:block !important}
+.gallery-page.hidden{display:none !important}
 </style>
 </head>
 <body>
@@ -1973,11 +1973,9 @@ function handleShareTarget() {
   }
 }
 
-// ============ NAVIGATION (v3: 가장 단순한 방식) ============
-// inline 스타일이나 DOM 조작 없이 CSS 클래스만 토글.
-// .upload-page는 기본 display:none, .show 클래스 붙으면 block
-// .gallery-page는 기본 display:block, .hidden 붙으면 none
-// 모든 inline style은 깨끗이 초기화 (이전 버전의 잔재 제거)
+// ============ NAVIGATION (v4: !important + 강제 reflow) ============
+// CSS에 !important를 박았으니 어떤 inline style이나 다른 규칙도 못 이김.
+// 추가로 클래스 변경 후 강제로 reflow를 트리거해서 모바일 브라우저 렌더링 캐시 우회.
 
 function _clearInlineLayout(el) {
   if (!el) return
@@ -1992,6 +1990,12 @@ function _clearInlineLayout(el) {
   el.style.display = ''
 }
 
+function _forceReflow(el) {
+  // 강제 reflow 트리거 — 모바일 Chrome이 클래스 변경을 무시할 때 우회
+  if (!el) return
+  void el.offsetHeight
+}
+
 function showOnlyGallery() {
   const gallery = document.getElementById('galleryPage')
   const upload = document.getElementById('uploadPage')
@@ -1999,12 +2003,15 @@ function showOnlyGallery() {
     _clearInlineLayout(gallery)
     gallery.classList.remove('hidden')
     gallery.classList.remove('offscreen-parked')
+    _forceReflow(gallery)
   }
   if (upload) {
     _clearInlineLayout(upload)
     upload.classList.remove('show')
     upload.classList.remove('offscreen-parked')
+    _forceReflow(upload)
   }
+  window.scrollTo(0, 0)
 }
 
 function showOnlyUpload() {
@@ -2013,11 +2020,14 @@ function showOnlyUpload() {
   if (gallery) {
     _clearInlineLayout(gallery)
     gallery.classList.add('hidden')
+    _forceReflow(gallery)
   }
   if (upload) {
     _clearInlineLayout(upload)
     upload.classList.add('show')
+    _forceReflow(upload)
   }
+  window.scrollTo(0, 0)
 }
 
 function hideAllPages() {
