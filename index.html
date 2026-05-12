@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-13-debug-box">
+<meta name="hi5-version" content="2026-05-13-grid-fix">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -83,10 +83,10 @@ img{display:block;max-width:100%}
 .color-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid transparent;flex-shrink:0;cursor:pointer}
 .color-dot.active{transform:scale(1.15);border-color:var(--ink)}
 
-.grid{padding:8px 14px;column-count:2;column-gap:8px}
-.grid.cols-1{column-count:1}
-.grid.cols-2{column-count:2}
-.grid.cols-3{column-count:3;column-gap:6px}
+.grid{padding:8px 14px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;align-items:start}
+.grid.cols-1{grid-template-columns:1fr;gap:8px}
+.grid.cols-2{grid-template-columns:repeat(2,1fr);gap:8px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr);gap:6px}
 .grid.cols-3 .card .info{padding:6px 8px}
 .grid.cols-3 .card .info .ttl{font-size:10px}
 .grid.cols-3 .card .info .tag{font-size:8px}
@@ -110,7 +110,7 @@ img{display:block;max-width:100%}
 .gc-cols{display:inline-flex;background:#f5f5f5;border-radius:4px;padding:2px;gap:2px}
 .gc-cols button{padding:5px 8px;font-size:13px;background:none;border:none;cursor:pointer;color:var(--mute);border-radius:3px;line-height:1;font-weight:700}
 .gc-cols button.active{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.card{break-inside:avoid;margin-bottom:8px;position:relative;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:pointer}
+.card{position:relative;background:#fff;border:1px solid var(--line);overflow:hidden;cursor:pointer}
 .card:active{transform:scale(.98)}
 .card img{width:100%;height:auto}
 .card .badge{position:absolute;top:6px;left:6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:3px 6px;letter-spacing:.5px;z-index:1}
@@ -2004,44 +2004,6 @@ function showOnlyUpload() {
     uploadParked.classList.add('show')
     uploadParked.style.display = 'block'
   }
-  // 🔍 디버그: 0.3초 후 실제 상태 화면에 표시
-  setTimeout(() => {
-    const g = document.getElementById('galleryPage')
-    const u = document.getElementById('uploadPage')
-    const gStyle = g ? window.getComputedStyle(g) : null
-    const uStyle = u ? window.getComputedStyle(u) : null
-    const visibleCards = document.querySelectorAll('.card')
-    let cardInfo = []
-    visibleCards.forEach((c, i) => {
-      if (i < 3) {
-        const r = c.getBoundingClientRect()
-        const cs = window.getComputedStyle(c)
-        cardInfo.push(`카드${i}: display=${cs.display} visible=${r.width>0&&r.height>0} parent=${c.parentElement?.id||c.parentElement?.className||'?'}`)
-      }
-    })
-    showDebugBox([
-      `갤러리 class: "${g?.className||'없음'}"`,
-      `갤러리 display(computed): ${gStyle?.display}`,
-      `갤러리 display(inline): ${g?.style.display}`,
-      `갤러리 visible: ${g && g.getBoundingClientRect().height > 0}`,
-      `업로드 class: "${u?.className||'없음'}"`,
-      `업로드 display(computed): ${uStyle?.display}`,
-      `--- .card 총 ${visibleCards.length}개 ---`,
-      ...cardInfo
-    ])
-  }, 300)
-}
-
-function showDebugBox(lines) {
-  let box = document.getElementById('hi5DebugBox')
-  if (!box) {
-    box = document.createElement('div')
-    box.id = 'hi5DebugBox'
-    box.style.cssText = 'position:fixed;top:60px;left:8px;right:8px;background:rgba(0,0,0,.92);color:#0f0;font-family:monospace;font-size:10px;padding:10px;border-radius:6px;z-index:99999;white-space:pre-wrap;line-height:1.5;max-height:50vh;overflow-y:auto;border:2px solid #0f0'
-    box.onclick = () => box.remove()
-    document.body.appendChild(box)
-  }
-  box.textContent = '🔍 디버그 (탭하면 닫힘)\n' + lines.join('\n')
 }
 
 function hideAllPages() {
