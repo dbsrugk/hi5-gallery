@@ -2903,14 +2903,53 @@ window.closeRotateModal = closeRotateModal
 
 // ============ COLLECTIONS ============
 window.showCollections = () => {
+  // 디버그: 호출됐는지 확인
+  console.log('[DEBUG] showCollections called')
+  showDebug('showCollections 호출됨')
+  
   hideAllPages()
   const col = document.getElementById('collectionsPage')
+  if (!col) {
+    showDebug('ERROR: collectionsPage 요소 없음!')
+    return
+  }
   col.classList.add('show')
   col.style.display = 'block'
+  col.style.zIndex = '100'
+  
+  // 강제로 갤러리 숨김
+  const gal = document.getElementById('galleryPage')
+  gal.style.display = 'none'
+  gal.style.visibility = 'hidden'
+  
   clearBnavActive()
   document.getElementById('navCollections').classList.add('active')
   renderCollectionsList()
   window.scrollTo(0,0)
+  
+  // 디버그: 실제 적용된 스타일 확인
+  setTimeout(() => {
+    const galStyle = window.getComputedStyle(gal).display
+    const colStyle = window.getComputedStyle(col).display
+    showDebug(`gal:${galStyle} col:${colStyle}`)
+  }, 100)
+}
+
+function showDebug(msg) {
+  let d = document.getElementById('debugPanel')
+  if (!d) {
+    d = document.createElement('div')
+    d.id = 'debugPanel'
+    d.style.cssText = 'position:fixed;top:60px;left:10px;right:10px;background:rgba(0,0,0,.9);color:#0f0;padding:10px;font-size:11px;font-family:monospace;border-radius:4px;z-index:9999;max-height:120px;overflow-y:auto'
+    document.body.appendChild(d)
+  }
+  const time = new Date().toTimeString().slice(0,8)
+  d.innerHTML = `<div>${time} - ${msg}</div>` + d.innerHTML
+  // 5초 후 가장 오래된 로그 제거 (너무 길어지지 않게)
+  setTimeout(() => {
+    const lines = d.querySelectorAll('div')
+    if (lines.length > 8) lines[lines.length - 1].remove()
+  }, 5000)
 }
 
 function getCollectionArtworks(colId) {
