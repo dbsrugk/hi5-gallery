@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v6-fix-event-order">
+<meta name="hi5-version" content="2026-05-12-v6-trycatch-diag">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -524,11 +524,11 @@ body.select-mode .card .select-check{display:flex}
 
 <!-- ============ BOTTOM NAV ============ -->
 <nav class="bnav">
-  <button class="bnav-item active" id="navGallery" onclick="showGallery()">
+  <button class="bnav-item active" id="navGallery" onclick="try{showGallery()}catch(e){toast('갤러리 에러: '+e.message)}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     <span>갤러리</span>
   </button>
-  <button class="bnav-item" id="navUpload" onclick="showUpload()">
+  <button class="bnav-item" id="navUpload" onclick="try{showUpload()}catch(e){toast('업로드 에러: '+e.message)}">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
     <span>업로드</span>
   </button>
