@@ -1104,6 +1104,68 @@ let uploadMode = 'single'  // 'single' | 'multi' | 'url'
 let multiFiles = []  // [{file, preview, status, error}]
 let urlItems = []    // [{url, preview, status, error}]
 
+// 이미지를 2400px 이하로 리사이즈 (원본이 더 작으면 그대로 반환)
+// PNG는 무손실 보존, JPEG는 품질 0.9
+async function resizeImageForUpload(file, maxSize = 2400, quality = 0.9) {
+  // PNG는 무손실 보존이 중요할 수 있으니 큰 사진만 리사이즈
+  // JPEG/JPG/WEBP는 항상 리사이즈 검토
+  const isPng = (file.type === 'image/png')
+  
+  // createImageBitmap으로 빠르게 디코딩
+  let bitmap
+  try {
+    bitmap = await createImageBitmap(file)
+  } catch (e) {
+    // 디코딩 실패 시 원본 그대로 반환
+    return file
+  }
+  
+  // 원본이 이미 작으면 그대로
+  if (Math.max(bitmap.width, bitmap.height) <= maxSize) {
+    bitmap.close && bitmap.close()
+    return file
+  }
+  
+  const ratio = maxSize / Math.max(bitmap.width, bitmap.height)
+  const w = Math.round(bitmap.width * ratio)
+  const h = Math.round(bitmap.height * ratio)
+  
+  // OffscreenCanvas로 백그라운드 처리
+  let blob
+  try {
+    if (typeof OffscreenCanvas !== 'undefined') {
+      const canvas = new OffscreenCanvas(w, h)
+      const ctx = canvas.getContext('2d')
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(bitmap, 0, 0, w, h)
+      bitmap.close && bitmap.close()
+      const outType = isPng ? 'image/png' : 'image/jpeg'
+      blob = await canvas.convertToBlob({ type: outType, quality })
+    } else {
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
+      ctx.drawImage(bitmap, 0, 0, w, h)
+      bitmap.close && bitmap.close()
+      blob = await new Promise(res => canvas.toBlob(res, isPng ? 'image/png' : 'image/jpeg', quality))
+    }
+  } catch (e) {
+    return file  // 실패 시 원본
+  }
+  
+  if (!blob) return file
+  // 리사이즈 후 더 커진 경우는 거의 없지만, 만약 그렇다면 원본 반환
+  if (blob.size > file.size) return file
+  
+  // File 객체로 래핑 (이름 보존)
+  const newName = file.name.replace(/\.(png|jpg|jpeg|webp|heic|heif)$/i, '') + (isPng ? '.png' : '.jpg')
+  return new File([blob], newName, { type: blob.type })
+}
+
 function switchUploadMode(mode) {
   uploadMode = mode
   document.querySelectorAll('.upload-tab').forEach(t => {
@@ -1443,19 +1505,35 @@ function showProgress(show) {
 }
 
 // ============ 파일 1장 업로드 (재사용) ============
-async function uploadSingleFile(file, meta, customTitle) {
-  // 색상 자동 추출 (실패해도 mono로 폴백)
+async function uploadSingleFile(file, meta, customTitle, opts = {}) {
+  // opts.preview: 이미 만들어둔 썸네일 dataURL이 있으면 컬러 추출에 재활용 (속도)
+  
+  // 1) 업로드 전 자동 리사이즈 (2400px, 품질 0.9) — 화질 거의 보존, 용량 1/2~1/3
+  let uploadFile = file
+  try {
+    uploadFile = await resizeImageForUpload(file, 2400, 0.9)
+  } catch (e) {
+    uploadFile = file
+  }
+  
+  // 2) 색상 추출 — 썸네일이 있으면 재활용 (훨씬 빠름)
   let mainColor = 'mono'
-  try { mainColor = await extractMainColor(file) } catch(e) {}
+  try {
+    if (opts.preview) {
+      mainColor = await extractMainColor(opts.preview)
+    } else {
+      mainColor = await extractMainColor(uploadFile)
+    }
+  } catch(e) {}
 
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+  const ext = (uploadFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext || 'jpg'}`
   const filePath = `gallery/${fileName}`
-  const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, file, {cacheControl:'3600', upsert:false})
+  const {error: upErr} = await supabase.storage.from('artworks').upload(filePath, uploadFile, {cacheControl:'3600', upsert:false})
   if (upErr) throw upErr
   const {data:{publicUrl}} = supabase.storage.from('artworks').getPublicUrl(filePath)
   // 자동 제목
-  const title = customTitle || generateAutoTitle(meta, file.name)
+  const title = customTitle || generateAutoTitle(meta, uploadFile.name)
   const {error} = await supabase.from('artworks').insert({
     ...meta,
     title,
@@ -1543,30 +1621,58 @@ window.submitArtwork = async () => {
     return
   }
 
-  // 여러 장 업로드
+  // 여러 장 업로드 — 병렬 5장 동시
   if (uploadMode === 'multi') {
     if (multiFiles.length === 0) { toast('이미지를 선택해 주세요'); return }
     btn.disabled = true
     showProgress(true)
-    let done = 0, failed = 0
-    for (let i = 0; i < multiFiles.length; i++) {
-      const m = multiFiles[i]
-      if (m.status === 'done') { done++; continue }
-      m.status = 'uploading'
-      renderMultiPreview()
-      setProgress(`업로드 중 (${i+1}/${multiFiles.length})`, i, multiFiles.length)
-      try {
-        await uploadSingleFile(m.file, meta, null)
-        m.status = 'done'
-        done++
-      } catch (err) {
-        m.status = 'error'
-        m.error = err.message
-        failed++
-      }
-      renderMultiPreview()
+    
+    const CONCURRENCY = 5  // 동시 업로드 개수
+    let done = 0, failed = 0, firstError = null
+    
+    // 작업 큐 — 인덱스 순서대로, 워커 5명이 한 장씩 집어감
+    let cursor = 0
+    const updateProgress = () => {
+      const processed = done + failed
+      setProgress(`업로드 중 (${processed}/${multiFiles.length})${failed > 0 ? ` · ${failed}장 실패` : ''}`, processed, multiFiles.length)
     }
-    setProgress(`완료: ${done}장 성공${failed > 0 ? `, ${failed}장 실패` : ''}`, multiFiles.length, multiFiles.length)
+    
+    async function worker() {
+      while (cursor < multiFiles.length) {
+        const i = cursor++
+        const m = multiFiles[i]
+        if (!m || m.status === 'done') {
+          if (m && m.status === 'done') done++
+          continue
+        }
+        m.status = 'uploading'
+        // 너무 자주 렌더하지 않게 — 다른 워커가 함께 작동
+        try {
+          await uploadSingleFile(m.file, meta, null, { preview: m.preview })
+          m.status = 'done'
+          done++
+        } catch (err) {
+          m.status = 'error'
+          m.error = (err && err.message) ? err.message : String(err)
+          if (!firstError) firstError = m.error
+          failed++
+        }
+        updateProgress()
+      }
+    }
+    
+    // 주기적 미리보기 갱신 — 별도 타이머
+    const refreshTimer = setInterval(() => renderMultiPreview(), 500)
+    
+    const workers = []
+    for (let k = 0; k < CONCURRENCY; k++) workers.push(worker())
+    await Promise.all(workers)
+    
+    clearInterval(refreshTimer)
+    renderMultiPreview()
+    
+    const summary = `완료: ${done}장 성공${failed > 0 ? ` · ${failed}장 실패` : ''}`
+    setProgress(summary + (firstError && failed > 0 ? `\n첫 실패 사유: ${firstError.slice(0,80)}` : ''), multiFiles.length, multiFiles.length)
     toast(`${done}장 업로드 완료${failed > 0 ? ` · ${failed}장 실패` : ''}`)
     await loadData()
     btn.disabled = false
