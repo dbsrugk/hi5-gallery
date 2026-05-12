@@ -144,6 +144,30 @@ img{display:block;max-width:100%}
 .file-zone .hint{font-size:11px;color:var(--mute);line-height:1.5}
 .file-zone img.preview{max-height:200px;margin:0 auto}
 
+/* AI 분석 패널 */
+.ai-panel{display:none;margin-bottom:16px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+.ai-panel.show{display:block}
+.ai-trigger{width:100%;padding:14px;background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:none;color:var(--red);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.ai-trigger:disabled{color:var(--mute);cursor:wait}
+.ai-trigger .sparkle{font-size:16px}
+.ai-result{padding:14px;border-top:1px solid var(--line);display:none}
+.ai-result.show{display:block}
+.ai-result-title{font-size:11px;color:var(--mute);font-weight:700;letter-spacing:.3px;margin-bottom:8px;text-transform:uppercase}
+.ai-tag-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.ai-tag{padding:6px 10px;border:1px solid var(--line);border-radius:14px;background:#fafafa;font-size:12px;cursor:pointer;color:var(--ink);transition:all .15s}
+.ai-tag:hover{border-color:var(--red)}
+.ai-tag.picked{background:var(--red);color:#fff;border-color:var(--red)}
+.ai-comment-box{background:#fafafa;border-radius:4px;padding:10px 12px;font-size:12px;line-height:1.6;color:var(--ink);margin-bottom:10px}
+.ai-comment-actions{display:flex;gap:8px}
+.ai-comment-actions button{flex:1;padding:8px;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:4px;cursor:pointer;font-weight:600}
+.ai-comment-actions button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.ai-loading{padding:20px;text-align:center;font-size:12px;color:var(--mute)}
+.ai-loading .dot{display:inline-block;animation:aidot 1.4s infinite}
+.ai-loading .dot:nth-child(2){animation-delay:.2s}
+.ai-loading .dot:nth-child(3){animation-delay:.4s}
+@keyframes aidot{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.ai-error{padding:14px;font-size:12px;color:#c0392b;background:#fff5f5}
+
 /* 다중 선택 미리보기 */
 .multi-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px;max-height:280px;overflow-y:auto;padding:2px}
 .multi-preview .mp-item{position:relative;aspect-ratio:1;background:var(--line);border-radius:4px;overflow:hidden}
@@ -260,6 +284,15 @@ img{display:block;max-width:100%}
         <div class="msg">이미지 선택</div>
         <div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>
       </div>
+    </div>
+
+    <!-- AI 분석 패널 (이미지 선택 후 자동 표시) -->
+    <div class="ai-panel" id="aiPanel">
+      <button class="ai-trigger" id="aiTrigger" onclick="runAiAnalysis()">
+        <span class="sparkle">✨</span>
+        <span id="aiTriggerText">AI로 태그 추천받기</span>
+      </button>
+      <div class="ai-result" id="aiResult"></div>
     </div>
   </div>
 
@@ -895,6 +928,7 @@ window.editCurrent = () => {
   document.getElementById('fileZoneContent').innerHTML = `<img src="${a.image_url}" class="preview" alt="">`
   document.getElementById('fileZone').classList.add('has-file')
   selectedFile = null
+  hideAiPanel()  // 수정 모드에서는 AI 패널 숨김 (필요하면 새 이미지 선택 시 자동 노출)
 
   // 상세 정보 폼 동적 주입 (수정 모드에서만)
   injectDetailForm(a)
@@ -1043,6 +1077,12 @@ function switchUploadMode(mode) {
   if (!editingId) {
     btn.textContent = isBatch ? '일괄 업로드' : '업로드'
   }
+  // 한 장 모드 + 이미 이미지 선택된 상태면 AI 패널 유지, 아니면 숨김
+  if (mode === 'single' && selectedFile) {
+    showAiPanel()
+  } else {
+    hideAiPanel()
+  }
 }
 
 function setupFileInput() {
@@ -1055,6 +1095,9 @@ function setupFileInput() {
     const url = URL.createObjectURL(f)
     document.getElementById('fileZoneContent').innerHTML = `<img src="${url}" class="preview" alt="">`
     document.getElementById('fileZone').classList.add('has-file')
+    // AI 패널 표시 (결과는 비워둠)
+    showAiPanel()
+    resetAiResult()
   })
 
   // 여러 장 업로드
@@ -1457,6 +1500,7 @@ function resetUploadForm() {
   selectedFile = null
   document.getElementById('fileZone').classList.remove('has-file')
   document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
+  hideAiPanel()
   multiFiles.forEach(m => URL.revokeObjectURL(m.preview))
   multiFiles = []
   urlItems = []
@@ -1491,6 +1535,174 @@ function showSlide(list) {
 window.exitSlideshow = () => {
   clearInterval(slideTimer)
   document.getElementById('slideshow').classList.remove('show')
+}
+
+// ============ AI ANALYSIS ============
+let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
+
+function showAiPanel() {
+  document.getElementById('aiPanel').classList.add('show')
+}
+
+function hideAiPanel() {
+  document.getElementById('aiPanel').classList.remove('show')
+  resetAiResult()
+}
+
+function resetAiResult() {
+  aiResultData = null
+  const result = document.getElementById('aiResult')
+  result.classList.remove('show')
+  result.innerHTML = ''
+  const trigger = document.getElementById('aiTrigger')
+  trigger.disabled = false
+  document.getElementById('aiTriggerText').textContent = 'AI로 태그 추천받기'
+}
+
+async function runAiAnalysis() {
+  if (!selectedFile) {
+    toast('먼저 이미지를 선택해주세요')
+    return
+  }
+
+  const trigger = document.getElementById('aiTrigger')
+  const result = document.getElementById('aiResult')
+  trigger.disabled = true
+  document.getElementById('aiTriggerText').textContent = '분석 중'
+  result.classList.add('show')
+  result.innerHTML = `<div class="ai-loading">Claude가 작품을 보고 있어요<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>`
+
+  try {
+    // 1. 파일을 임시 Supabase Storage에 업로드 (Claude가 접근할 수 있도록)
+    const ext = (selectedFile.name.split('.').pop() || 'jpg').toLowerCase()
+    const tempPath = `temp/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`
+    const { error: upErr } = await supabase.storage.from('artworks').upload(tempPath, selectedFile, {
+      contentType: selectedFile.type,
+      upsert: false
+    })
+    if (upErr) throw new Error('이미지 업로드 실패: ' + upErr.message)
+
+    const { data: pub } = supabase.storage.from('artworks').getPublicUrl(tempPath)
+    const tempUrl = pub.publicUrl
+
+    // 2. Edge Function 호출
+    const { data: { session } } = await supabase.auth.getSession()
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${session?.access_token || SUPABASE_KEY}`
+    }
+    const fnUrl = `${SUPABASE_URL}/functions/v1/analyze-artwork`
+    const res = await fetch(fnUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ image_url: tempUrl })
+    })
+
+    // 3. 임시 파일 삭제 (분석 끝났으니 지움)
+    supabase.storage.from('artworks').remove([tempPath]).catch(() => {})
+
+    if (!res.ok) {
+      const errBody = await res.text()
+      throw new Error(`서버 오류 (${res.status}): ${errBody.slice(0, 200)}`)
+    }
+
+    const data = await res.json()
+    if (data.error) throw new Error(data.error + (data.detail ? '\n' + data.detail : ''))
+
+    aiResultData = {
+      tags: data.tags || [],
+      comment: data.comment || '',
+      pickedTags: new Set()
+    }
+    renderAiResult()
+
+  } catch (err) {
+    console.error('AI 분석 실패:', err)
+    result.innerHTML = `<div class="ai-error">⚠ 분석 실패<br><span style="font-size:11px;color:var(--mute)">${escapeHtml(String(err.message || err))}</span></div>`
+    trigger.disabled = false
+    document.getElementById('aiTriggerText').textContent = '다시 시도'
+  }
+}
+window.runAiAnalysis = runAiAnalysis
+
+function renderAiResult() {
+  if (!aiResultData) return
+  const result = document.getElementById('aiResult')
+  const tags = aiResultData.tags
+  const comment = aiResultData.comment
+
+  // 현재 입력란에 이미 있는 태그 자동 체크
+  const currentTags = new Set(
+    (document.getElementById('fTags').value || '')
+      .split(/[\s,]+/).filter(Boolean).map(t => t.replace(/^#/, ''))
+  )
+  tags.forEach(t => { if (currentTags.has(t)) aiResultData.pickedTags.add(t) })
+
+  result.innerHTML = `
+    ${tags.length ? `
+      <div class="ai-result-title">✨ 추천 태그 (탭해서 선택)</div>
+      <div class="ai-tag-list">
+        ${tags.map(t => `<button class="ai-tag ${aiResultData.pickedTags.has(t)?'picked':''}" onclick="toggleAiTag('${escapeAttr(t)}')">${escapeHtml(t)}</button>`).join('')}
+      </div>
+    ` : ''}
+    ${comment ? `
+      <div class="ai-result-title">📝 분석 코멘트</div>
+      <div class="ai-comment-box">${escapeHtml(comment)}</div>
+      <div class="ai-comment-actions">
+        <button onclick="useAiComment('replace')">코멘트로 교체</button>
+        <button class="primary" onclick="useAiComment('append')">코멘트에 추가</button>
+      </div>
+    ` : ''}
+  `
+  document.getElementById('aiTriggerText').textContent = '✓ 분석 완료 · 다시 분석'
+  document.getElementById('aiTrigger').disabled = false
+}
+
+function toggleAiTag(tag) {
+  if (!aiResultData) return
+  if (aiResultData.pickedTags.has(tag)) {
+    aiResultData.pickedTags.delete(tag)
+  } else {
+    aiResultData.pickedTags.add(tag)
+  }
+  // 입력란 동기화
+  syncTagsInput()
+  // UI 갱신
+  document.querySelectorAll('.ai-tag').forEach(el => {
+    const t = el.textContent
+    el.classList.toggle('picked', aiResultData.pickedTags.has(t))
+  })
+}
+window.toggleAiTag = toggleAiTag
+
+function syncTagsInput() {
+  if (!aiResultData) return
+  const fTags = document.getElementById('fTags')
+  // 기존 사용자 입력 태그 (AI 추천 외의 것) 보존
+  const aiTagSet = new Set(aiResultData.tags)
+  const existing = (fTags.value || '').split(/[\s,]+/).filter(Boolean).map(t => t.replace(/^#/, ''))
+  const userTags = existing.filter(t => !aiTagSet.has(t))
+  const picked = Array.from(aiResultData.pickedTags)
+  fTags.value = [...userTags, ...picked].join(', ')
+}
+
+function useAiComment(mode) {
+  if (!aiResultData?.comment) return
+  const fMemo = document.getElementById('fMemo')
+  if (!fMemo) { toast('코멘트 입력란을 찾을 수 없어요'); return }
+  if (mode === 'replace') {
+    fMemo.value = aiResultData.comment
+  } else {
+    const cur = fMemo.value.trim()
+    fMemo.value = cur ? cur + '\n\n' + aiResultData.comment : aiResultData.comment
+  }
+  toast('코멘트 적용됨')
+}
+window.useAiComment = useAiComment
+
+function escapeAttr(s) {
+  return String(s).replace(/'/g, "\\'").replace(/"/g, '\\"')
 }
 
 // ============ SEARCH ============
