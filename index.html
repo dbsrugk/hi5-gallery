@@ -88,8 +88,26 @@ img{display:block;max-width:100%}
 .card .info .ttl{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .card .info .tag{font-size:9px;color:var(--mute);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.fab{position:fixed;bottom:calc(96px + var(--safe));right:calc(50% - 220px);z-index:99;width:54px;height:54px;border-radius:50%;background:var(--red);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(192,57,43,.4);display:flex;align-items:center;justify-content:center}
+.fab{position:fixed;bottom:calc(96px + var(--safe));right:calc(50% - 220px);z-index:99;width:54px;height:54px;border-radius:50%;background:var(--red);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(192,57,43,.4);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
 @media(max-width:480px){.fab{right:20px}}
+
+/* PDF FAB (FAB 위쪽에 작게) */
+.fab-pdf{position:fixed;bottom:calc(160px + var(--safe));right:calc(50% - 220px);z-index:99;width:44px;height:44px;border-radius:50%;background:#fff;color:var(--ink);font-size:18px;border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center;cursor:pointer}
+@media(max-width:480px){.fab-pdf{right:25px}}
+
+/* PDF 진행 모달 */
+.pdf-modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.8);z-index:200;align-items:center;justify-content:center;padding:30px}
+.pdf-modal.show{display:flex}
+.pdf-modal-box{background:#fff;border-radius:8px;padding:24px 20px;width:100%;max-width:320px;text-align:center}
+.pdf-modal-box h3{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.pdf-modal-box .pdf-sub{font-size:12px;color:var(--mute);margin-bottom:18px}
+.pdf-progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.pdf-progress-bar{height:100%;background:var(--red);width:0%;transition:width .25s}
+.pdf-progress-text{font-size:11px;color:var(--mute);margin-bottom:18px}
+.pdf-modal-actions{display:flex;gap:8px}
+.pdf-modal-actions button{flex:1;padding:10px;font-size:13px;font-weight:700;border-radius:4px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.pdf-modal-actions button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.pdf-modal-actions button:disabled{opacity:.5;cursor:not-allowed}
 
 .bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);padding:10px 0 calc(14px + var(--safe));display:flex;justify-content:space-around;z-index:100}
 .bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 12px;color:var(--mute);font-size:9px;font-weight:700}
@@ -260,7 +278,24 @@ img{display:block;max-width:100%}
   <div class="color-strip" id="colors"></div>
   <div id="gridContainer"></div>
 
+  <button class="fab-pdf" id="fabPdf" onclick="openPdfModal()" title="PDF 내보내기">📄</button>
   <button class="fab" id="fab" onclick="startSlideshow()">▶</button>
+</div>
+
+<!-- ============ PDF 진행 모달 ============ -->
+<div class="pdf-modal" id="pdfModal">
+  <div class="pdf-modal-box">
+    <h3 id="pdfModalTitle">PDF로 내보내기</h3>
+    <div class="pdf-sub" id="pdfModalSub">현재 보이는 작품들을 PDF 포트폴리오로 저장합니다.</div>
+    <div class="pdf-progress" id="pdfProgressWrap" style="display:none">
+      <div class="pdf-progress-bar" id="pdfProgressBar"></div>
+    </div>
+    <div class="pdf-progress-text" id="pdfProgressText" style="display:none">준비 중...</div>
+    <div class="pdf-modal-actions" id="pdfModalActions">
+      <button onclick="closePdfModal()" id="pdfCancelBtn">취소</button>
+      <button class="primary" onclick="generatePdf()" id="pdfStartBtn">PDF 생성</button>
+    </div>
+  </div>
 </div>
 
 <!-- ============ UPLOAD PAGE ============ -->
@@ -772,6 +807,7 @@ function renderGrid() {
   const list = getFiltered()
   const container = document.getElementById('gridContainer')
   document.getElementById('fab').style.display = list.length > 0 ? 'flex' : 'none'
+  document.getElementById('fabPdf').style.display = list.length > 0 ? 'flex' : 'none'
 
   // 검색 결과 정보 업데이트
   if (searchQuery) {
@@ -1536,6 +1572,358 @@ window.exitSlideshow = () => {
   clearInterval(slideTimer)
   document.getElementById('slideshow').classList.remove('show')
 }
+
+// ============ PDF EXPORT ============
+let pdfLibLoaded = false
+
+async function loadPdfLib() {
+  if (pdfLibLoaded) return
+  // jsPDF CDN 로드
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script')
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+    s.onload = resolve
+    s.onerror = () => reject(new Error('jsPDF 로드 실패'))
+    document.head.appendChild(s)
+  })
+  pdfLibLoaded = true
+}
+
+function openPdfModal() {
+  const list = getFiltered()
+  if (list.length === 0) {
+    toast('표시할 작품이 없어요')
+    return
+  }
+  // 모달 초기화
+  document.getElementById('pdfModalTitle').textContent = 'PDF로 내보내기'
+  document.getElementById('pdfModalSub').textContent = `현재 보이는 작품 ${list.length}장을 PDF 포트폴리오로 저장합니다.`
+  document.getElementById('pdfProgressWrap').style.display = 'none'
+  document.getElementById('pdfProgressText').style.display = 'none'
+  document.getElementById('pdfStartBtn').disabled = false
+  document.getElementById('pdfStartBtn').textContent = 'PDF 생성'
+  document.getElementById('pdfCancelBtn').textContent = '취소'
+  document.getElementById('pdfModal').classList.add('show')
+}
+window.openPdfModal = openPdfModal
+
+function closePdfModal() {
+  document.getElementById('pdfModal').classList.remove('show')
+}
+window.closePdfModal = closePdfModal
+
+function updatePdfProgress(current, total, msg) {
+  document.getElementById('pdfProgressWrap').style.display = 'block'
+  document.getElementById('pdfProgressText').style.display = 'block'
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0
+  document.getElementById('pdfProgressBar').style.width = pct + '%'
+  document.getElementById('pdfProgressText').textContent = msg || `${current} / ${total}`
+}
+
+// 이미지를 PDF에 넣을 비율(가로/세로)에 맞게 크기 계산
+function fitImageInBox(imgW, imgH, boxW, boxH) {
+  const ratio = Math.min(boxW / imgW, boxH / imgH)
+  return { w: imgW * ratio, h: imgH * ratio }
+}
+
+// 이미지 URL → HTMLImageElement (CORS 우회: Supabase는 CORS 허용됨)
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error('image load failed: ' + url))
+    img.src = url
+  })
+}
+
+// 이미지를 JPEG dataURL로 변환 (PDF 크기 줄이기 위해)
+function imageToJpegDataUrl(img, maxW = 1200, quality = 0.82) {
+  const ratio = Math.min(1, maxW / img.naturalWidth)
+  const w = Math.round(img.naturalWidth * ratio)
+  const h = Math.round(img.naturalHeight * ratio)
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, w, h)
+  ctx.drawImage(img, 0, 0, w, h)
+  return { dataUrl: canvas.toDataURL('image/jpeg', quality), w, h }
+}
+
+// 한글 텍스트를 캔버스에 그려 이미지로 변환 → PDF에 삽입 (한글 폰트 임베딩 우회)
+function textBlockToImage(opts) {
+  const {
+    lines,        // [{text, size, color, weight, align}]
+    width,        // px
+    padding = 0,
+    bg = '#ffffff'
+  } = opts
+  const dpr = 2  // 선명도 위해 2배
+  // 측정용 캔버스
+  const measureCanvas = document.createElement('canvas')
+  const mctx = measureCanvas.getContext('2d')
+  const lineHeights = lines.map(l => Math.round((l.size || 14) * 1.5))
+  const totalHeight = lineHeights.reduce((s, h) => s + h, 0) + padding * 2
+  const canvas = document.createElement('canvas')
+  canvas.width = (width + padding * 2) * dpr
+  canvas.height = totalHeight * dpr
+  const ctx = canvas.getContext('2d')
+  ctx.scale(dpr, dpr)
+  ctx.fillStyle = bg
+  ctx.fillRect(0, 0, width + padding * 2, totalHeight)
+  let y = padding
+  lines.forEach((line, i) => {
+    const size = line.size || 14
+    const weight = line.weight || 400
+    ctx.font = `${weight} ${size}px "Nanum Gothic", sans-serif`
+    ctx.fillStyle = line.color || '#1a1a1a'
+    ctx.textBaseline = 'top'
+    const text = line.text || ''
+    // 단순 줄바꿈 (긴 줄 자동 줄바꿈)
+    const maxW = width
+    const words = text.split('')
+    let curLine = ''
+    const wrapped = []
+    for (let j = 0; j < words.length; j++) {
+      const test = curLine + words[j]
+      if (ctx.measureText(test).width > maxW && curLine) {
+        wrapped.push(curLine)
+        curLine = words[j]
+      } else {
+        curLine = test
+      }
+    }
+    if (curLine) wrapped.push(curLine)
+    // 줄바꿈 처리: \n도 지원
+    const finalLines = []
+    wrapped.forEach(w => {
+      w.split('\n').forEach(p => finalLines.push(p))
+    })
+    finalLines.forEach((fl, idx) => {
+      const lineH = Math.round(size * 1.5)
+      if (line.align === 'center') {
+        ctx.textAlign = 'center'
+        ctx.fillText(fl, (width + padding * 2) / 2, y + idx * lineH)
+      } else if (line.align === 'right') {
+        ctx.textAlign = 'right'
+        ctx.fillText(fl, width + padding, y + idx * lineH)
+      } else {
+        ctx.textAlign = 'left'
+        ctx.fillText(fl, padding, y + idx * lineH)
+      }
+    })
+    y += Math.max(lineHeights[i], finalLines.length * Math.round(size * 1.5))
+  })
+  // 실제 높이로 잘라낸 캔버스 반환
+  return {
+    dataUrl: canvas.toDataURL('image/jpeg', 0.9),
+    w: canvas.width / dpr,
+    h: canvas.height / dpr
+  }
+}
+
+async function generatePdf() {
+  const list = getFiltered()
+  if (list.length === 0) { toast('표시할 작품이 없어요'); return }
+
+  const startBtn = document.getElementById('pdfStartBtn')
+  const cancelBtn = document.getElementById('pdfCancelBtn')
+  startBtn.disabled = true
+  startBtn.textContent = '생성 중...'
+
+  try {
+    updatePdfProgress(0, list.length, '라이브러리 로딩 중...')
+    await loadPdfLib()
+
+    const { jsPDF } = window.jspdf
+    // A4 세로, 단위 mm
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+    const pageW = 210, pageH = 297
+    const margin = 15
+
+    // ── 1) 표지 페이지 (미니멀)
+    updatePdfProgress(0, list.length, '표지 생성 중...')
+    // 상단 빨간 띠
+    pdf.setFillColor(192, 57, 43)
+    pdf.rect(0, 0, pageW, 8, 'F')
+    // Hi5 로고 (간단히 빨간 사각형 + 텍스트로 표현)
+    const logoImg = textBlockToImage({
+      lines: [
+        { text: 'Hi5', size: 64, weight: 800, color: '#c0392b', align: 'center' }
+      ],
+      width: 600,
+      padding: 20,
+      bg: '#ffffff'
+    })
+    const logoMm = 30
+    pdf.addImage(logoImg.dataUrl, 'JPEG', (pageW - logoMm) / 2, 100, logoMm, logoMm * (logoImg.h / logoImg.w))
+
+    // 메인 타이틀
+    const today = new Date()
+    const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`
+    const coverImg = textBlockToImage({
+      lines: [
+        { text: '부산 센텀점', size: 22, weight: 800, color: '#1a1a1a', align: 'center' },
+        { text: 'Portfolio', size: 32, weight: 400, color: '#1a1a1a', align: 'center' },
+        { text: '', size: 12 },
+        { text: `작품 ${list.length}장 · ${dateStr}`, size: 12, color: '#666', align: 'center' }
+      ],
+      width: 600,
+      padding: 20
+    })
+    const coverMm = 120
+    pdf.addImage(coverImg.dataUrl, 'JPEG', (pageW - coverMm) / 2, 145, coverMm, coverMm * (coverImg.h / coverImg.w))
+
+    // 하단 빨간 띠
+    pdf.setFillColor(192, 57, 43)
+    pdf.rect(0, pageH - 8, pageW, 8, 'F')
+
+    // ── 2) 작품 페이지들
+    const cats = Object.fromEntries(categories.map(c => [c.id, c]))
+    for (let i = 0; i < list.length; i++) {
+      const a = list[i]
+      updatePdfProgress(i + 1, list.length, `작품 ${i+1}/${list.length} 처리 중...`)
+      
+      pdf.addPage()
+      
+      // 상단 헤더 (얇은 빨간 띠 + 페이지 번호)
+      pdf.setFillColor(192, 57, 43)
+      pdf.rect(0, 0, pageW, 3, 'F')
+      
+      // 이미지 로드 & 압축
+      let img, jpeg
+      try {
+        img = await loadImage(a.image_url)
+        jpeg = imageToJpegDataUrl(img, 1400, 0.82)
+      } catch (e) {
+        console.warn('image load failed for', a.id, e)
+        // 이미지 로드 실패해도 메타정보는 출력
+      }
+      
+      // 이미지 박스 (페이지의 60% 높이까지)
+      const imgBoxX = margin
+      const imgBoxY = 15
+      const imgBoxW = pageW - margin * 2
+      const imgBoxH = 150
+      
+      if (jpeg) {
+        const fit = fitImageInBox(jpeg.w, jpeg.h, imgBoxW, imgBoxH)
+        const ix = imgBoxX + (imgBoxW - fit.w) / 2
+        const iy = imgBoxY + (imgBoxH - fit.h) / 2
+        pdf.addImage(jpeg.dataUrl, 'JPEG', ix, iy, fit.w, fit.h)
+      } else {
+        pdf.setFontSize(10)
+        pdf.setTextColor(150)
+        pdf.text('(이미지를 불러올 수 없습니다)', pageW / 2, imgBoxY + imgBoxH / 2, { align: 'center' })
+      }
+      
+      // 구분선
+      const sepY = imgBoxY + imgBoxH + 8
+      pdf.setDrawColor(192, 57, 43)
+      pdf.setLineWidth(0.5)
+      pdf.line(margin, sepY, pageW - margin, sepY)
+      
+      // 메타정보 (한글 → 이미지로)
+      const cat = cats[a.category]
+      const tags = (a.tags || []).map(t => '#' + t).join('  ')
+      const metaParts = [a.student_name, a.school, a.subject].filter(Boolean).join(' · ')
+      const dateMeta = a.artwork_date ? new Date(a.artwork_date).toLocaleDateString('ko-KR') : ''
+      const memo = a.memo || ''
+      
+      const metaLines = []
+      // 카테고리 + 제목
+      metaLines.push({
+        text: (cat ? cat.name + '  ·  ' : '') + (a.title || '제목 없음'),
+        size: 16, weight: 800, color: '#1a1a1a'
+      })
+      // 학생/학교/과목/날짜
+      if (metaParts || dateMeta) {
+        metaLines.push({
+          text: [metaParts, dateMeta].filter(Boolean).join(' · '),
+          size: 11, color: '#666'
+        })
+      }
+      // 태그
+      if (tags) {
+        metaLines.push({ text: '', size: 4 })
+        metaLines.push({ text: tags, size: 11, color: '#c0392b', weight: 700 })
+      }
+      // 코멘트
+      if (memo) {
+        metaLines.push({ text: '', size: 6 })
+        metaLines.push({ text: memo, size: 12, color: '#1a1a1a' })
+      }
+      
+      const metaImg = textBlockToImage({
+        lines: metaLines,
+        width: 740,
+        padding: 12
+      })
+      const metaW = pageW - margin * 2
+      const metaH = metaW * (metaImg.h / metaImg.w)
+      const maxMetaH = pageH - sepY - 18
+      const finalMetaH = Math.min(metaH, maxMetaH)
+      const finalMetaW = metaH > maxMetaH ? maxMetaH * (metaImg.w / metaImg.h) : metaW
+      pdf.addImage(
+        metaImg.dataUrl, 'JPEG',
+        margin + (metaW - finalMetaW) / 2,
+        sepY + 5,
+        finalMetaW, finalMetaH
+      )
+      
+      // 페이지 번호 (하단)
+      pdf.setFontSize(9)
+      pdf.setTextColor(150)
+      pdf.text(`${i + 1} / ${list.length}`, pageW / 2, pageH - 6, { align: 'center' })
+    }
+
+    // ── 저장
+    updatePdfProgress(list.length, list.length, '저장 중...')
+    const fileName = `Hi5_부산센텀점_Portfolio_${dateStr.replace(/\./g, '')}.pdf`
+
+    // 모바일: Web Share API로 공유, 데스크톱: 다운로드
+    const blob = pdf.output('blob')
+    let shared = false
+    if (navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: 'application/pdf' })] })) {
+      try {
+        const file = new File([blob], fileName, { type: 'application/pdf' })
+        await navigator.share({ files: [file], title: 'Hi5 Portfolio' })
+        shared = true
+      } catch (e) {
+        // 사용자가 취소했거나 share 실패 → 다운로드로 폴백
+        console.log('share cancelled or failed, falling back to download', e)
+      }
+    }
+    if (!shared) {
+      // 폴백: 다운로드
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = fileName
+      document.body.appendChild(a)
+      a.click()
+      setTimeout(() => {
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }, 100)
+    }
+
+    startBtn.textContent = '✓ 완료'
+    cancelBtn.textContent = '닫기'
+    updatePdfProgress(list.length, list.length, '✓ PDF 생성 완료!')
+    setTimeout(() => closePdfModal(), 1500)
+
+  } catch (err) {
+    console.error('PDF 생성 실패:', err)
+    toast('PDF 생성 실패: ' + (err.message || err))
+    startBtn.disabled = false
+    startBtn.textContent = 'PDF 생성'
+    document.getElementById('pdfProgressText').textContent = '⚠ 실패: ' + String(err.message || err).slice(0, 60)
+  }
+}
+window.generatePdf = generatePdf
 
 // ============ AI ANALYSIS ============
 let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
