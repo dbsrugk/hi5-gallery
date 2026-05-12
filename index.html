@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-stable-rollback">
+<meta name="hi5-version" content="2026-05-12-v2-css-isolation">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -801,8 +801,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   setupFileInput()
   setupGalleryControls()
   renderColors()
-  // 페이지 시작 시 업로드 페이지는 DOM에서 빼둠 (갤러리만 보임)
-  parkPages()
+  // 페이지 시작 시: 업로드 페이지는 화면 밖으로 격리, 갤러리만 표시
   showOnlyGallery()
   await loadData()
   handleShareTarget()
@@ -1963,56 +1962,69 @@ function handleShareTarget() {
   }
 }
 
-// ============ NAVIGATION ============
-// DOM에서 직접 제거/삽입하는 핵 옵션 (CSS는 신뢰 못 함)
-let galleryParked = null  // DOM에서 빼놓은 갤러리 페이지
-let uploadParked = null   // DOM에서 빼놓은 업로드 페이지
-let pageHost = null       // 페이지가 들어가는 부모 (body)
+// ============ NAVIGATION (v2: CSS 격리 방식) ============
+// DOM 제거 방식은 innerHTML null 에러를 일으켜서 폐기.
+// 페이지는 항상 DOM에 두고, 안 보이는 페이지는 화면 밖으로 밀어냄.
+// 이렇게 하면 getElementById가 항상 정상 작동 + 시각적으로는 완전 격리.
 
-function parkPages() {
-  pageHost = document.body
-  // 시작 시점에 두 페이지를 찾아 변수에 저장
-  if (!galleryParked) galleryParked = document.getElementById('galleryPage')
-  if (!uploadParked) uploadParked = document.getElementById('uploadPage')
+// 격리용 스타일을 inline으로 강제 (CSS 충돌 우회)
+const OFFSCREEN_STYLE = {
+  position: 'fixed',
+  left: '-100vw',
+  top: '0',
+  width: '100vw',
+  visibility: 'hidden',
+  pointerEvents: 'none',
+  zIndex: '-1'
+}
+const ONSCREEN_STYLE = {
+  position: '',
+  left: '',
+  top: '',
+  width: '',
+  visibility: '',
+  pointerEvents: '',
+  zIndex: ''
+}
+
+function applyStyle(el, styleObj) {
+  if (!el) return
+  Object.keys(styleObj).forEach(k => { el.style[k] = styleObj[k] })
+}
+
+function moveOffscreen(el) {
+  if (!el) return
+  applyStyle(el, OFFSCREEN_STYLE)
+  el.style.display = 'block'  // display:none 대신 화면 밖으로
+  el.classList.add('offscreen-parked')
+}
+
+function moveOnscreen(el) {
+  if (!el) return
+  applyStyle(el, ONSCREEN_STYLE)
+  el.style.display = 'block'
+  el.classList.remove('offscreen-parked')
+  el.classList.remove('hidden')
 }
 
 function showOnlyGallery() {
-  parkPages()
-  // 업로드 페이지를 DOM에서 제거
-  if (uploadParked && uploadParked.parentNode) {
-    uploadParked.parentNode.removeChild(uploadParked)
-  }
-  // 갤러리는 DOM에 있어야 함
-  if (galleryParked && !galleryParked.parentNode) {
-    pageHost.appendChild(galleryParked)
-  }
-  // 클래스/스타일 정리
-  if (galleryParked) {
-    galleryParked.classList.remove('hidden')
-    galleryParked.style.display = 'block'
-  }
+  const gallery = document.getElementById('galleryPage')
+  const upload = document.getElementById('uploadPage')
+  moveOffscreen(upload)
+  moveOnscreen(gallery)
+  if (upload) upload.classList.remove('show')
 }
 
 function showOnlyUpload() {
-  parkPages()
-  // 갤러리 페이지를 DOM에서 제거
-  if (galleryParked && galleryParked.parentNode) {
-    galleryParked.parentNode.removeChild(galleryParked)
-  }
-  // 업로드는 DOM에 있어야 함
-  if (uploadParked && !uploadParked.parentNode) {
-    pageHost.appendChild(uploadParked)
-  }
-  // 클래스/스타일 정리
-  if (uploadParked) {
-    uploadParked.classList.add('show')
-    uploadParked.style.display = 'block'
-  }
+  const gallery = document.getElementById('galleryPage')
+  const upload = document.getElementById('uploadPage')
+  moveOffscreen(gallery)
+  moveOnscreen(upload)
+  if (upload) upload.classList.add('show')
 }
 
 function hideAllPages() {
   // 호환성 유지 (기존 코드가 호출함)
-  // 실제 페이지 표시는 showOnly* 함수가 담당
 }
 
 function clearBnavActive() {
@@ -2046,24 +2058,27 @@ function showUploadPage() {
 
 function resetUploadForm() {
   if (editingId) return
-  document.getElementById('fTags').value = ''
-  document.getElementById('fMemo').value = ''
-  document.getElementById('fileInput').value = ''
-  document.getElementById('multiFileInput').value = ''
-  document.getElementById('urlInput').value = ''
+  const _v = (id, val) => { const el = document.getElementById(id); if (el) el.value = val }
+  const _t = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val }
+  const _h = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val }
+  _v('fTags', '')
+  _v('fMemo', '')
+  _v('fileInput', '')
+  _v('multiFileInput', '')
+  _v('urlInput', '')
   selectedFile = null
-  document.getElementById('fileZone').classList.remove('has-file')
-  document.getElementById('fileZoneContent').innerHTML = `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`
+  const fz = document.getElementById('fileZone'); if (fz) fz.classList.remove('has-file')
+  _h('fileZoneContent', `<div class="icon">📷</div><div class="msg">이미지 선택</div><div class="hint">탭해서 사진 가져오기 (최대 20MB)</div>`)
   hideAiPanel()
   multiFiles = []
   urlItems = []
   renderMultiPreview()
   renderUrlPreview()
   showProgress(false)
-  document.getElementById('upTitle').textContent = '새 '
-  document.getElementById('upTitleEm').textContent = '업로드'
-  document.getElementById('upSubtitle').textContent = 'Add New Artwork'
-  document.getElementById('btnSubmit').textContent = uploadMode === 'single' ? '업로드' : '일괄 업로드'
+  _t('upTitle', '새 ')
+  _t('upTitleEm', '업로드')
+  _t('upSubtitle', 'Add New Artwork')
+  _t('btnSubmit', uploadMode === 'single' ? '업로드' : '일괄 업로드')
 }
 
 // ============ SLIDESHOW ============
