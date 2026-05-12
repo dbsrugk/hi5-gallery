@@ -90,6 +90,33 @@ img{display:block;max-width:100%}
 .card .info .ttl{font-size:11px;font-weight:700;line-height:1.3;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .card .info .tag{font-size:9px;color:var(--mute);letter-spacing:.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
+/* 선택 모드 */
+body.select-mode .card .fav{display:none}
+body.select-mode .card{cursor:pointer}
+.card .select-check{display:none;position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);border:2px solid var(--line);color:#fff;font-size:16px;align-items:center;justify-content:center;z-index:2;font-weight:700;line-height:1}
+body.select-mode .card .select-check{display:flex}
+.card.selected{outline:3px solid var(--red);outline-offset:-3px}
+.card.selected .select-check{background:var(--red);border-color:var(--red);color:#fff}
+
+/* 선택 모드 하단 액션 바 */
+.select-bar{display:none;position:fixed;bottom:calc(72px + var(--safe));left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:420px;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;z-index:150;align-items:center;gap:8px}
+.select-bar.show{display:flex}
+.select-bar .sb-count{flex:1;font-size:12px;font-weight:700;color:var(--ink);padding-left:6px}
+.select-bar button{padding:9px 12px;font-size:12px;font-weight:700;border-radius:4px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;white-space:nowrap}
+.select-bar button.primary{background:var(--red);color:#fff;border-color:var(--red)}
+.select-bar button.danger{background:#fff;color:var(--red);border-color:var(--red)}
+.select-bar button:disabled{opacity:.5;cursor:not-allowed}
+
+/* 회전 진행 모달 (PDF 모달과 유사) */
+.rotate-modal{display:none;position:fixed;inset:0;background:rgba(26,26,26,.8);z-index:300;align-items:center;justify-content:center;padding:30px}
+.rotate-modal.show{display:flex}
+.rotate-modal-box{background:#fff;border-radius:8px;padding:24px 20px;width:100%;max-width:320px;text-align:center}
+.rotate-modal-box h3{font-size:15px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.rotate-modal-box .rt-sub{font-size:12px;color:var(--mute);margin-bottom:18px}
+.rt-progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-bottom:10px}
+.rt-progress-bar{height:100%;background:var(--red);width:0%;transition:width .25s}
+.rt-progress-text{font-size:11px;color:var(--mute);margin-bottom:18px}
+
 .fab{position:fixed;bottom:calc(96px + var(--safe));right:calc(50% - 220px);z-index:99;width:54px;height:54px;border-radius:50%;background:var(--red);color:#fff;font-size:26px;box-shadow:0 6px 20px rgba(192,57,43,.4);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer}
 @media(max-width:480px){.fab{right:20px}}
 
@@ -251,6 +278,7 @@ img{display:block;max-width:100%}
         <div class="sub">Busan Centum · Gallery</div>
       </div>
     </div>
+    <button class="search-btn" id="selectBtn" onclick="toggleSelectMode()" title="선택 모드">☑</button>
     <button class="search-btn" id="searchBtn" onclick="toggleSearch()">⌕</button>
   </div>
 
@@ -284,6 +312,14 @@ img{display:block;max-width:100%}
 
   <button class="fab-pdf" id="fabPdf" onclick="openPdfModal()" title="PDF 내보내기">📄</button>
   <button class="fab" id="fab" onclick="startSlideshow()">▶</button>
+
+  <!-- 선택 모드 하단 액션 바 -->
+  <div class="select-bar" id="selectBar">
+    <div class="sb-count"><span id="selectCount">0</span>장 선택</div>
+    <button onclick="selectAllVisible()">전체</button>
+    <button onclick="rotateSelected()" class="primary" id="rotateBtn">↻ 90°</button>
+    <button onclick="cancelSelectMode()">취소</button>
+  </div>
 </div>
 
 <!-- ============ PDF 진행 모달 ============ -->
@@ -298,6 +334,19 @@ img{display:block;max-width:100%}
     <div class="pdf-modal-actions" id="pdfModalActions">
       <button onclick="closePdfModal()" id="pdfCancelBtn">취소</button>
       <button class="primary" onclick="generatePdf()" id="pdfStartBtn">PDF 생성</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 회전 진행 모달 ============ -->
+<div class="rotate-modal" id="rotateModal">
+  <div class="rotate-modal-box">
+    <h3 id="rotateModalTitle">작품 회전 중</h3>
+    <div class="rt-sub" id="rotateModalSub">선택한 작품을 시계방향으로 90도 돌립니다.</div>
+    <div class="rt-progress"><div class="rt-progress-bar" id="rtProgressBar"></div></div>
+    <div class="rt-progress-text" id="rtProgressText">준비 중...</div>
+    <div class="pdf-modal-actions">
+      <button onclick="closeRotateModal()" id="rotateCloseBtn" disabled>닫기</button>
     </div>
   </div>
 </div>
@@ -472,6 +521,8 @@ let activeView = 'all'
 let activeCat = 'all'
 let activeColor = 'all'
 let searchQuery = ''
+let selectMode = false
+let selectedIds = new Set()
 let currentId = null
 let editingId = null
 let selectedFile = null
@@ -837,10 +888,12 @@ function renderGrid() {
     const badge = (a.tags||[]).includes('합격작') ? '합격작' : (a.tags||[]).includes('우수작') ? '우수작' : a.category==='best' ? 'BEST' : null
     const tagText = ((a.tags||[]).slice(0,2).map(t => '#'+t).join(' '))
     const studentText = a.student_name ? a.student_name + (tagText ? ' · ' : '') : ''
+    const isSelected = selectedIds.has(a.id)
     return `
-      <div class="card" data-id="${a.id}">
+      <div class="card ${isSelected?'selected':''}" data-id="${a.id}">
         ${badge ? `<div class="badge">${badge}</div>` : ''}
         <button class="fav ${a.is_favorite?'on':''}" data-fav="${a.id}">${a.is_favorite?'♥':'♡'}</button>
+        <div class="select-check">${isSelected?'✓':''}</div>
         <img src="${a.image_url}" alt="${escapeHtml(a.title)}" loading="lazy">
         <div class="info">
           <div class="ttl">${escapeHtml(a.title)}</div>
@@ -851,7 +904,15 @@ function renderGrid() {
   container.innerHTML = `<div class="grid">${cards}</div>`
 
   document.querySelectorAll('.card').forEach(el => {
-    el.onclick = e => { if (e.target.classList.contains('fav')) return; openModal(parseInt(el.dataset.id)) }
+    el.onclick = e => {
+      if (e.target.classList.contains('fav')) return
+      const id = parseInt(el.dataset.id)
+      if (selectMode) {
+        toggleSelectArtwork(id)
+      } else {
+        openModal(id)
+      }
+    }
   })
   document.querySelectorAll('.fav').forEach(el => {
     el.onclick = async e => { e.stopPropagation(); await toggleFav(parseInt(el.dataset.fav)) }
@@ -1106,31 +1167,28 @@ let urlItems = []    // [{url, preview, status, error}]
 
 // 이미지를 2400px 이하로 리사이즈 (원본이 더 작으면 그대로 반환)
 // PNG는 무손실 보존, JPEG는 품질 0.9
+// + EXIF orientation을 자동으로 인식해서 똑바로 세움
 async function resizeImageForUpload(file, maxSize = 2400, quality = 0.9) {
-  // PNG는 무손실 보존이 중요할 수 있으니 큰 사진만 리사이즈
-  // JPEG/JPG/WEBP는 항상 리사이즈 검토
   const isPng = (file.type === 'image/png')
   
-  // createImageBitmap으로 빠르게 디코딩
+  // createImageBitmap에 imageOrientation: 'from-image' 옵션 — EXIF 회전 자동 적용
   let bitmap
   try {
-    bitmap = await createImageBitmap(file)
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
   } catch (e) {
-    // 디코딩 실패 시 원본 그대로 반환
-    return file
+    // 옵션 지원 안 하는 옛 브라우저 폴백
+    try {
+      bitmap = await createImageBitmap(file)
+    } catch (e2) {
+      return file
+    }
   }
   
-  // 원본이 이미 작으면 그대로
-  if (Math.max(bitmap.width, bitmap.height) <= maxSize) {
-    bitmap.close && bitmap.close()
-    return file
-  }
+  // 원본이 이미 작으면 그대로 (다만 EXIF 회전은 적용된 채로 저장해야 하므로 강제 재인코딩)
+  const needsResize = Math.max(bitmap.width, bitmap.height) > maxSize
+  const w = needsResize ? Math.round(bitmap.width * (maxSize / Math.max(bitmap.width, bitmap.height))) : bitmap.width
+  const h = needsResize ? Math.round(bitmap.height * (maxSize / Math.max(bitmap.width, bitmap.height))) : bitmap.height
   
-  const ratio = maxSize / Math.max(bitmap.width, bitmap.height)
-  const w = Math.round(bitmap.width * ratio)
-  const h = Math.round(bitmap.height * ratio)
-  
-  // OffscreenCanvas로 백그라운드 처리
   let blob
   try {
     if (typeof OffscreenCanvas !== 'undefined') {
@@ -1154,14 +1212,13 @@ async function resizeImageForUpload(file, maxSize = 2400, quality = 0.9) {
       blob = await new Promise(res => canvas.toBlob(res, isPng ? 'image/png' : 'image/jpeg', quality))
     }
   } catch (e) {
-    return file  // 실패 시 원본
+    return file
   }
   
   if (!blob) return file
-  // 리사이즈 후 더 커진 경우는 거의 없지만, 만약 그렇다면 원본 반환
-  if (blob.size > file.size) return file
+  // 리사이즈 안 했고 결과가 커졌으면 원본 (다만 EXIF 회전이 필요하면 어쩔 수 없이 큰 거 씀)
+  if (!needsResize && blob.size > file.size * 1.3) return file
   
-  // File 객체로 래핑 (이름 보존)
   const newName = file.name.replace(/\.(png|jpg|jpeg|webp|heic|heif)$/i, '') + (isPng ? '.png' : '.jpg')
   return new File([blob], newName, { type: blob.type })
 }
@@ -2197,6 +2254,212 @@ async function generatePdf() {
   }
 }
 window.generatePdf = generatePdf
+
+// ============ SELECT MODE & ROTATION ============
+function toggleSelectMode() {
+  if (selectMode) {
+    cancelSelectMode()
+  } else {
+    enterSelectMode()
+  }
+}
+window.toggleSelectMode = toggleSelectMode
+
+function enterSelectMode() {
+  selectMode = true
+  selectedIds.clear()
+  document.body.classList.add('select-mode')
+  document.getElementById('selectBtn').classList.add('active')
+  document.getElementById('selectBar').classList.add('show')
+  // FAB은 숨김 (선택 바와 겹침)
+  document.getElementById('fab').style.display = 'none'
+  document.getElementById('fabPdf').style.display = 'none'
+  updateSelectBarCount()
+  renderGrid()
+}
+
+function cancelSelectMode() {
+  selectMode = false
+  selectedIds.clear()
+  document.body.classList.remove('select-mode')
+  document.getElementById('selectBtn').classList.remove('active')
+  document.getElementById('selectBar').classList.remove('show')
+  // FAB 복원
+  const list = getFiltered()
+  document.getElementById('fab').style.display = list.length > 0 ? 'flex' : 'none'
+  document.getElementById('fabPdf').style.display = list.length > 0 ? 'flex' : 'none'
+  renderGrid()
+}
+window.cancelSelectMode = cancelSelectMode
+
+function toggleSelectArtwork(id) {
+  if (selectedIds.has(id)) {
+    selectedIds.delete(id)
+  } else {
+    selectedIds.add(id)
+  }
+  // 개별 카드만 업데이트 (전체 리렌더 안 함, 빠름)
+  const card = document.querySelector(`.card[data-id="${id}"]`)
+  if (card) {
+    const sel = selectedIds.has(id)
+    card.classList.toggle('selected', sel)
+    const chk = card.querySelector('.select-check')
+    if (chk) chk.textContent = sel ? '✓' : ''
+  }
+  updateSelectBarCount()
+}
+
+function selectAllVisible() {
+  const list = getFiltered()
+  // 전체 선택 토글: 다 선택돼 있으면 해제, 아니면 다 선택
+  const allSelected = list.every(a => selectedIds.has(a.id))
+  if (allSelected) {
+    list.forEach(a => selectedIds.delete(a.id))
+  } else {
+    list.forEach(a => selectedIds.add(a.id))
+  }
+  updateSelectBarCount()
+  renderGrid()
+}
+window.selectAllVisible = selectAllVisible
+
+function updateSelectBarCount() {
+  document.getElementById('selectCount').textContent = selectedIds.size
+  document.getElementById('rotateBtn').disabled = selectedIds.size === 0
+}
+
+// 이미지 회전: 다운로드 → 캔버스로 90도 회전 → 같은 경로에 덮어쓰기
+async function rotateArtworkImage(artwork, degrees = 90) {
+  // 1) 이미지 다운로드 (이미 캐시에 있으면 빠름)
+  const res = await fetch(artwork.image_url, { mode: 'cors' })
+  if (!res.ok) throw new Error('이미지 다운로드 실패')
+  const blob = await res.blob()
+  
+  // 2) createImageBitmap으로 디코딩
+  const bitmap = await createImageBitmap(blob)
+  const srcW = bitmap.width
+  const srcH = bitmap.height
+  
+  // 3) 회전된 캔버스 만들기
+  // degrees는 시계방향 90의 배수 (90, 180, 270, -90)
+  const deg = ((degrees % 360) + 360) % 360
+  const rad = (deg * Math.PI) / 180
+  const dstW = (deg === 90 || deg === 270) ? srcH : srcW
+  const dstH = (deg === 90 || deg === 270) ? srcW : srcH
+  
+  let blob2
+  if (typeof OffscreenCanvas !== 'undefined') {
+    const canvas = new OffscreenCanvas(dstW, dstH)
+    const ctx = canvas.getContext('2d')
+    ctx.translate(dstW / 2, dstH / 2)
+    ctx.rotate(rad)
+    ctx.drawImage(bitmap, -srcW / 2, -srcH / 2)
+    bitmap.close && bitmap.close()
+    // JPEG로 저장 (PNG는 너무 큼)
+    const outType = (blob.type === 'image/png') ? 'image/png' : 'image/jpeg'
+    blob2 = await canvas.convertToBlob({ type: outType, quality: 0.92 })
+  } else {
+    const canvas = document.createElement('canvas')
+    canvas.width = dstW
+    canvas.height = dstH
+    const ctx = canvas.getContext('2d')
+    ctx.translate(dstW / 2, dstH / 2)
+    ctx.rotate(rad)
+    ctx.drawImage(bitmap, -srcW / 2, -srcH / 2)
+    bitmap.close && bitmap.close()
+    const outType = (blob.type === 'image/png') ? 'image/png' : 'image/jpeg'
+    blob2 = await new Promise(r => canvas.toBlob(r, outType, 0.92))
+  }
+  if (!blob2) throw new Error('회전 처리 실패')
+  
+  // 4) Storage에 같은 경로로 덮어쓰기
+  const storagePath = artwork.storage_path
+  if (!storagePath) throw new Error('storage_path가 없어요 (옛날 작품일 수 있음)')
+  
+  const { error: upErr } = await supabase.storage.from('artworks').upload(storagePath, blob2, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: blob2.type
+  })
+  if (upErr) throw upErr
+  
+  // 5) DB의 image_url에 캐시 무효화 쿼리 추가 (?v=타임스탬프)
+  const { data: { publicUrl } } = supabase.storage.from('artworks').getPublicUrl(storagePath)
+  const newUrl = publicUrl + '?v=' + Date.now()
+  const { error: dbErr } = await supabase.from('artworks').update({ image_url: newUrl }).eq('id', artwork.id)
+  if (dbErr) throw dbErr
+  
+  // 로컬 artworks 배열에도 반영
+  const local = artworks.find(x => x.id === artwork.id)
+  if (local) local.image_url = newUrl
+}
+
+async function rotateSelected() {
+  if (selectedIds.size === 0) return
+  const ids = Array.from(selectedIds)
+  
+  // 확인
+  if (!confirm(`${ids.length}장을 시계방향 90도로 회전할까요?\n원본을 덮어쓰며, 작업에 시간이 걸려요.`)) return
+  
+  // 모달 표시
+  const modal = document.getElementById('rotateModal')
+  modal.classList.add('show')
+  document.getElementById('rotateModalTitle').textContent = '작품 회전 중'
+  document.getElementById('rotateModalSub').textContent = `${ids.length}장을 시계방향 90°로 처리합니다.`
+  document.getElementById('rtProgressBar').style.width = '0%'
+  document.getElementById('rtProgressText').textContent = '준비 중...'
+  document.getElementById('rotateCloseBtn').disabled = true
+  
+  const CONCURRENCY = 3
+  let done = 0, failed = 0, firstError = null
+  let cursor = 0
+  
+  const update = () => {
+    const processed = done + failed
+    const pct = Math.round((processed / ids.length) * 100)
+    document.getElementById('rtProgressBar').style.width = pct + '%'
+    document.getElementById('rtProgressText').textContent = 
+      `${processed}/${ids.length} 처리 중${failed > 0 ? ` · ${failed}장 실패` : ''}`
+  }
+  
+  async function worker() {
+    while (cursor < ids.length) {
+      const i = cursor++
+      const id = ids[i]
+      const art = artworks.find(x => x.id === id)
+      if (!art) { failed++; update(); continue }
+      try {
+        await rotateArtworkImage(art, 90)
+        done++
+      } catch (err) {
+        console.error('rotate failed', id, err)
+        failed++
+        if (!firstError) firstError = err.message || String(err)
+      }
+      update()
+    }
+  }
+  
+  const workers = []
+  for (let k = 0; k < CONCURRENCY; k++) workers.push(worker())
+  await Promise.all(workers)
+  
+  // 완료
+  document.getElementById('rtProgressText').textContent = 
+    `완료: ${done}장 성공${failed > 0 ? ` · ${failed}장 실패\n첫 오류: ${(firstError||'').slice(0,60)}` : ''}`
+  document.getElementById('rotateCloseBtn').disabled = false
+  
+  // 갤러리 새로고침
+  renderGrid()
+}
+window.rotateSelected = rotateSelected
+
+function closeRotateModal() {
+  document.getElementById('rotateModal').classList.remove('show')
+  // 회전 끝나면 선택 모드 자동 해제
+  cancelSelectMode()
+}
+window.closeRotateModal = closeRotateModal
 
 // ============ AI ANALYSIS ============
 let aiResultData = null  // { tags: [], comment: '', pickedTags: Set }
