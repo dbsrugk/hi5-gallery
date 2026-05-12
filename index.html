@@ -295,6 +295,7 @@ body.select-mode .card .select-check{display:flex}
 .loading{text-align:center;padding:40px;color:var(--mute);font-size:12px;letter-spacing:1px;text-transform:uppercase}
 .gallery-page{display:block}
 .gallery-page.hidden{display:none}
+.gallery-page.hidden *{display:none !important}
 </style>
 </head>
 <body>
@@ -1964,46 +1965,35 @@ function handleShareTarget() {
 }
 
 // ============ NAVIGATION ============
-// DOM에서 직접 제거/삽입하는 핵 옵션 (CSS는 신뢰 못 함)
-let galleryParked = null  // DOM에서 빼놓은 갤러리 페이지
-let uploadParked = null   // DOM에서 빼놓은 업로드 페이지
-let pageHost = null       // 페이지가 들어가는 부모 (body)
+// 페이지 전환: 클래스 + 인라인 스타일 강제 (CSS 충돌 무시)
+let galleryParked = null
+let uploadParked = null
+let pageHost = null
 
 function parkPages() {
   pageHost = document.body
-  // 시작 시점에 두 페이지를 찾아 변수에 저장
   if (!galleryParked) galleryParked = document.getElementById('galleryPage')
   if (!uploadParked) uploadParked = document.getElementById('uploadPage')
 }
 
 function showOnlyGallery() {
   parkPages()
-  // 업로드 페이지를 DOM에서 제거
-  if (uploadParked && uploadParked.parentNode) {
-    uploadParked.parentNode.removeChild(uploadParked)
-  }
-  // 갤러리는 DOM에 있어야 함
-  if (galleryParked && !galleryParked.parentNode) {
-    pageHost.appendChild(galleryParked)
-  }
-  // 클래스/스타일 정리
   if (galleryParked) {
     galleryParked.classList.remove('hidden')
     galleryParked.style.display = 'block'
+  }
+  if (uploadParked) {
+    uploadParked.classList.remove('show')
+    uploadParked.style.display = 'none'
   }
 }
 
 function showOnlyUpload() {
   parkPages()
-  // 갤러리 페이지를 DOM에서 제거
-  if (galleryParked && galleryParked.parentNode) {
-    galleryParked.parentNode.removeChild(galleryParked)
+  if (galleryParked) {
+    galleryParked.classList.add('hidden')
+    galleryParked.style.display = 'none'
   }
-  // 업로드는 DOM에 있어야 함
-  if (uploadParked && !uploadParked.parentNode) {
-    pageHost.appendChild(uploadParked)
-  }
-  // 클래스/스타일 정리
   if (uploadParked) {
     uploadParked.classList.add('show')
     uploadParked.style.display = 'block'
@@ -2012,7 +2002,6 @@ function showOnlyUpload() {
 
 function hideAllPages() {
   // 호환성 유지 (기존 코드가 호출함)
-  // 실제 페이지 표시는 showOnly* 함수가 담당
 }
 
 function clearBnavActive() {
