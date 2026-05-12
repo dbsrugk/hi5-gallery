@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v5-NUKE-pwa">
+<meta name="hi5-version" content="2026-05-12-v5-NUKE-diag-borders">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -201,6 +201,12 @@ body.select-mode .card .select-check{display:flex}
 
 .upload-page{padding:20px;display:none !important}
 .upload-page.show{display:block !important}
+
+/* === v5-NUKE 진단용: 어느 부모에 속한 카드인지 시각화 === */
+#gridContainer { outline: 4px solid red !important; }
+#gridContainer .card { outline: 3px solid blue !important; }
+#uploadPage { outline: 4px solid lime !important; }
+#uploadPage .card { outline: 3px solid orange !important; }
 
 .upload-page h2{font-family:'Bodoni Moda',serif;font-size:28px;margin-bottom:4px;font-weight:400}
 .upload-page h2 em{color:var(--red);font-style:italic;font-weight:700}
@@ -2034,7 +2040,7 @@ function _updateDebugBar(label) {
   const gridC = document.getElementById('gridContainer')
   const gridH = gridC ? Math.round(gridC.getBoundingClientRect().height) : '?'
   const gridD = gridC ? getComputedStyle(gridC).display : '?'
-  bar.textContent = `v5-NUKE [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px`
+  bar.textContent = `v5-diag [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px`
 }
 
 function showOnlyGallery() {
