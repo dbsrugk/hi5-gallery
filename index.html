@@ -207,6 +207,11 @@ body.select-mode .card .select-check{display:flex}
 .collections-page.show{display:block}
 .collection-detail-page{padding-bottom:90px;display:none;background:var(--bg);position:relative;z-index:5;min-height:100vh}
 .collection-detail-page.show{display:block}
+/* 안전장치: show 클래스 없으면 무조건 숨김 강제 */
+.collections-page:not(.show),
+.collection-detail-page:not(.show),
+.upload-page:not(.show){display:none !important;visibility:hidden !important}
+.gallery-page.hidden{display:none !important;visibility:hidden !important}
 .col-card{display:flex;gap:14px;padding:16px;border-bottom:1px solid var(--line);cursor:pointer;align-items:center;transition:background .15s}
 .col-card:active{background:#fafafa}
 .col-card .col-cover{width:84px;height:84px;flex-shrink:0;border-radius:6px;overflow:hidden;background:var(--line);position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px}
@@ -2093,14 +2098,26 @@ function hideAllPages() {
   const upl = document.getElementById('uploadPage')
   const col = document.getElementById('collectionsPage')
   const cd  = document.getElementById('collectionDetailPage')
-  gal.classList.add('hidden')
-  gal.style.display = 'none'
-  upl.classList.remove('show')
-  upl.style.display = 'none'
-  col.classList.remove('show')
-  col.style.display = 'none'
-  cd.classList.remove('show')
-  cd.style.display = 'none'
+  if (gal) {
+    gal.classList.add('hidden')
+    gal.style.display = 'none'
+    gal.style.visibility = 'hidden'
+  }
+  if (upl) {
+    upl.classList.remove('show')
+    upl.style.display = 'none'
+    upl.style.visibility = 'hidden'
+  }
+  if (col) {
+    col.classList.remove('show')
+    col.style.display = 'none'
+    col.style.visibility = 'hidden'
+  }
+  if (cd) {
+    cd.classList.remove('show')
+    cd.style.display = 'none'
+    cd.style.visibility = 'hidden'
+  }
 }
 
 function clearBnavActive() {
@@ -2112,6 +2129,7 @@ window.showGallery = () => {
   const gal = document.getElementById('galleryPage')
   gal.classList.remove('hidden')
   gal.style.display = 'block'
+  gal.style.visibility = 'visible'
   clearBnavActive()
   document.getElementById('navGallery').classList.add('active')
   resetUploadForm()
@@ -2130,6 +2148,7 @@ function showUploadPage() {
   const upl = document.getElementById('uploadPage')
   upl.classList.add('show')
   upl.style.display = 'block'
+  upl.style.visibility = 'visible'
   clearBnavActive()
   document.getElementById('navUpload').classList.add('active')
   window.scrollTo(0,0)
@@ -2903,35 +2922,28 @@ window.closeRotateModal = closeRotateModal
 
 // ============ COLLECTIONS ============
 window.showCollections = () => {
-  // 디버그: 호출됐는지 확인
-  console.log('[DEBUG] showCollections called')
   showDebug('showCollections 호출됨')
-  
   hideAllPages()
   const col = document.getElementById('collectionsPage')
-  if (!col) {
-    showDebug('ERROR: collectionsPage 요소 없음!')
-    return
-  }
+  if (!col) return
   col.classList.add('show')
   col.style.display = 'block'
-  col.style.zIndex = '100'
-  
-  // 강제로 갤러리 숨김
-  const gal = document.getElementById('galleryPage')
-  gal.style.display = 'none'
-  gal.style.visibility = 'hidden'
-  
+  col.style.visibility = 'visible'
+  if (selectMode) cancelSelectMode()
   clearBnavActive()
   document.getElementById('navCollections').classList.add('active')
   renderCollectionsList()
   window.scrollTo(0,0)
-  
-  // 디버그: 실제 적용된 스타일 확인
+  // 디버그: 모든 페이지 상태
   setTimeout(() => {
-    const galStyle = window.getComputedStyle(gal).display
-    const colStyle = window.getComputedStyle(col).display
-    showDebug(`gal:${galStyle} col:${colStyle}`)
+    const pages = ['galleryPage','uploadPage','collectionsPage','collectionDetailPage']
+    const status = pages.map(id => {
+      const el = document.getElementById(id)
+      if (!el) return `${id.slice(0,3)}:없음`
+      const s = window.getComputedStyle(el)
+      return `${id.slice(0,3).toUpperCase()}:${s.display==='none'?'X':'O'}`
+    }).join(' ')
+    showDebug(status)
   }, 100)
 }
 
@@ -2940,15 +2952,14 @@ function showDebug(msg) {
   if (!d) {
     d = document.createElement('div')
     d.id = 'debugPanel'
-    d.style.cssText = 'position:fixed;top:60px;left:10px;right:10px;background:rgba(0,0,0,.9);color:#0f0;padding:10px;font-size:11px;font-family:monospace;border-radius:4px;z-index:9999;max-height:120px;overflow-y:auto'
+    d.style.cssText = 'position:fixed;top:60px;left:10px;right:10px;background:rgba(0,0,0,.9);color:#0f0;padding:10px;font-size:11px;font-family:monospace;border-radius:4px;z-index:9999;max-height:160px;overflow-y:auto;pointer-events:none'
     document.body.appendChild(d)
   }
   const time = new Date().toTimeString().slice(0,8)
   d.innerHTML = `<div>${time} - ${msg}</div>` + d.innerHTML
-  // 5초 후 가장 오래된 로그 제거 (너무 길어지지 않게)
   setTimeout(() => {
     const lines = d.querySelectorAll('div')
-    if (lines.length > 8) lines[lines.length - 1].remove()
+    if (lines.length > 10) lines[lines.length - 1].remove()
   }, 5000)
 }
 
@@ -3011,6 +3022,7 @@ window.showCollectionDetail = (id) => {
   const cd = document.getElementById('collectionDetailPage')
   cd.classList.add('show')
   cd.style.display = 'block'
+  cd.style.visibility = 'visible'
   clearBnavActive()
   document.getElementById('navCollections').classList.add('active')
   
