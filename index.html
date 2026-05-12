@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="hi5-version" content="2026-05-12-v5-NUKE-diag-borders">
+<meta name="hi5-version" content="2026-05-12-v5-live-monitor">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Hi5 Gallery">
@@ -2040,8 +2040,20 @@ function _updateDebugBar(label) {
   const gridC = document.getElementById('gridContainer')
   const gridH = gridC ? Math.round(gridC.getBoundingClientRect().height) : '?'
   const gridD = gridC ? getComputedStyle(gridC).display : '?'
-  bar.textContent = `v5-diag [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px`
+  const cardCount = document.querySelectorAll('#gridContainer .card').length
+  bar.textContent = `v5-live [${label}] G:${gDisp}/${gH}px U:${uDisp}/${uH}px grid:${gridD}/${gridH}px cards:${cardCount}`
 }
+
+// 디버그 바 1초마다 자동 갱신
+setInterval(() => {
+  const cur = document.getElementById('debugBar')
+  if (!cur) return
+  const text = cur.textContent || ''
+  let label = 'LIVE'
+  if (text.includes('[GALLERY]')) label = 'GALLERY'
+  else if (text.includes('[UPLOAD]')) label = 'UPLOAD'
+  _updateDebugBar(label)
+}, 1000)
 
 function showOnlyGallery() {
   const gallery = document.getElementById('galleryPage')
